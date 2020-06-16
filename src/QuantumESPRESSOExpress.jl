@@ -1,5 +1,5 @@
 module QuantumESPRESSOExpress
 
-# Write your package code here.
+include("EosFitting.jl")
 
 end
