@@ -1,4 +1,4 @@
-module QuantumESPRESSO
+module Phonon
 
 using AbInitioSoftwareBase.Inputs: inputstring, writeinput, set_verbosity
 using Dates: format, now
@@ -11,7 +11,7 @@ using Setfield: @set!, @set
 using Unitful: @u_str
 using UnitfulAtomic
 
-import ..Phonon:
+import Express.Phonon:
     DfptMethod,
     SelfConsistentField,
     ForceConstant,

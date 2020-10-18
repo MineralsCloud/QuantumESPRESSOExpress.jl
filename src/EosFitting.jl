@@ -1,4 +1,4 @@
-module QuantumESPRESSO
+module EosFitting
 
 using AbInitioSoftwareBase.Inputs: set_verbosity
 using Crystallography: Cell, eachatom, cellvolume
@@ -16,7 +16,7 @@ using Setfield: @set!
 using Unitful
 using UnitfulAtomic
 
-import ..EosFitting:
+import Express.EosFitting:
     SelfConsistentField,
     VariableCellOptimization,
     preset_template,
