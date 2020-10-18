@@ -1,9 +1,11 @@
 module QuantumESPRESSO
 
-using AbInitioSoftwareBase.Inputs: setverbosity
+using AbInitioSoftwareBase.Inputs: set_verbosity
 using Crystallography: Cell, eachatom, cellvolume
+using Dates: format, now
 using Distributed: LocalManager
-using EquationsOfState.Collections
+using EquationsOfStateOfSolids.Collections
+using OptionalArgChecks: @argcheck
 using QuantumESPRESSO.Inputs: inputstring, optionof
 using QuantumESPRESSO.Inputs.PWscf:
     CellParametersCard, AtomicPositionsCard, PWInput, optconvert
@@ -14,19 +16,23 @@ using Setfield: @set!
 using Unitful
 using UnitfulAtomic
 
-using ...Express: SelfConsistentField, VariableCellOptimization
 import ..EosFitting:
-    preset_template, _check_software_settings, _expand_settings, _readoutput
+    SelfConsistentField,
+    VariableCellOptimization,
+    preset_template,
+    _check_software_settings,
+    _expand_settings,
+    _readoutput
 
 export safe_exit
 
 function _check_software_settings(settings)
     map(("manager", "bin", "n")) do key
-        @assert haskey(settings, key) "key `$key` not found!"
+        @argcheck haskey(settings, key)
     end
-    @assert isinteger(settings["n"]) && settings["n"] >= 1
+    @argcheck isinteger(settings["n"]) && settings["n"] >= 1
     if settings["manager"] == "docker"
-        @assert haskey(settings, "container")
+        @argcheck haskey(settings, "container")
     elseif settings["manager"] == "ssh"
     elseif settings["manager"] == "local"  # Do nothing
     else
@@ -75,9 +81,13 @@ function _expand_settings(settings)
 end # function _expand_settings
 
 function preset_template(calc, template)
-    template = setverbosity(template, "high")
+    template = set_verbosity(template, "high")
     @set! template.control.calculation = calc isa SelfConsistentField ? "scf" : "vc-relax"
-    @set! template.control.outdir = mktempdir()
+    @set! template.control.outdir = abspath(mktempdir(
+        mkpath(template.control.outdir);
+        prefix = template.control.prefix * '_' * format(now(), "Y-m-d_H:M:S_"),
+        cleanup = false,
+    ))
     return template
 end
 
@@ -109,4 +119,4 @@ end
 
 safe_exit(template::PWInput, dir) = touch(joinpath(dir, template.control.prefix * ".EXIT"))
 
-end # module QuantumESPRESSO
+end
