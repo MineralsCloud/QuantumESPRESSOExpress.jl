@@ -21,6 +21,7 @@ import Express.EosFitting:
     SelfConsistentField,
     VariableCellOptimization,
     standardize,
+    customize,
     _check_software_settings,
     _expand_settings,
     _readoutput
@@ -84,18 +85,18 @@ end # function _expand_settings
 _shortname(::SelfConsistentField) = "scf"
 _shortname(::VariableCellOptimization) = "vc-relax"
 
-function standardize(template, calc)
+function standardize(template::PWInput, calc)::PWInput
     @set! template.control.calculation = _shortname(calc)
     return set_verbosity(template, "high")
 end
 
-function customize(template, pressure, eos)
+function customize(template::PWInput, pressure, eos_or_volume)::PWInput
     @set! template.control.outdir = abspath(mktempdir(
         mkpath(template.control.outdir);
         prefix = template.control.prefix * format(now(), "_Y-m-d_H:M:S_"),
         cleanup = false,
     ))
-    return set_press_vol(template, pressure, eos)
+    return set_press_vol(template, pressure, eos_or_volume)
 end
 
 function _readoutput(::SelfConsistentField, s::AbstractString)
