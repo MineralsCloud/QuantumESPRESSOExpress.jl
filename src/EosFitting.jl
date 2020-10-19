@@ -5,6 +5,7 @@ using Crystallography: Cell, eachatom, cellvolume
 using Dates: format, now
 using Distributed: LocalManager
 using EquationsOfStateOfSolids.Collections
+using Express.EosFitting: set_press_vol
 using OptionalArgChecks: @argcheck
 using QuantumESPRESSO.Inputs: inputstring, optionof
 using QuantumESPRESSO.Inputs.PWscf:
@@ -19,7 +20,7 @@ using UnitfulAtomic
 import Express.EosFitting:
     SelfConsistentField,
     VariableCellOptimization,
-    preset_template,
+    standardize,
     _check_software_settings,
     _expand_settings,
     _readoutput
@@ -80,15 +81,21 @@ function _expand_settings(settings)
     )
 end # function _expand_settings
 
-function preset_template(calc, template)
-    template = set_verbosity(template, "high")
-    @set! template.control.calculation = calc isa SelfConsistentField ? "scf" : "vc-relax"
+_shortname(::SelfConsistentField) = "scf"
+_shortname(::VariableCellOptimization) = "vc-relax"
+
+function standardize(template, calc)
+    @set! template.control.calculation = _shortname(calc)
+    return set_verbosity(template, "high")
+end
+
+function customize(template, pressure, eos)
     @set! template.control.outdir = abspath(mktempdir(
         mkpath(template.control.outdir);
-        prefix = template.control.prefix * '_' * format(now(), "Y-m-d_H:M:S_"),
+        prefix = template.control.prefix * format(now(), "_Y-m-d_H:M:S_"),
         cleanup = false,
     ))
-    return template
+    return set_press_vol(template, pressure, eos)
 end
 
 function _readoutput(::SelfConsistentField, s::AbstractString)
