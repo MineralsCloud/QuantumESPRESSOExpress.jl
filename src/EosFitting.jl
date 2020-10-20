@@ -21,13 +21,13 @@ import Express.EosFitting:
     VariableCellOptimization,
     standardize,
     customize,
-    _check_software_settings,
-    _expand_settings,
+    check_software_settings,
+    expand_settings,
     parseoutput
 
 export safe_exit
 
-function _check_software_settings(settings)
+function check_software_settings(settings)
     map(("manager", "bin", "n")) do key
         @argcheck haskey(settings, key)
     end
@@ -49,7 +49,7 @@ const EosMap = (
     v = Vinet,
 )
 
-function _expand_settings(settings)
+function expand_settings(settings)
     template = parse(PWInput, read(expanduser(settings["template"]), String))
     qe = settings["qe"]
     if qe["manager"] == "local"
