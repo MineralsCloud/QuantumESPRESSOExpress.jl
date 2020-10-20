@@ -24,7 +24,7 @@ import Express.EosFitting:
     customize,
     _check_software_settings,
     _expand_settings,
-    _readoutput
+    parseoutput
 
 export safe_exit
 
@@ -99,12 +99,11 @@ function customize(template::PWInput, pressure, eos_or_volume)::PWInput
     return set_press_vol(template, pressure, eos_or_volume)
 end
 
-function _readoutput(::SelfConsistentField, s::AbstractString)
-    preamble = tryparse(Preamble, s)
+function parseoutput(str::AbstractString, ::SelfConsistentField)
+    preamble = tryparse(Preamble, str)
     e = try
-        parse_electrons_energies(s, :converged)
+        parse_electrons_energies(str, :converged)
     catch
-        nothing
     end
     if preamble !== nothing && e !== nothing
         return preamble.omega * u"bohr^3" => e.ε[end] * u"Ry"  # volume, energy
@@ -112,14 +111,14 @@ function _readoutput(::SelfConsistentField, s::AbstractString)
         return
     end
 end
-function _readoutput(::VariableCellOptimization, s::AbstractString)
-    if !isjobdone(s)
+function parseoutput(str::AbstractString, ::VariableCellOptimization)
+    if !isjobdone(str)
         @warn "Job is not finished!"
     end
-    x = tryparsefinal(CellParametersCard, s)
+    x = tryparsefinal(CellParametersCard, str)
     if x !== nothing
-        return cellvolume(parsefinal(CellParametersCard, s)) * u"bohr^3" =>
-            parse_electrons_energies(s, :converged).ε[end] * u"Ry"  # volume, energy
+        return cellvolume(parsefinal(CellParametersCard, str)) * u"bohr^3" =>
+            parse_electrons_energies(str, :converged).ε[end] * u"Ry"  # volume, energy
     else
         return
     end
