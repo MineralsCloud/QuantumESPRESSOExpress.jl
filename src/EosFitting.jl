@@ -40,7 +40,7 @@ function _check_software_settings(settings)
     else
         error("unknown manager `$(settings["manager"])`!")
     end
-end # function _check_software_settings
+end
 
 const EosMap = (
     m = Murnaghan,
@@ -80,7 +80,7 @@ function _expand_settings(settings)
         bin = PWCmd(; bin = bin),
         manager = manager,
     )
-end # function _expand_settings
+end
 
 _shortname(::SelfConsistentField) = "scf"
 _shortname(::VariableCellOptimization) = "vc-relax"
@@ -111,7 +111,7 @@ function _readoutput(::SelfConsistentField, s::AbstractString)
     else
         return
     end
-end # function _readoutput
+end
 function _readoutput(::VariableCellOptimization, s::AbstractString)
     if !isjobdone(s)
         @warn "Job is not finished!"
