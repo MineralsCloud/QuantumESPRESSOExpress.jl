@@ -1,11 +1,10 @@
 module EosFitting
 
-using AbInitioSoftwareBase.Inputs: set_verbosity
+using AbInitioSoftwareBase.Inputs: set_verbosity, set_press_vol
 using Crystallography: Cell, eachatom, cellvolume
 using Dates: format, now
 using Distributed: LocalManager
 using EquationsOfStateOfSolids.Collections
-using Express.EosFitting: set_press_vol
 using OptionalArgChecks: @argcheck
 using QuantumESPRESSO.Inputs: inputstring, optionof
 using QuantumESPRESSO.Inputs.PWscf:
