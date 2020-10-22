@@ -133,7 +133,7 @@ end
 function customize(template::PWInput, pressure, eos_or_volume)::PWInput
     @set! template.control.outdir = abspath(mktempdir(
         mkpath(template.control.outdir);
-        prefix = template.control.prefix * format(now(), "_Y-m-d_H:M:S_"),
+        prefix = "temp_" * template.control.prefix * format(now(), "_Y-m-d_H:M:S_"),
         cleanup = false,
     ))
     return set_press_vol(template, pressure, eos_or_volume)
