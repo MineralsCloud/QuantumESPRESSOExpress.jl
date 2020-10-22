@@ -13,7 +13,8 @@ using QuantumESPRESSO.Outputs.PWscf:
     Preamble, parse_electrons_energies, parsefinal, isjobdone, tryparsefinal
 using QuantumESPRESSO.CLI: PWCmd
 using Setfield: @set!
-using Unitful
+import Unitful
+using Unitful: uparse, @u_str
 using UnitfulAtomic
 
 import Express.EosFitting:
@@ -22,10 +23,20 @@ import Express.EosFitting:
     standardize,
     customize,
     check_software_settings,
-    expand_settings,
+    expand,
+    makeinput,
     parseoutput
 
-export safe_exit
+export SelfConsistentField,
+    VariableCellOptimization,
+    standardize,
+    customize,
+    check_software_settings,
+    expand,
+    makeinput,
+    parseoutput
+
+const UNIT_CONTEXT = [Unitful, UnitfulAtomic]
 
 function check_software_settings(settings)
     map(("manager", "bin", "n")) do key
@@ -41,16 +52,44 @@ function check_software_settings(settings)
     end
 end
 
-const EosMap = (
-    m = Murnaghan,
-    bm2 = BirchMurnaghan2nd,
-    bm3 = BirchMurnaghan3rd,
-    bm4 = BirchMurnaghan4th,
-    v = Vinet,
-)
+function expandeos(settings)
+    type = string(lowercase(settings["type"]))
+    T = if type in ("m", "murnaghan")
+        Murnaghan
+    elseif type in ("bm2", "birchmurnaghan2nd", "birch-murnaghan-2")
+        BirchMurnaghan2nd
+    elseif type in ("bm3", "birchmurnaghan3rd", "birch-murnaghan-3")
+        BirchMurnaghan3rd
+    elseif type in ("bm4", "birchmurnaghan4th", "birch-murnaghan-4")
+        BirchMurnaghan4th
+    elseif type in ("v", "vinet")
+        Vinet
+    end
+    p = map(settings["parameters"]) do x
+        @assert length(x) == 2
+        first(x) * uparse(last(x); unit_context = UNIT_CONTEXT)
+    end
+    return T(p...)
+end
 
-function expand_settings(settings)
-    template = parse(PWInput, read(expanduser(settings["template"]), String))
+function expand(settings)
+    pressures = map(settings["pressures"]["values"]) do pressure
+        pressure * uparse(settings["pressures"]["unit"]; unit_context = UNIT_CONTEXT)
+    end
+
+    function expandtmpl(settings)
+        templates = map(settings) do file
+            str = read(expanduser(file), String)
+            parse(PWInput, str)
+        end
+        if length(templates) == 1
+            return fill(first(templates), length(pressures))
+        else
+            return templates
+        end
+    end
+    templates = expandtmpl(settings["templates"])
+
     qe = settings["qe"]
     if qe["manager"] == "local"
         bin = qe["bin"]
@@ -61,21 +100,23 @@ function expand_settings(settings)
         # manager = DockerEnvironment(n, qe["container"], bin)
     else
     end
-    return (
-        template = template,
-        pressures = settings["pressures"] .* u"GPa",
-        trial_eos = EosMap[Symbol(settings["trial_eos"]["type"])](settings["trial_eos"]["parameters"] .*
-                                                                  uparse.(
-            settings["trial_eos"]["units"];
-            unit_context = [Unitful, UnitfulAtomic],
-        )...),
-        dirs = map(settings["pressures"]) do pressure
+
+    function expanddirs(settings)
+        return map(pressures, templates) do pressure, template
             abspath(joinpath(
-                expanduser(settings["dir"]),
-                template.control.prefix,
-                "p" * string(pressure),
+                expanduser(settings["workdir"]),
+                template.control.prefix * format(now(), "_Y-m-d_H:M_"),
+                "p=" * string(pressure),
             ))
-        end,
+        end
+    end
+    dirs = expanddirs(settings)
+
+    return (
+        templates = templates,
+        pressures = pressures,
+        trial_eos = expandeos(settings["trial_eos"]),
+        dirs = dirs,
         bin = PWCmd(; bin = bin),
         manager = manager,
     )
