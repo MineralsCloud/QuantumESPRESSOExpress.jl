@@ -1,7 +1,7 @@
 module EosFitting
 
 using AbInitioSoftwareBase.Inputs: set_verbosity, set_press_vol
-using Crystallography: Cell, eachatom, cellvolume
+using Crystallography: cellvolume
 using Dates: format, now
 using Distributed: LocalManager
 using QuantumESPRESSO.Inputs: inputstring, optionof
@@ -11,12 +11,13 @@ using QuantumESPRESSO.Outputs.PWscf:
     Preamble, parse_electrons_energies, parsefinal, isjobdone, tryparsefinal
 using QuantumESPRESSO.CLI: PWCmd
 using Setfield: @set!
+using Unitful: uparse, ustrip, @u_str
 import Unitful
-using Unitful: uparse, @u_str
 using UnitfulAtomic
 
 import Express.EosFitting:
     SelfConsistentField,
+    StructureOptimization,
     VariableCellOptimization,
     standardize,
     customize,
@@ -51,7 +52,6 @@ function check_software_settings(settings)
     end
 end
 
-
 function expand_settings(settings)
     pressures = map(settings["pressures"]["values"]) do pressure
         pressure * uparse(settings["pressures"]["unit"]; unit_context = UNIT_CONTEXT)
@@ -62,8 +62,11 @@ function expand_settings(settings)
             str = read(expanduser(file), String)
             parse(PWInput, str)
         end
-        if length(templates) == 1
+        N = length(templates)
+        if N == 1
             return fill(first(templates), length(pressures))
+        elseif N != length(pressures)
+            throw(DimensionMismatch("`\"templates\"` should be the same length as `\"pressures\"`!"))
         else
             return templates
         end
@@ -85,8 +88,8 @@ function expand_settings(settings)
         return map(pressures, templates) do pressure, template
             abspath(joinpath(
                 expanduser(settings["workdir"]),
-                template.control.prefix * format(now(), "_Y-m-d_H:M_"),
-                "p=" * string(pressure),
+                template.control.prefix * format(now(), "_Y-m-d_H:M"),
+                "p=" * string(ustrip(pressure)),
             ))
         end
     end
@@ -102,11 +105,16 @@ function expand_settings(settings)
     )
 end
 
-_shortname(::SelfConsistentField) = "scf"
-_shortname(::VariableCellOptimization) = "vc-relax"
-
 function standardize(template::PWInput, calc)::PWInput
-    @set! template.control.calculation = _shortname(calc)
+    @set! template.control.calculation = if calc isa SelfConsistentField  # Functions can be extended, not safe
+        "scf"
+    elseif calc isa StructureOptimization
+        "relax"
+    elseif calc isa VariableCellOptimization
+        "vc-relax"
+    else
+        error("this should never happen!")
+    end
     return set_verbosity(template, "high")
 end
 
