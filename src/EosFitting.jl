@@ -21,7 +21,7 @@ import Express.EosFitting:
     standardize,
     customize,
     check_software_settings,
-    expand,
+    expand_settings,
     expandeos,
     makeinput,
     parseoutput
@@ -31,7 +31,7 @@ export SelfConsistentField,
     standardize,
     customize,
     check_software_settings,
-    expand,
+    expand_settings,
     makeinput,
     parseoutput
 
@@ -52,7 +52,7 @@ function check_software_settings(settings)
 end
 
 
-function expand(settings)
+function expand_settings(settings)
     pressures = map(settings["pressures"]["values"]) do pressure
         pressure * uparse(settings["pressures"]["unit"]; unit_context = UNIT_CONTEXT)
     end
