@@ -4,7 +4,6 @@ using AbInitioSoftwareBase.Inputs: set_verbosity, set_press_vol
 using Crystallography: Cell, eachatom, cellvolume
 using Dates: format, now
 using Distributed: LocalManager
-using EquationsOfStateOfSolids.Collections
 using QuantumESPRESSO.Inputs: inputstring, optionof
 using QuantumESPRESSO.Inputs.PWscf:
     CellParametersCard, AtomicPositionsCard, PWInput, optconvert
@@ -23,6 +22,7 @@ import Express.EosFitting:
     customize,
     check_software_settings,
     expand,
+    expandeos,
     makeinput,
     parseoutput
 
@@ -51,25 +51,6 @@ function check_software_settings(settings)
     end
 end
 
-function expandeos(settings)
-    type = string(lowercase(settings["type"]))
-    T = if type in ("m", "murnaghan")
-        Murnaghan
-    elseif type in ("bm2", "birchmurnaghan2nd", "birch-murnaghan-2")
-        BirchMurnaghan2nd
-    elseif type in ("bm3", "birchmurnaghan3rd", "birch-murnaghan-3")
-        BirchMurnaghan3rd
-    elseif type in ("bm4", "birchmurnaghan4th", "birch-murnaghan-4")
-        BirchMurnaghan4th
-    elseif type in ("v", "vinet")
-        Vinet
-    end
-    p = map(settings["parameters"]) do x
-        @assert length(x) == 2
-        first(x) * uparse(last(x); unit_context = UNIT_CONTEXT)
-    end
-    return T(p...)
-end
 
 function expand(settings)
     pressures = map(settings["pressures"]["values"]) do pressure
