@@ -5,7 +5,6 @@ using Crystallography: Cell, eachatom, cellvolume
 using Dates: format, now
 using Distributed: LocalManager
 using EquationsOfStateOfSolids.Collections
-using OptionalArgChecks: @argcheck
 using QuantumESPRESSO.Inputs: inputstring, optionof
 using QuantumESPRESSO.Inputs.PWscf:
     CellParametersCard, AtomicPositionsCard, PWInput, optconvert
@@ -40,11 +39,11 @@ const UNIT_CONTEXT = [Unitful, UnitfulAtomic]
 
 function check_software_settings(settings)
     map(("manager", "bin", "n")) do key
-        @argcheck haskey(settings, key)
+        @assert haskey(settings, key)
     end
-    @argcheck isinteger(settings["n"]) && settings["n"] >= 1
+    @assert isinteger(settings["n"]) && settings["n"] >= 1
     if settings["manager"] == "docker"
-        @argcheck haskey(settings, "container")
+        @assert haskey(settings, "container")
     elseif settings["manager"] == "ssh"
     elseif settings["manager"] == "local"  # Do nothing
     else
