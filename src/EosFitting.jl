@@ -25,6 +25,7 @@ import Express.EosFitting:
     expand_settings,
     expandeos,
     makeinput,
+    shortname,
     parseoutput
 
 export SelfConsistentField,
