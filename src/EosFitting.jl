@@ -1,11 +1,9 @@
 module EosFitting
 
 using AbInitioSoftwareBase.Inputs: set_verbosity, set_press_vol
-using Crystallography: Cell, eachatom, cellvolume
+using Crystallography: cellvolume
 using Dates: format, now
 using Distributed: LocalManager
-using EquationsOfStateOfSolids.Collections
-using OptionalArgChecks: @argcheck
 using QuantumESPRESSO.Inputs: inputstring, optionof
 using QuantumESPRESSO.Inputs.PWscf:
     CellParametersCard, AtomicPositionsCard, PWInput, optconvert
@@ -13,27 +11,41 @@ using QuantumESPRESSO.Outputs.PWscf:
     Preamble, parse_electrons_energies, parsefinal, isjobdone, tryparsefinal
 using QuantumESPRESSO.CLI: PWCmd
 using Setfield: @set!
-using Unitful
+using Unitful: uparse, ustrip, @u_str
+import Unitful
 using UnitfulAtomic
 
 import Express.EosFitting:
     SelfConsistentField,
+    StructureOptimization,
     VariableCellOptimization,
     standardize,
     customize,
     check_software_settings,
     expand_settings,
+    expandeos,
+    makeinput,
+    shortname,
     parseoutput
 
-export safe_exit
+export SelfConsistentField,
+    VariableCellOptimization,
+    standardize,
+    customize,
+    check_software_settings,
+    expand_settings,
+    makeinput,
+    parseoutput
+
+const UNIT_CONTEXT = [Unitful, UnitfulAtomic]
 
 function check_software_settings(settings)
     map(("manager", "bin", "n")) do key
-        @argcheck haskey(settings, key)
+        @assert haskey(settings, key)
     end
-    @argcheck isinteger(settings["n"]) && settings["n"] >= 1
+    @assert isinteger(settings["n"]) && settings["n"] >= 1
     if settings["manager"] == "docker"
-        @argcheck haskey(settings, "container")
+        @assert haskey(settings, "container")
     elseif settings["manager"] == "ssh"
     elseif settings["manager"] == "local"  # Do nothing
     else
@@ -41,16 +53,27 @@ function check_software_settings(settings)
     end
 end
 
-const EosMap = (
-    m = Murnaghan,
-    bm2 = BirchMurnaghan2nd,
-    bm3 = BirchMurnaghan3rd,
-    bm4 = BirchMurnaghan4th,
-    v = Vinet,
-)
-
 function expand_settings(settings)
-    template = parse(PWInput, read(expanduser(settings["template"]), String))
+    pressures = map(settings["pressures"]["values"]) do pressure
+        pressure * uparse(settings["pressures"]["unit"]; unit_context = UNIT_CONTEXT)
+    end
+
+    function expandtmpl(settings)
+        templates = map(settings) do file
+            str = read(expanduser(file), String)
+            parse(PWInput, str)
+        end
+        N = length(templates)
+        if N == 1
+            return fill(first(templates), length(pressures))
+        elseif N != length(pressures)
+            throw(DimensionMismatch("`\"templates\"` should be the same length as `\"pressures\"`!"))
+        else
+            return templates
+        end
+    end
+    templates = expandtmpl(settings["templates"])
+
     qe = settings["qe"]
     if qe["manager"] == "local"
         bin = qe["bin"]
@@ -61,31 +84,42 @@ function expand_settings(settings)
         # manager = DockerEnvironment(n, qe["container"], bin)
     else
     end
-    return (
-        template = template,
-        pressures = settings["pressures"] .* u"GPa",
-        trial_eos = EosMap[Symbol(settings["trial_eos"]["type"])](settings["trial_eos"]["parameters"] .*
-                                                                  uparse.(
-            settings["trial_eos"]["units"];
-            unit_context = [Unitful, UnitfulAtomic],
-        )...),
-        dirs = map(settings["pressures"]) do pressure
+
+    function expanddirs(settings)
+        return map(pressures, templates) do pressure, template
             abspath(joinpath(
-                expanduser(settings["dir"]),
-                template.control.prefix,
-                "p" * string(pressure),
+                expanduser(settings["workdir"]),
+                template.control.prefix * format(now(), "_Y-m-d_H:M"),
+                "p=" * string(ustrip(pressure)),
             ))
-        end,
+        end
+    end
+    dirs = expanddirs(settings)
+
+    return (
+        templates = templates,
+        pressures = pressures,
+        trial_eos = expandeos(settings["trial_eos"]),
+        dirs = dirs,
         bin = PWCmd(; bin = bin),
         manager = manager,
     )
 end
 
-_shortname(::SelfConsistentField) = "scf"
-_shortname(::VariableCellOptimization) = "vc-relax"
+shortname(::SelfConsistentField) = "scf"
+shortname(::StructureOptimization) = "relax"
+shortname(::VariableCellOptimization) = "vc-relax"
 
 function standardize(template::PWInput, calc)::PWInput
-    @set! template.control.calculation = _shortname(calc)
+    @set! template.control.calculation = if calc isa SelfConsistentField  # Functions can be extended, not safe
+        "scf"
+    elseif calc isa StructureOptimization
+        "relax"
+    elseif calc isa VariableCellOptimization
+        "vc-relax"
+    else
+        error("this should never happen!")
+    end
     return set_verbosity(template, "high")
 end
 
