@@ -89,7 +89,6 @@ function expand_settings(settings)
         return map(pressures, templates) do pressure, template
             abspath(joinpath(
                 expanduser(settings["workdir"]),
-                template.control.prefix * format(now(), "_Y-m-d_H:M"),
                 "p=" * string(ustrip(pressure)),
             ))
         end
