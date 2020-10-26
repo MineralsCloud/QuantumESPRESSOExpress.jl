@@ -4,6 +4,7 @@ qe:
   manager: local
   n: 16
 workdir: examples/GaN
+save: GaN.eos
 templates:
   - examples/GaN/template.in
 pressures:
