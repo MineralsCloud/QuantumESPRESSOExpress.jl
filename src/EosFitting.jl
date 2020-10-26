@@ -4,9 +4,7 @@ using AbInitioSoftwareBase.Inputs: set_verbosity, set_press_vol
 using Crystallography: cellvolume
 using Dates: format, now
 using Distributed: LocalManager
-using QuantumESPRESSO.Inputs: inputstring, optionof
-using QuantumESPRESSO.Inputs.PWscf:
-    CellParametersCard, AtomicPositionsCard, PWInput, optconvert
+using QuantumESPRESSO.Inputs.PWscf: CellParametersCard, PWInput
 using QuantumESPRESSO.Outputs.PWscf:
     Preamble, parse_electrons_energies, parsefinal, isjobdone, tryparsefinal
 using QuantumESPRESSO.CLI: PWCmd
@@ -22,20 +20,28 @@ import Express.EosFitting:
     standardize,
     customize,
     check_software_settings,
+    load_settings,
+    makeinput,
     expand_settings,
     expandeos,
-    makeinput,
     shortname,
-    parseoutput
+    parseoutput,
+    readoutput,
+    eosfit,
+    writeinput,
+    buildjob,
+    buildworkflow
 
 export SelfConsistentField,
+    StructureOptimization,
     VariableCellOptimization,
-    standardize,
-    customize,
-    check_software_settings,
-    expand_settings,
+    load_settings,
     makeinput,
-    parseoutput
+    readoutput,
+    eosfit,
+    writeinput,
+    buildjob,
+    buildworkflow
 
 const UNIT_CONTEXT = [Unitful, UnitfulAtomic]
 
