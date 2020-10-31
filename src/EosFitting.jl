@@ -15,8 +15,14 @@ using UnitfulAtomic
 
 import Express.EosFitting:
     SelfConsistentField,
-    StructureOptimization,
+    Scf,
+    FixedIonSelfConsistentField,
+    StructuralOptimization,
+    FixedCellOptimization,
     VariableCellOptimization,
+    StOptim,
+    VcOptim,
+    ScfOrOptim,
     standardize,
     customize,
     check_software_settings,
@@ -33,8 +39,14 @@ import Express.EosFitting:
     buildworkflow
 
 export SelfConsistentField,
-    StructureOptimization,
+    Scf,
+    FixedIonSelfConsistentField,
+    StructuralOptimization,
+    FixedCellOptimization,
     VariableCellOptimization,
+    StOptim,
+    VcOptim,
+    ScfOrOptim,
     load_settings,
     makeinput,
     readoutput,
@@ -112,13 +124,13 @@ function expand_settings(settings)
 end
 
 shortname(::SelfConsistentField) = "scf"
-shortname(::StructureOptimization) = "relax"
+shortname(::StructuralOptimization) = "relax"
 shortname(::VariableCellOptimization) = "vc-relax"
 
 function standardize(template::PWInput, calc)::PWInput
     @set! template.control.calculation = if calc isa SelfConsistentField  # Functions can be extended, not safe
         "scf"
-    elseif calc isa StructureOptimization
+    elseif calc isa StructuralOptimization
         "relax"
     elseif calc isa VariableCellOptimization
         "vc-relax"
