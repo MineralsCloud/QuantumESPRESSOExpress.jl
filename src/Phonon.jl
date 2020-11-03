@@ -98,6 +98,14 @@ function expand_settings(settings)
         bin = bin,
         manager = manager,
     )
+end
+
+previnputtype(::Dfpt) = PWInput
+
+shortname(::Scf) = "scf"
+shortname(::Dfpt) = "dfpt"
+shortname(::PhononDispersion) = "disp"
+shortname(::VDos) = "vdos"
 
 parsecell(str) =
     tryparsefinal(CellParametersCard, str), tryparsefinal(AtomicPositionsCard, str)
