@@ -1,6 +1,7 @@
 module EosFitting
 
-using AbInitioSoftwareBase.Inputs: set_verbosity, set_press_vol
+using AbInitioSoftwareBase: load
+using AbInitioSoftwareBase.Inputs: set_verbosity, set_press_vol, writeinput
 using Crystallography: cellvolume
 using Dates: format, now
 using Distributed: LocalManager
@@ -13,16 +14,14 @@ using Unitful: uparse, ustrip, @u_str
 import Unitful
 using UnitfulAtomic
 
+using Express: SelfConsistentField, Scf
 import Express.EosFitting:
-    SelfConsistentField,
-    Scf,
     FixedIonSelfConsistentField,
     StructuralOptimization,
     FixedCellOptimization,
     VariableCellOptimization,
     StOptim,
     VcOptim,
-    ScfOrOptim,
     standardize,
     customize,
     check_software_settings,
@@ -32,9 +31,7 @@ import Express.EosFitting:
     expandeos,
     shortname,
     parseoutput,
-    readoutput,
     eosfit,
-    writeinput,
     buildjob,
     buildworkflow
 
@@ -46,10 +43,9 @@ export SelfConsistentField,
     VariableCellOptimization,
     StOptim,
     VcOptim,
-    ScfOrOptim,
     load_settings,
     makeinput,
-    readoutput,
+    load,
     eosfit,
     writeinput,
     buildjob,
@@ -149,28 +145,34 @@ function customize(template::PWInput, pressure, eos_or_volume)::PWInput
     return set_press_vol(template, pressure, eos_or_volume)
 end
 
-function parseoutput(str::AbstractString, ::SelfConsistentField)
-    preamble = tryparse(Preamble, str)
-    e = try
-        parse_electrons_energies(str, :converged)
-    catch
-    end
-    if preamble !== nothing && e !== nothing
-        return preamble.omega * u"bohr^3" => e.ε[end] * u"Ry"  # volume, energy
-    else
-        return
+function parseoutput(::SelfConsistentField)
+    function (file)
+        str = read(file, String)
+        preamble = tryparse(Preamble, str)
+        e = try
+            parse_electrons_energies(str, :converged)
+        catch
+        end
+        if preamble !== nothing && e !== nothing
+            return preamble.omega * u"bohr^3" => e.ε[end] * u"Ry"  # volume, energy
+        else
+            return
+        end
     end
 end
-function parseoutput(str::AbstractString, ::VariableCellOptimization)
-    if !isjobdone(str)
-        @warn "Job is not finished!"
-    end
-    x = tryparsefinal(CellParametersCard, str)
-    if x !== nothing
-        return cellvolume(parsefinal(CellParametersCard, str)) * u"bohr^3" =>
-            parse_electrons_energies(str, :converged).ε[end] * u"Ry"  # volume, energy
-    else
-        return
+function parseoutput(::VariableCellOptimization)
+    function (file)
+        str = read(file, String)
+        if !isjobdone(str)
+            @warn "Job is not finished!"
+        end
+        x = tryparsefinal(CellParametersCard, str)
+        if x !== nothing
+            return cellvolume(parsefinal(CellParametersCard, str)) * u"bohr^3" =>
+                parse_electrons_energies(str, :converged).ε[end] * u"Ry"  # volume, energy
+        else
+            return
+        end
     end
 end
 
