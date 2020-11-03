@@ -149,28 +149,34 @@ function customize(template::PWInput, pressure, eos_or_volume)::PWInput
     return set_press_vol(template, pressure, eos_or_volume)
 end
 
-function parseoutput(str::AbstractString, ::SelfConsistentField)
-    preamble = tryparse(Preamble, str)
-    e = try
-        parse_electrons_energies(str, :converged)
-    catch
-    end
-    if preamble !== nothing && e !== nothing
-        return preamble.omega * u"bohr^3" => e.ε[end] * u"Ry"  # volume, energy
-    else
-        return
+function parseoutput(::SelfConsistentField)
+    function (file)
+        str = read(file, String)
+        preamble = tryparse(Preamble, str)
+        e = try
+            parse_electrons_energies(str, :converged)
+        catch
+        end
+        if preamble !== nothing && e !== nothing
+            return preamble.omega * u"bohr^3" => e.ε[end] * u"Ry"  # volume, energy
+        else
+            return
+        end
     end
 end
-function parseoutput(str::AbstractString, ::VariableCellOptimization)
-    if !isjobdone(str)
-        @warn "Job is not finished!"
-    end
-    x = tryparsefinal(CellParametersCard, str)
-    if x !== nothing
-        return cellvolume(parsefinal(CellParametersCard, str)) * u"bohr^3" =>
-            parse_electrons_energies(str, :converged).ε[end] * u"Ry"  # volume, energy
-    else
-        return
+function parseoutput(::VariableCellOptimization)
+    function (file)
+        str = read(file, String)
+        if !isjobdone(str)
+            @warn "Job is not finished!"
+        end
+        x = tryparsefinal(CellParametersCard, str)
+        if x !== nothing
+            return cellvolume(parsefinal(CellParametersCard, str)) * u"bohr^3" =>
+                parse_electrons_energies(str, :converged).ε[end] * u"Ry"  # volume, energy
+        else
+            return
+        end
     end
 end
 
