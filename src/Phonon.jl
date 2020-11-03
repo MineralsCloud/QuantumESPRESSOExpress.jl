@@ -17,37 +17,27 @@ import Express.Phonon:
     ForceConstant,
     PhononDispersion,
     PhononDensityOfStates,
-    preset_template,
     _expand_settings,
     parsecell
+    standardize
 
 # This is a helper function and should not be exported.
-function preset_template(::DfptMethod, template::PhInput, pw::PWInput)
+function standardize(::Dfpt, template::PhInput, pw::PWInput)
     @set! template.inputph.verbosity = "high"
     return relayinfo(pw, template)
 end
-function preset_template(::ForceConstant, template::Q2rInput, ph::PhInput)
+function standardize(::Ifc, template::Q2rInput, ph::PhInput)
     return relayinfo(ph, template)
 end
-function preset_template(
-    ::PhononDispersion,
-    template::MatdynInput,
-    q2r::Q2rInput,
-    ph::PhInput,
-)
+function standardize(::PhononDispersion, template::MatdynInput, q2r::Q2rInput, ph::PhInput)
     template = relayinfo(q2r, relayinfo(ph, template))
     return @set template.input.dos = false
 end
-function preset_template(
-    ::PhononDensityOfStates,
-    template::MatdynInput,
-    q2r::Q2rInput,
-    ph::PhInput,
-)
+function standardize(::VDos, template::MatdynInput, q2r::Q2rInput, ph::PhInput)
     template = relayinfo(q2r, relayinfo(ph, template))
     return @set template.input.dos = true
 end
-function preset_template(::SelfConsistentField, template::PWInput)
+function standardize(::SelfConsistentField, template::PWInput)
     @set! template.control.calculation = "scf"
     @set! template.control.outdir = abspath(mktempdir(
         mkpath(template.control.outdir);
