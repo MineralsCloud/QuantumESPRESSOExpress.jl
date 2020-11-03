@@ -19,8 +19,11 @@ using Express.Phonon:
     Ifc,
     PhononDispersion,
     PhononDensityOfStates,
-    VDos
-import Express.Phonon: standardize, expand_settings, parsecell, previnputtype
+    VDos,
+    makeinput,
+    standardize,
+    customize
+import Express.Phonon: standardize, expand_settings, parsecell, previnputtype, shortname
 
 export DensityFunctionalPerturbationTheory,
     Dfpt,
@@ -31,43 +34,33 @@ export DensityFunctionalPerturbationTheory,
     PhononDispersion,
     PhononDensityOfStates,
     VDos,
-    standardize
+    standardize,
+    makeinput,
+    standardize,
+    customize
+
 
 # This is a helper function and should not be exported.
-function standardize(::Dfpt, template::PhInput, pw::PWInput)
-    @set! template.inputph.verbosity = "high"
-    return relayinfo(pw, template)
-end
-function standardize(::Ifc, template::Q2rInput, ph::PhInput)
-    return relayinfo(ph, template)
-end
-function standardize(::PhononDispersion, template::MatdynInput, q2r::Q2rInput, ph::PhInput)
-    template = relayinfo(q2r, relayinfo(ph, template))
-    return @set template.input.dos = false
-end
-function standardize(::VDos, template::MatdynInput, q2r::Q2rInput, ph::PhInput)
-    template = relayinfo(q2r, relayinfo(ph, template))
-    return @set template.input.dos = true
-end
-function standardize(::SelfConsistentField, template::PWInput)
-    @set! template.control.calculation = "scf"
+standardize(template::PWInput, ::SelfConsistentField)::PWInput =
+    @set(template.control.calculation = "scf")
+standardize(template::PhInput, ::Dfpt)::PhInput = @set(template.inputph.verbosity = "high")
+standardize(template::Q2rInput, ::Ifc)::Q2rInput = template
+standardize(template::MatdynInput, ::PhononDispersion)::MatdynInput =
+    @set(template.input.dos = false)
+standardize(template::MatdynInput, ::VDos)::MatdynInput = @set(template.input.dos = true)
+
+function customize(template::PWInput, args...)::PWInput
     @set! template.control.outdir = abspath(mktempdir(
         mkpath(template.control.outdir);
-        prefix = template.control.prefix * '_' * format(now(), "Y-m-d_H:M:S_"),
+        prefix = template.control.prefix * format(now(), "_Y-m-d_H:M:S_"),
         cleanup = false,
     ))
     return set_verbosity(template, "high")
 end
-
-# function (::Step{ForceConstant,Action{:prepare_input}})(
-#     q2r_input,
-#     phonon_input,
-#     template::Q2rInput,
-# )
-#     object = parse(PhInput, read(phonon_input, String))
-#     write(q2r_input, inputstring(relay(object, template)))
-#     return
-# end
+customize(template::PhInput, pw::PWInput)::PhInput = relayinfo(pw, template)
+customize(template::Q2rInput, ph::PhInput)::Q2rInput = relayinfo(ph, template)
+customize(template::MatdynInput, q2r::Q2rInput, ph::PhInput)::MatdynInput =
+    relayinfo(q2r, relayinfo(ph, template))
 
 function expand_settings(settings)
     templatetexts = [read(expanduser(f), String) for f in settings["template"]]
