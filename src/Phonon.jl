@@ -11,14 +11,26 @@ using Setfield: @set!, @set
 using Unitful: @u_str
 using UnitfulAtomic
 
-import Express.Phonon:
-    DfptMethod,
-    SelfConsistentField,
-    ForceConstant,
+using Express: SelfConsistentField, Scf
+using Express.Phonon:
+    DensityFunctionalPerturbationTheory,
+    Dfpt,
+    InteratomicForceConstants,
+    Ifc,
     PhononDispersion,
     PhononDensityOfStates,
-    _expand_settings,
-    parsecell
+    VDos
+import Express.Phonon: standardize, expand_settings, parsecell, previnputtype
+
+export DensityFunctionalPerturbationTheory,
+    Dfpt,
+    SelfConsistentField,
+    Scf,
+    InteratomicForceConstants,
+    Ifc,
+    PhononDispersion,
+    PhononDensityOfStates,
+    VDos,
     standardize
 
 # This is a helper function and should not be exported.
@@ -57,7 +69,7 @@ end
 #     return
 # end
 
-function _expand_settings(settings)
+function expand_settings(settings)
     templatetexts = [read(expanduser(f), String) for f in settings["template"]]
     template = parse(PWInput, templatetexts[1]),
     parse(PhInput, templatetexts[2]),
@@ -86,7 +98,6 @@ function _expand_settings(settings)
         bin = bin,
         manager = manager,
     )
-end # function _expand_settings
 
 parsecell(str) =
     tryparsefinal(CellParametersCard, str), tryparsefinal(AtomicPositionsCard, str)
