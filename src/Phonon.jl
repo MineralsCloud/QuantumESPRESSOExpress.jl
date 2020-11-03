@@ -1,14 +1,15 @@
 module Phonon
 
-using AbInitioSoftwareBase.Inputs: inputstring, writeinput, set_verbosity
 using Dates: format, now
 using Distributed: LocalManager
+using QuantumESPRESSO.CLI: PhCmd, PWCmd
 using QuantumESPRESSO.Inputs.PWscf:
-    AtomicPositionsCard, CellParametersCard, PWInput, optconvert
+    AtomicPositionsCard, CellParametersCard, PWInput, optconvert, set_verbosity
 using QuantumESPRESSO.Inputs.PHonon: PhInput, Q2rInput, MatdynInput, DynmatInput, relayinfo
 using QuantumESPRESSO.Outputs.PWscf: tryparsefinal
 using Setfield: @set!, @set
-using Unitful: @u_str
+using Unitful: uparse, ustrip, @u_str
+import Unitful
 using UnitfulAtomic
 
 using Express: SelfConsistentField, Scf
@@ -39,6 +40,7 @@ export DensityFunctionalPerturbationTheory,
     standardize,
     customize
 
+const UNIT_CONTEXT = [Unitful, UnitfulAtomic]
 
 # This is a helper function and should not be exported.
 standardize(template::PWInput, ::SelfConsistentField)::PWInput =
@@ -63,11 +65,18 @@ customize(template::MatdynInput, q2r::Q2rInput, ph::PhInput)::MatdynInput =
     relayinfo(q2r, relayinfo(ph, template))
 
 function expand_settings(settings)
-    templatetexts = [read(expanduser(f), String) for f in settings["template"]]
-    template = parse(PWInput, templatetexts[1]),
-    parse(PhInput, templatetexts[2]),
-    parse(Q2rInput, templatetexts[3]),
-    parse(MatdynInput, templatetexts[4])
+    pressures = map(settings["pressures"]["values"]) do pressure
+        pressure * uparse(settings["pressures"]["unit"]; unit_context = UNIT_CONTEXT)
+    end
+
+    function expandtmpl(settings)
+        return map(settings, (PWInput, PhInput, Q2rInput, MatdynInput)) do file, T
+            str = read(expanduser(file), String)
+            parse(T, str)
+        end
+    end
+    templates = expandtmpl(settings["templates"])
+
     qe = settings["qe"]
     if qe["manager"] == "local"
         bin = qe["bin"]
@@ -78,21 +87,27 @@ function expand_settings(settings)
         # manager = DockerEnvironment(n, qe["container"], bin)
     else
     end
-    return (
-        template = template,
-        pressures = settings["pressures"] .* u"GPa",
-        dirs = map(settings["pressures"]) do pressure
+
+    function expanddirs(settings)
+        return map(pressures, templates) do pressure, template
             abspath(joinpath(
-                expanduser(settings["dir"]),
-                template[1].control.prefix,
-                "p" * string(pressure),
+                expanduser(settings["workdir"]),
+                "p=" * string(ustrip(pressure)),
             ))
-        end,
-        bin = bin,
+        end
+    end
+    dirs = expanddirs(settings)
+
+    return (
+        templates = templates,
+        pressures = pressures,
+        dirs = dirs,
+        bin = PWCmd(; bin = bin),
         manager = manager,
     )
 end
 
+previnputtype(::SelfConsistentField) = PWInput
 previnputtype(::Dfpt) = PWInput
 
 shortname(::Scf) = "scf"
