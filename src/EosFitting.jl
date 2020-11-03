@@ -1,6 +1,7 @@
 module EosFitting
 
-using AbInitioSoftwareBase.Inputs: set_verbosity, set_press_vol
+using AbInitioSoftwareBase: load
+using AbInitioSoftwareBase.Inputs: set_verbosity, set_press_vol, writeinput
 using Crystallography: cellvolume
 using Dates: format, now
 using Distributed: LocalManager
@@ -13,16 +14,14 @@ using Unitful: uparse, ustrip, @u_str
 import Unitful
 using UnitfulAtomic
 
+using Express: SelfConsistentField, Scf
 import Express.EosFitting:
-    SelfConsistentField,
-    Scf,
     FixedIonSelfConsistentField,
     StructuralOptimization,
     FixedCellOptimization,
     VariableCellOptimization,
     StOptim,
     VcOptim,
-    ScfOrOptim,
     standardize,
     customize,
     check_software_settings,
@@ -32,9 +31,7 @@ import Express.EosFitting:
     expandeos,
     shortname,
     parseoutput,
-    readoutput,
     eosfit,
-    writeinput,
     buildjob,
     buildworkflow
 
@@ -46,10 +43,9 @@ export SelfConsistentField,
     VariableCellOptimization,
     StOptim,
     VcOptim,
-    ScfOrOptim,
     load_settings,
     makeinput,
-    readoutput,
+    load,
     eosfit,
     writeinput,
     buildjob,
