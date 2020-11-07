@@ -91,7 +91,7 @@ function expand_settings(settings)
     end
 
     function expanddirs(settings)
-        return map(pressures, templates) do pressure, template
+        return map(pressures) do pressure
             abspath(joinpath(
                 expanduser(settings["workdir"]),
                 "p=" * string(ustrip(pressure)),
