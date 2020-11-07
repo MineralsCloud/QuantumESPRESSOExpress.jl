@@ -4,7 +4,7 @@ using Dates: format, now
 using Distributed: LocalManager
 using QuantumESPRESSO.CLI: PhCmd, PWCmd
 using QuantumESPRESSO.Inputs.PWscf:
-    AtomicPositionsCard, CellParametersCard, PWInput, optconvert, set_verbosity
+    AtomicPositionsCard, CellParametersCard, PWInput, optconvert, set_verbosity, set_cell
 using QuantumESPRESSO.Inputs.PHonon: PhInput, Q2rInput, MatdynInput, DynmatInput, relayinfo
 using QuantumESPRESSO.Outputs.PWscf: tryparsefinal
 using Setfield: @set!, @set
@@ -51,13 +51,15 @@ standardize(template::MatdynInput, ::PhononDispersion)::MatdynInput =
     @set(template.input.dos = false)
 standardize(template::MatdynInput, ::VDos)::MatdynInput = @set(template.input.dos = true)
 
-function customize(template::PWInput, args...)::PWInput
+function customize(template::PWInput, new_structure)::PWInput
     @set! template.control.outdir = abspath(mktempdir(
         mkpath(template.control.outdir);
         prefix = template.control.prefix * format(now(), "_Y-m-d_H:M:S_"),
         cleanup = false,
     ))
-    return set_verbosity(template, "high")
+    template = set_cell(template, new_structure...)
+    template = set_verbosity(template, "high")
+    return template
 end
 customize(template::PhInput, pw::PWInput)::PhInput = relayinfo(pw, template)
 customize(template::Q2rInput, ph::PhInput)::Q2rInput = relayinfo(ph, template)
