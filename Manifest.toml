@@ -191,7 +191,7 @@ version = "0.1.3"
 
 [[Express]]
 deps = ["AbInitioSoftwareBase", "Compat", "Crystallography", "Distributed", "EquationsOfStateOfSolids", "Mustache", "Serialization", "Setfield", "SimpleWorkflow", "Unitful", "UnitfulAtomic", "UrlDownload"]
-git-tree-sha1 = "33a9fd9bc538f03da3fcf193b327bb6f2452a8c3"
+git-tree-sha1 = "372d5f66a0734a60cbc38c6ba6a8fc16bf87ce67"
 repo-rev = "master"
 repo-url = "git@github.com:MineralsCloud/Express.jl.git"
 uuid = "b12df14e-adf7-11e9-0606-d5813a258349"
