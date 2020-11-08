@@ -1,0 +1,26 @@
+workflow: eos+phonon
+qe:
+  bin:
+    - pw.x
+    - ph.x
+    - q2r.x
+    - matdyn.x
+  manager: local
+  n: 16
+workdir: examples/GaN
+templates:
+  - - examples/GaN/template.in
+  - - examples/GaN/ph.in
+  - - examples/GaN/q2r.in
+  - - examples/GaN/disp.in
+pressures:
+  unit: GPa
+  values:
+    - -5
+    - 0
+    - 5
+    - 10
+    - 15
+    - 20
+    - 25
+    - 30
