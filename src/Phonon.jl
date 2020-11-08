@@ -1,78 +1,97 @@
 module Phonon
 
-using AbInitioSoftwareBase.Inputs: inputstring, writeinput, set_verbosity
 using Dates: format, now
 using Distributed: LocalManager
+using QuantumESPRESSO.CLI: PhCmd, PWCmd
 using QuantumESPRESSO.Inputs.PWscf:
-    AtomicPositionsCard, CellParametersCard, PWInput, optconvert
+    AtomicPositionsCard, CellParametersCard, PWInput, optconvert, set_verbosity, set_cell
 using QuantumESPRESSO.Inputs.PHonon: PhInput, Q2rInput, MatdynInput, DynmatInput, relayinfo
 using QuantumESPRESSO.Outputs.PWscf: tryparsefinal
 using Setfield: @set!, @set
-using Unitful: @u_str
+using Unitful: uparse, ustrip, @u_str
+import Unitful
 using UnitfulAtomic
 
-import Express.Phonon:
-    DfptMethod,
-    SelfConsistentField,
-    ForceConstant,
+using Express: SelfConsistentField, Scf
+using Express.EosFitting: VcOptim
+using Express.Phonon:
+    DensityFunctionalPerturbationTheory,
+    Dfpt,
+    InteratomicForceConstants,
+    Ifc,
     PhononDispersion,
     PhononDensityOfStates,
-    preset_template,
-    _expand_settings,
-    parsecell
+    VDos,
+    makeinput,
+    standardize,
+    customize
+import Express.Phonon:
+    standardize, customize, expand_settings, parsecell, inputtype, shortname
+
+export DensityFunctionalPerturbationTheory,
+    Dfpt,
+    SelfConsistentField,
+    Scf,
+    InteratomicForceConstants,
+    Ifc,
+    PhononDispersion,
+    PhononDensityOfStates,
+    VDos,
+    standardize,
+    makeinput,
+    standardize,
+    customize
+
+const UNIT_CONTEXT = [Unitful, UnitfulAtomic]
 
 # This is a helper function and should not be exported.
-function preset_template(::DfptMethod, template::PhInput, pw::PWInput)
-    @set! template.inputph.verbosity = "high"
-    return relayinfo(pw, template)
-end
-function preset_template(::ForceConstant, template::Q2rInput, ph::PhInput)
-    return relayinfo(ph, template)
-end
-function preset_template(
-    ::PhononDispersion,
-    template::MatdynInput,
-    q2r::Q2rInput,
-    ph::PhInput,
-)
-    template = relayinfo(q2r, relayinfo(ph, template))
-    return @set template.input.dos = false
-end
-function preset_template(
-    ::PhononDensityOfStates,
-    template::MatdynInput,
-    q2r::Q2rInput,
-    ph::PhInput,
-)
-    template = relayinfo(q2r, relayinfo(ph, template))
-    return @set template.input.dos = true
-end
-function preset_template(::SelfConsistentField, template::PWInput)
-    @set! template.control.calculation = "scf"
+standardize(template::PWInput, ::SelfConsistentField)::PWInput =
+    @set(template.control.calculation = "scf")
+standardize(template::PhInput, ::Dfpt)::PhInput = @set(template.inputph.verbosity = "high")
+standardize(template::Q2rInput, ::Ifc)::Q2rInput = template
+standardize(template::MatdynInput, ::PhononDispersion)::MatdynInput =
+    @set(template.input.dos = false)
+standardize(template::MatdynInput, ::VDos)::MatdynInput = @set(template.input.dos = true)
+
+function customize(template::PWInput, new_structure)::PWInput
     @set! template.control.outdir = abspath(mktempdir(
         mkpath(template.control.outdir);
-        prefix = template.control.prefix * '_' * format(now(), "Y-m-d_H:M:S_"),
+        prefix = template.control.prefix * format(now(), "_Y-m-d_H:M:S_"),
         cleanup = false,
     ))
-    return set_verbosity(template, "high")
+    template = set_cell(template, new_structure...)
+    template = set_verbosity(template, "high")
+    return template
 end
+customize(template::PWInput) = template
+customize(template::PhInput, pw::PWInput)::PhInput = relayinfo(pw, template)
+customize(template::Q2rInput, ph::PhInput)::Q2rInput = relayinfo(ph, template)
+customize(template::MatdynInput, q2r::Q2rInput, ph::PhInput)::MatdynInput =
+    relayinfo(q2r, relayinfo(ph, template))
+customize(template::MatdynInput, ph::PhInput, q2r::Q2rInput) = customize(template, q2r, ph)
 
-# function (::Step{ForceConstant,Action{:prepare_input}})(
-#     q2r_input,
-#     phonon_input,
-#     template::Q2rInput,
-# )
-#     object = parse(PhInput, read(phonon_input, String))
-#     write(q2r_input, inputstring(relay(object, template)))
-#     return
-# end
+function expand_settings(settings)
+    pressures = map(settings["pressures"]["values"]) do pressure
+        pressure * uparse(settings["pressures"]["unit"]; unit_context = UNIT_CONTEXT)
+    end
 
-function _expand_settings(settings)
-    templatetexts = [read(expanduser(f), String) for f in settings["template"]]
-    template = parse(PWInput, templatetexts[1]),
-    parse(PhInput, templatetexts[2]),
-    parse(Q2rInput, templatetexts[3]),
-    parse(MatdynInput, templatetexts[4])
+    function expandtmpl(settings)
+        return map(settings, (PWInput, PhInput, Q2rInput, MatdynInput)) do files, T
+            temps = map(files) do file
+                str = read(expanduser(file), String)
+                parse(T, str)
+            end
+            if length(temps) == 1
+                fill(temps[1], length(pressures))
+            elseif length(temps) != length(pressures)
+                throw(DimensionMismatch("!!!"))
+            else
+                temps
+            end
+        end
+    end
+    templates = expandtmpl(settings["templates"])
+
     qe = settings["qe"]
     if qe["manager"] == "local"
         bin = qe["bin"]
@@ -83,20 +102,37 @@ function _expand_settings(settings)
         # manager = DockerEnvironment(n, qe["container"], bin)
     else
     end
-    return (
-        template = template,
-        pressures = settings["pressures"] .* u"GPa",
-        dirs = map(settings["pressures"]) do pressure
+
+    function expanddirs(settings)
+        return map(pressures) do pressure
             abspath(joinpath(
-                expanduser(settings["dir"]),
-                template[1].control.prefix,
-                "p" * string(pressure),
+                expanduser(settings["workdir"]),
+                "p=" * string(ustrip(pressure)),
             ))
-        end,
-        bin = bin,
+        end
+    end
+    dirs = expanddirs(settings)
+
+    return (
+        templates = templates,
+        pressures = pressures,
+        dirs = dirs,
+        bin = PWCmd(; bin = bin),
         manager = manager,
     )
-end # function _expand_settings
+end
+
+inputtype(::SelfConsistentField) = PWInput
+inputtype(::Dfpt) = PhInput
+inputtype(::Ifc) = Q2rInput
+inputtype(::Union{PhononDispersion,VDos}) = MatdynInput
+
+shortname(::Scf) = "scf"
+shortname(::VcOptim) = "vc-relax"
+shortname(::Dfpt) = "dfpt"
+shortname(::Ifc) = "q2r"
+shortname(::PhononDispersion) = "disp"
+shortname(::VDos) = "vdos"
 
 parsecell(str) =
     tryparsefinal(CellParametersCard, str), tryparsefinal(AtomicPositionsCard, str)
