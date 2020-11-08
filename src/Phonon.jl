@@ -2,7 +2,7 @@ module Phonon
 
 using Dates: format, now
 using Distributed: LocalManager
-using QuantumESPRESSO.CLI: PhCmd, PWCmd
+using QuantumESPRESSO.CLI: PhCmd, PWCmd, Q2rCmd, MatdynCmd
 using QuantumESPRESSO.Inputs.PWscf:
     AtomicPositionsCard, CellParametersCard, PWInput, optconvert, set_verbosity, set_cell
 using QuantumESPRESSO.Inputs.PHonon: PhInput, Q2rInput, MatdynInput, DynmatInput, relayinfo
@@ -117,7 +117,12 @@ function expand_settings(settings)
         templates = templates,
         pressures = pressures,
         dirs = dirs,
-        bin = PWCmd(; bin = bin),
+        bin = [
+            PWCmd(bin = bin[1]),
+            PhCmd(bin = bin[2]),
+            Q2rCmd(bin = bin[3]),
+            MatdynCmd(bin = bin[4]),
+        ],
         manager = manager,
     )
 end
