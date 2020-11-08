@@ -13,6 +13,7 @@ import Unitful
 using UnitfulAtomic
 
 using Express: SelfConsistentField, Scf
+using Express.EosFitting: VcOptim
 using Express.Phonon:
     DensityFunctionalPerturbationTheory,
     Dfpt,
@@ -24,7 +25,8 @@ using Express.Phonon:
     makeinput,
     standardize,
     customize
-import Express.Phonon: standardize, expand_settings, parsecell, previnputtype, shortname
+import Express.Phonon:
+    standardize, customize, expand_settings, parsecell, inputtype, shortname
 
 export DensityFunctionalPerturbationTheory,
     Dfpt,
@@ -61,10 +63,12 @@ function customize(template::PWInput, new_structure)::PWInput
     template = set_verbosity(template, "high")
     return template
 end
+customize(template::PWInput) = template
 customize(template::PhInput, pw::PWInput)::PhInput = relayinfo(pw, template)
 customize(template::Q2rInput, ph::PhInput)::Q2rInput = relayinfo(ph, template)
 customize(template::MatdynInput, q2r::Q2rInput, ph::PhInput)::MatdynInput =
     relayinfo(q2r, relayinfo(ph, template))
+customize(template::MatdynInput, ph::PhInput, q2r::Q2rInput) = customize(template, q2r, ph)
 
 function expand_settings(settings)
     pressures = map(settings["pressures"]["values"]) do pressure
@@ -72,9 +76,18 @@ function expand_settings(settings)
     end
 
     function expandtmpl(settings)
-        return map(settings, (PWInput, PhInput, Q2rInput, MatdynInput)) do file, T
-            str = read(expanduser(file), String)
-            parse(T, str)
+        return map(settings, (PWInput, PhInput, Q2rInput, MatdynInput)) do files, T
+            temps = map(files) do file
+                str = read(expanduser(file), String)
+                parse(T, str)
+            end
+            if length(temps) == 1
+                fill(temps[1], length(pressures))
+            elseif length(temps) != length(pressures)
+                throw(DimensionMismatch("!!!"))
+            else
+                temps
+            end
         end
     end
     templates = expandtmpl(settings["templates"])
@@ -109,11 +122,15 @@ function expand_settings(settings)
     )
 end
 
-previnputtype(::SelfConsistentField) = PWInput
-previnputtype(::Dfpt) = PWInput
+inputtype(::SelfConsistentField) = PWInput
+inputtype(::Dfpt) = PhInput
+inputtype(::Ifc) = Q2rInput
+inputtype(::Union{PhononDispersion,VDos}) = MatdynInput
 
 shortname(::Scf) = "scf"
+shortname(::VcOptim) = "vc-relax"
 shortname(::Dfpt) = "dfpt"
+shortname(::Ifc) = "q2r"
 shortname(::PhononDispersion) = "disp"
 shortname(::VDos) = "vdos"
 
