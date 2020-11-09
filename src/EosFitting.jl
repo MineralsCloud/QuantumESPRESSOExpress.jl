@@ -1,7 +1,6 @@
 module EosFitting
 
-using AbInitioSoftwareBase: load
-using AbInitioSoftwareBase.Inputs: set_verbosity, set_press_vol, writeinput
+using AbInitioSoftwareBase.Inputs: set_verbosity, set_press_vol
 using Crystallography: cellvolume
 using Dates: format, now
 using Distributed: LocalManager
@@ -14,42 +13,17 @@ using Unitful: uparse, ustrip, @u_str
 import Unitful
 using UnitfulAtomic
 
-using Express: SelfConsistentField, Scf
+using Express: SelfConsistentField
 import Express.EosFitting:
-    FixedIonSelfConsistentField,
     StructuralOptimization,
-    FixedCellOptimization,
     VariableCellOptimization,
-    StOptim,
-    VcOptim,
     standardize,
     customize,
     check_software_settings,
-    load_settings,
-    makeinput,
     expand_settings,
     expandeos,
     shortname,
-    parseoutput,
-    eosfit,
-    buildjob,
-    buildworkflow
-
-export SelfConsistentField,
-    Scf,
-    FixedIonSelfConsistentField,
-    StructuralOptimization,
-    FixedCellOptimization,
-    VariableCellOptimization,
-    StOptim,
-    VcOptim,
-    load_settings,
-    makeinput,
-    load,
-    eosfit,
-    writeinput,
-    buildjob,
-    buildworkflow
+    parseoutput
 
 const UNIT_CONTEXT = [Unitful, UnitfulAtomic]
 
