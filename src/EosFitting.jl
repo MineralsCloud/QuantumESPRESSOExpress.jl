@@ -7,7 +7,7 @@ using Distributed: LocalManager
 using QuantumESPRESSO.Inputs.PWscf: CellParametersCard, PWInput
 using QuantumESPRESSO.Outputs.PWscf:
     Preamble, parse_electrons_energies, parsefinal, isjobdone, tryparsefinal
-using QuantumESPRESSO.CLI: PWCmd
+using QuantumESPRESSO.CLI: PWX
 using Setfield: @set!
 using Unitful: uparse, ustrip, @u_str
 import Unitful
@@ -88,7 +88,7 @@ function expand_settings(settings)
         pressures = pressures,
         trial_eos = expandeos(settings["trial_eos"]),
         dirs = dirs,
-        bin = PWCmd(; bin = bin),
+        bin = PWX(; bin = bin),
         manager = manager,
     )
 end
