@@ -132,7 +132,7 @@ inputtype(::Dfpt) = PhInput
 inputtype(::Ifc) = Q2rInput
 inputtype(::Union{PhononDispersion,VDos}) = MatdynInput
 
-shortname(::Scf) = "scf"
+shortname(::Scf) = "phscf"
 shortname(::VcOptim) = "vc-relax"
 shortname(::Dfpt) = "dfpt"
 shortname(::Ifc) = "q2r"
