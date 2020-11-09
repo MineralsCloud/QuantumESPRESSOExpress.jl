@@ -1,7 +1,6 @@
 module EosFitting
 
-using AbInitioSoftwareBase: load
-using AbInitioSoftwareBase.Inputs: set_verbosity, set_press_vol, writeinput
+using AbInitioSoftwareBase.Inputs: set_verbosity, set_press_vol
 using Crystallography: cellvolume
 using Dates: format, now
 using Distributed: LocalManager
@@ -14,42 +13,17 @@ using Unitful: uparse, ustrip, @u_str
 import Unitful
 using UnitfulAtomic
 
-using Express: SelfConsistentField, Scf
+using Express: SelfConsistentField
 import Express.EosFitting:
-    FixedIonSelfConsistentField,
-    StructuralOptimization,
-    FixedCellOptimization,
-    VariableCellOptimization,
     StOptim,
     VcOptim,
     standardize,
     customize,
     check_software_settings,
-    load_settings,
-    makeinput,
     expand_settings,
     expandeos,
     shortname,
-    parseoutput,
-    eosfit,
-    buildjob,
-    buildworkflow
-
-export SelfConsistentField,
-    Scf,
-    FixedIonSelfConsistentField,
-    StructuralOptimization,
-    FixedCellOptimization,
-    VariableCellOptimization,
-    StOptim,
-    VcOptim,
-    load_settings,
-    makeinput,
-    load,
-    eosfit,
-    writeinput,
-    buildjob,
-    buildworkflow
+    parseoutput
 
 const UNIT_CONTEXT = [Unitful, UnitfulAtomic]
 
@@ -120,15 +94,15 @@ function expand_settings(settings)
 end
 
 shortname(::SelfConsistentField) = "scf"
-shortname(::StructuralOptimization) = "relax"
-shortname(::VariableCellOptimization) = "vc-relax"
+shortname(::StOptim) = "relax"
+shortname(::VcOptim) = "vc-relax"
 
 function standardize(template::PWInput, calc)::PWInput
     @set! template.control.calculation = if calc isa SelfConsistentField  # Functions can be extended, not safe
         "scf"
-    elseif calc isa StructuralOptimization
+    elseif calc isa StOptim
         "relax"
-    elseif calc isa VariableCellOptimization
+    elseif calc isa VcOptim
         "vc-relax"
     else
         error("this should never happen!")
@@ -160,7 +134,7 @@ function parseoutput(::SelfConsistentField)
         end
     end
 end
-function parseoutput(::VariableCellOptimization)
+function parseoutput(::VcOptim)
     function (file)
         str = read(file, String)
         if !isjobdone(str)

@@ -4,43 +4,19 @@ using Dates: format, now
 using Distributed: LocalManager
 using QuantumESPRESSO.CLI: PhCmd, PWCmd, Q2rCmd, MatdynCmd
 using QuantumESPRESSO.Inputs.PWscf:
-    AtomicPositionsCard, CellParametersCard, PWInput, optconvert, set_verbosity, set_cell
-using QuantumESPRESSO.Inputs.PHonon: PhInput, Q2rInput, MatdynInput, DynmatInput, relayinfo
+    AtomicPositionsCard, CellParametersCard, PWInput, set_verbosity, set_cell
+using QuantumESPRESSO.Inputs.PHonon: PhInput, Q2rInput, MatdynInput, relayinfo
 using QuantumESPRESSO.Outputs.PWscf: tryparsefinal
 using Setfield: @set!, @set
 using Unitful: uparse, ustrip, @u_str
 import Unitful
 using UnitfulAtomic
 
-using Express: SelfConsistentField, Scf
+using Express: SelfConsistentField
 using Express.EosFitting: VcOptim
-using Express.Phonon:
-    DensityFunctionalPerturbationTheory,
-    Dfpt,
-    InteratomicForceConstants,
-    Ifc,
-    PhononDispersion,
-    PhononDensityOfStates,
-    VDos,
-    makeinput,
-    standardize,
-    customize
+using Express.Phonon: Dfpt, Ifc, PhononDispersion, VDos
 import Express.Phonon:
     standardize, customize, expand_settings, parsecell, inputtype, shortname
-
-export DensityFunctionalPerturbationTheory,
-    Dfpt,
-    SelfConsistentField,
-    Scf,
-    InteratomicForceConstants,
-    Ifc,
-    PhononDispersion,
-    PhononDensityOfStates,
-    VDos,
-    standardize,
-    makeinput,
-    standardize,
-    customize
 
 const UNIT_CONTEXT = [Unitful, UnitfulAtomic]
 
@@ -132,7 +108,7 @@ inputtype(::Dfpt) = PhInput
 inputtype(::Ifc) = Q2rInput
 inputtype(::Union{PhononDispersion,VDos}) = MatdynInput
 
-shortname(::Scf) = "phscf"
+shortname(::SelfConsistentField) = "phscf"
 shortname(::VcOptim) = "vc-relax"
 shortname(::Dfpt) = "dfpt"
 shortname(::Ifc) = "q2r"
