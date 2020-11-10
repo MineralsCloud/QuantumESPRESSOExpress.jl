@@ -150,6 +150,4 @@ function parseoutput(::VcOptim)
     end
 end
 
-safe_exit(template::PWInput, dir) = touch(joinpath(dir, template.control.prefix * ".EXIT"))
-
 end
