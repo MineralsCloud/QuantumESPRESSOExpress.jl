@@ -1,4 +1,4 @@
-using Express.EosFitting: buildworkflow
+using Express: buildworkflow
 using QuantumESPRESSOExpress.EosFitting
 using SimpleWorkflow: run!
 
