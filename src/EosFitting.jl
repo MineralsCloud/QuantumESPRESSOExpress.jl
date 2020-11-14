@@ -90,6 +90,7 @@ function expand_settings(settings)
         dirs = dirs,
         bin = PWX(; bin = bin),
         manager = manager,
+        use_shell = settings["use_shell"],
     )
 end
 

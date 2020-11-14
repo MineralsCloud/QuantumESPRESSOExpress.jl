@@ -100,6 +100,7 @@ function expand_settings(settings)
             MatdynX(bin = bin[4]),
         ],
         manager = manager,
+        use_shell = settings["use_shell"],
     )
 end
 
