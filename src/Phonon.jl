@@ -108,12 +108,12 @@ inputtype(::Dfpt) = PhInput
 inputtype(::RealSpaceForceConstants) = Q2rInput
 inputtype(::Union{PhononDispersion,VDos}) = MatdynInput
 
-shortname(::SelfConsistentField) = "phscf"
-shortname(::VcOptim) = "vc-relax"
-shortname(::Dfpt) = "dfpt"
-shortname(::RealSpaceForceConstants) = "q2r"
-shortname(::PhononDispersion) = "disp"
-shortname(::VDos) = "vdos"
+shortname(::Type{SelfConsistentField}) = "phscf"
+shortname(::Type{VcOptim}) = "vc-relax"
+shortname(::Type{Dfpt}) = "dfpt"
+shortname(::Type{RealSpaceForceConstants}) = "q2r"
+shortname(::Type{PhononDispersion}) = "disp"
+shortname(::Type{VDos}) = "vdos"
 
 parsecell(str) =
     tryparsefinal(CellParametersCard, str), tryparsefinal(AtomicPositionsCard, str)
