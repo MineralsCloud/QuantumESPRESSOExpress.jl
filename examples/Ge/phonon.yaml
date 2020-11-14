@@ -1,0 +1,27 @@
+workflow: vdos
+qe:
+  bin:
+    - pw.x
+    - ph.x
+    - q2r.x
+    - matdyn.x
+  manager: local
+  n: 48
+workdir: examples/Ge
+templates:
+  - - examples/Ge/template.in
+  - - examples/Ge/ph.in
+  - - examples/Ge/q2r.in
+  - - examples/Ge/disp.in
+pressures:
+  unit: GPa
+  values:
+    # - -5
+    - 0
+    - 5
+    - 10
+    # - 15
+    # - 20
+    # - 25
+    # - 30
+use_shell: true
