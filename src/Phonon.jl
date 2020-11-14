@@ -14,7 +14,7 @@ using UnitfulAtomic
 
 using Express: SelfConsistentField
 using Express.EosFitting: VcOptim
-using Express.Phonon: Dfpt, Ifc, PhononDispersion, VDos
+using Express.Phonon: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos
 import Express.Phonon:
     standardize, customize, expand_settings, parsecell, inputtype, shortname
 
@@ -24,7 +24,7 @@ const UNIT_CONTEXT = [Unitful, UnitfulAtomic]
 standardize(template::PWInput, ::SelfConsistentField)::PWInput =
     @set(template.control.calculation = "scf")
 standardize(template::PhInput, ::Dfpt)::PhInput = @set(template.inputph.verbosity = "high")
-standardize(template::Q2rInput, ::Ifc)::Q2rInput = template
+standardize(template::Q2rInput, ::RealSpaceForceConstants)::Q2rInput = template
 standardize(template::MatdynInput, ::PhononDispersion)::MatdynInput =
     @set(template.input.dos = false)
 standardize(template::MatdynInput, ::VDos)::MatdynInput = @set(template.input.dos = true)
@@ -105,13 +105,13 @@ end
 
 inputtype(::SelfConsistentField) = PWInput
 inputtype(::Dfpt) = PhInput
-inputtype(::Ifc) = Q2rInput
+inputtype(::RealSpaceForceConstants) = Q2rInput
 inputtype(::Union{PhononDispersion,VDos}) = MatdynInput
 
 shortname(::SelfConsistentField) = "phscf"
 shortname(::VcOptim) = "vc-relax"
 shortname(::Dfpt) = "dfpt"
-shortname(::Ifc) = "q2r"
+shortname(::RealSpaceForceConstants) = "q2r"
 shortname(::PhononDispersion) = "disp"
 shortname(::VDos) = "vdos"
 

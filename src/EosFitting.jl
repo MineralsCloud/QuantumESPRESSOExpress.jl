@@ -93,9 +93,9 @@ function expand_settings(settings)
     )
 end
 
-shortname(::SelfConsistentField) = "scf"
-shortname(::StOptim) = "relax"
-shortname(::VcOptim) = "vc-relax"
+shortname(::Type{SelfConsistentField}) = "scf"
+shortname(::Type{StOptim}) = "relax"
+shortname(::Type{VcOptim}) = "vc-relax"
 
 function standardize(template::PWInput, calc)::PWInput
     @set! template.control.calculation = if calc isa SelfConsistentField  # Functions can be extended, not safe
