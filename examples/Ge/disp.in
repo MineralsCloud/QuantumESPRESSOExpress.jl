@@ -1,0 +1,12 @@
+&input
+asr='crystal'
+amass(1)=72.64
+flfrc='fc.out'
+flfrq='freq.out'
+flvec='modes.out'
+dos=.true.
+q_in_band_form=.false.
+nk1=8
+nk2=8
+nk3=8
+/
