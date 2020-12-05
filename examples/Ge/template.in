@@ -1,0 +1,29 @@
+&control
+calculation='scf'
+verbosity = 'high'
+pseudo_dir  = '/home/qe/pseudo'
+prefix='Ge'
+outdir   = './tmp'
+tprnfor = .true.
+tstress = .true.
+/
+&system
+ibrav=2
+celldm(1)=7.957636
+nat=2
+ntyp=1
+ecutwfc = 55
+/
+&electrons
+diagonalization='david'
+mixing_beta=0.7
+conv_thr=1.0d-10
+/
+ATOMIC_SPECIES
+Ge    72.64    Ge.pz-dn-kjpaw_psl.0.2.2.UPF
+
+ATOMIC_POSITIONS (crystal)
+Ge    0.00000    0.00000    0.00000
+Ge    0.75000    0.75000    0.75000
+K_POINTS automatic
+3 3 3 1 1 1
