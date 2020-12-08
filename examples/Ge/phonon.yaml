@@ -16,12 +16,12 @@ templates:
 pressures:
   unit: GPa
   values:
-    # - -5
+    - -5
+    - -2
     - 0
     - 5
     - 10
-    # - 15
-    # - 20
-    # - 25
-    # - 30
+    - 15
+    - 17
+    - 20
 use_shell: true
