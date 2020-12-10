@@ -2,7 +2,7 @@
 
 [[AbInitioSoftwareBase]]
 deps = ["IsURL", "JSON", "Pkg", "YAML"]
-git-tree-sha1 = "8d2064c87f8a2b9cb9fee5f25e3813b8634a2b46"
+git-tree-sha1 = "d00a79360ff42209b85e1475e650f193f16f16b2"
 repo-rev = "master"
 repo-url = "git@github.com:MineralsCloud/AbInitioSoftwareBase.jl.git"
 uuid = "df5135bc-470e-46c6-b451-292e27ca5b84"
@@ -196,7 +196,7 @@ version = "0.1.3"
 
 [[Express]]
 deps = ["AbInitioSoftwareBase", "Compat", "Crystallography", "Distributed", "EquationsOfStateOfSolids", "Mustache", "Serialization", "Setfield", "SimpleWorkflow", "Unitful", "UnitfulAtomic", "UrlDownload"]
-git-tree-sha1 = "88280e6126c446cc7cb116ea69977b872f4f138f"
+git-tree-sha1 = "db0f3ce46347e87c2f16e3cec10dcfeb0d2ab95b"
 repo-rev = "master"
 repo-url = "git@github.com:MineralsCloud/Express.jl.git"
 uuid = "b12df14e-adf7-11e9-0606-d5813a258349"
@@ -531,7 +531,7 @@ version = "0.2.0"
 
 [[QuantumESPRESSOBase]]
 deps = ["AbInitioSoftwareBase", "AutoHashEquals", "Compat", "ConstructionBase", "Crystallography", "Formatting", "LinearAlgebra", "OptionalArgChecks", "PyFortran90Namelists", "Setfield", "StaticArrays", "Unitful", "UnitfulAtomic"]
-git-tree-sha1 = "cf963f609b75a608998594f3131ae2ea8b1d3469"
+git-tree-sha1 = "326a147e1c8efa9e6e2cff113447e8800556b697"
 repo-rev = "master"
 repo-url = "git@github.com:MineralsCloud/QuantumESPRESSOBase.jl.git"
 uuid = "51b62caa-b28f-11e9-38c2-1f67cb498e05"
@@ -554,9 +554,9 @@ deps = ["Serialization"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [[ReadableRegex]]
-git-tree-sha1 = "304f1762033bd5790b5f560b86bdf0367e192f44"
+git-tree-sha1 = "befcfa33f50688319571a770be4a55114b71d70a"
 uuid = "cbbcb084-453d-4c4c-b292-e315607ba6a4"
-version = "0.3.1"
+version = "0.3.2"
 
 [[RecipesBase]]
 git-tree-sha1 = "b3fb709f3c97bfc6e948be68beeecb55a0b340ae"
@@ -692,9 +692,9 @@ uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [[TimeZones]]
 deps = ["Dates", "EzXML", "Mocking", "Pkg", "Printf", "RecipesBase", "Serialization", "Unicode"]
-git-tree-sha1 = "e8a5ab7e56d23bf147585001d33d969c655d4091"
+git-tree-sha1 = "4ba8a9579a243400db412b50300cd61d7447e583"
 uuid = "f269a46b-ccf7-5d73-abea-4c690281aa53"
-version = "1.5.2"
+version = "1.5.3"
 
 [[TranscodingStreams]]
 deps = ["Random", "Test"]
@@ -750,9 +750,9 @@ version = "2.9.10+3"
 
 [[YAML]]
 deps = ["Base64", "Dates", "Printf"]
-git-tree-sha1 = "209c033ada051007a934f7ab4738a4776bc041c3"
+git-tree-sha1 = "7136a9e10a2bff8fa88729cf0c80ec1cff65c64d"
 uuid = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
-version = "0.4.2"
+version = "0.4.3"
 
 [[Zlib_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
