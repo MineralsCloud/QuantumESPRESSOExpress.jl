@@ -9,7 +9,7 @@ using QuantumESPRESSO.Outputs.PWscf:
     Preamble, parse_electrons_energies, parsefinal, isjobdone, tryparsefinal
 using QuantumESPRESSO.CLI: PWX
 using Setfield: @set!
-using Unitful: uparse, ustrip, @u_str
+using Unitful: uparse, ustrip, dimension, @u_str
 import Unitful
 using UnitfulAtomic
 
@@ -41,27 +41,29 @@ function check_software_settings(settings)
     end
 end
 
+function _expandtmpl(settings, pressures)  # Can be pressures or volumes
+    templates = map(settings) do file
+        str = read(expanduser(file), String)
+        parse(PWInput, str)
+    end
+    M, N = length(templates), length(pressures)
+    if M == 1
+        return fill(first(templates), N)
+    elseif M == N
+        return templates
+    else
+        throw(DimensionMismatch("`\"templates\"` should be the same length as `\"pressures\"` or `\"volumes\"`!"))
+    end
+end
+
+function _expanddirs(settings, pressures_or_volumes)
+    prefix = dimension(eltype(pressures_or_volumes)) == dimension(u"Pa") ? "p" : "v"
+    return map(pressures_or_volumes) do pressure_or_volume
+        abspath(joinpath(expanduser(settings), prefix * string(ustrip(pressure_or_volume))))
+    end
+end
+
 function expand_settings(settings)
-    pressures = map(settings["pressures"]["values"]) do pressure
-        pressure * uparse(settings["pressures"]["unit"]; unit_context = UNIT_CONTEXT)
-    end
-
-    function expandtmpl(settings)
-        templates = map(settings) do file
-            str = read(expanduser(file), String)
-            parse(PWInput, str)
-        end
-        N = length(templates)
-        if N == 1
-            return fill(first(templates), length(pressures))
-        elseif N != length(pressures)
-            throw(DimensionMismatch("`\"templates\"` should be the same length as `\"pressures\"`!"))
-        else
-            return templates
-        end
-    end
-    templates = expandtmpl(settings["templates"])
-
     qe = settings["qe"]
     if qe["manager"] == "local"
         bin = qe["bin"]
@@ -73,19 +75,18 @@ function expand_settings(settings)
     else
     end
 
-    function expanddirs(settings)
-        return map(pressures) do pressure
-            abspath(joinpath(
-                expanduser(settings["workdir"]),
-                "p=" * string(ustrip(pressure)),
-            ))
-        end
+    key = haskey(settings, "pressures") ? "pressures" : "volumes"
+    pressures_or_volumes = map(settings[key]["values"]) do pressure_or_volume
+        pressure_or_volume * uparse(settings[key]["unit"]; unit_context = UNIT_CONTEXT)
     end
-    dirs = expanddirs(settings)
+
+    templates = _expandtmpl(settings["templates"], pressures_or_volumes)
+
+    dirs = _expanddirs(settings["workdir"], pressures_or_volumes)
 
     return (
         templates = templates,
-        pressures = pressures,
+        pressures_or_volumes = pressures_or_volumes,
         trial_eos = expandeos(settings["trial_eos"]),
         dirs = dirs,
         bin = PWX(; bin = bin),
