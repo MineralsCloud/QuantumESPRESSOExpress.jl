@@ -4,12 +4,14 @@ using AbInitioSoftwareBase.Inputs: Setter
 using Crystallography: cellvolume
 using Dates: format, now
 using Distributed: LocalManager
+using EquationsOfStateOfSolids.Collections: EquationOfStateOfSolids, PressureEOS, getparam
+using EquationsOfStateOfSolids.Volume: mustfindvolume
 using QuantumESPRESSO.Inputs.PWscf: CellParametersCard, PWInput
 using QuantumESPRESSO.Outputs.PWscf:
     Preamble, parse_electrons_energies, parsefinal, isjobdone, tryparsefinal
 using QuantumESPRESSO.CLI: PWX
 using Setfield: @set!
-using Unitful: uparse, ustrip, dimension, @u_str
+using Unitful: Pressure, Volume, uparse, ustrip, dimension, @u_str
 import Unitful
 using UnitfulAtomic
 
@@ -130,10 +132,21 @@ function (x::OutdirSetter)(template::PWInput)
     return template
 end
 
-function customize(template::PWInput, pressure, eos_or_volume)::PWInput
-    set = OutdirSetter() ∘ VolumeSetter(eos_or_volume) ∘ PressureSetter(pressure)
+function customize(template::PWInput, pressure::Pressure, volume::Volume)::PWInput
+    set = OutdirSetter() ∘ VolumeSetter(volume) ∘ PressureSetter(pressure)
     return set(template)
 end
+customize(template::PWInput, volume::Volume, pressure::Pressure) =
+    customize(template, pressure, volume)
+function customize(template::PWInput, pressure::Pressure, eos::PressureEOS)::PWInput
+    volume = mustfindvolume(eos, pressure; volume_scale = vscaling())
+    set = OutdirSetter() ∘ VolumeSetter(volume) ∘ PressureSetter(pressure)
+    return set(template)
+end
+customize(template::PWInput, pressure::Pressure, eos::EquationOfStateOfSolids) =
+    customize(template, pressure, PressureEOS(getparam(eos)))
+customize(template::PWInput, eos::EquationOfStateOfSolids, pressure::Pressure) =
+    customize(template, pressure, eos)
 
 function parseoutput(::SelfConsistentField)
     function (file)
