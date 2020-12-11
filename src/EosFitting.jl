@@ -113,17 +113,26 @@ function (::CalculationSetter{T})(template::PWInput) where {T}
     return template
 end
 
-function customize(template::PWInput, pressure, eos_or_volume)::PWInput
-    @set! template.control.outdir = abspath(mktempdir(
-        mkpath(template.control.outdir);
-        prefix = template.control.prefix * format(now(), "_Y-m-d_H:M:S_"),
-        cleanup = false,
 function standardize(template::PWInput, calc)::PWInput
     set = VerbositySetter("high") ∘ CalculationSetter(calc)
     return set(template)
 end
+
+struct OutdirSetter{T} <: Setter
+    timefmt::T
+end
+OutdirSetter() = OutdirSetter(" Y-m-d H:M:S ")
+function (x::OutdirSetter)(template::PWInput)
+    @set! template.control.outdir = abspath(joinpath(
+        template.control.outdir,
+        template.control.prefix * format(now(), x.timefmt),
     ))
-    return set_press_vol(template, pressure, eos_or_volume)
+    return template
+end
+
+function customize(template::PWInput, pressure, eos_or_volume)::PWInput
+    set = OutdirSetter() ∘ VolumeSetter(eos_or_volume) ∘ PressureSetter(pressure)
+    return set(template)
 end
 
 function parseoutput(::SelfConsistentField)
