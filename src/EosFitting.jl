@@ -1,6 +1,6 @@
 module EosFitting
 
-using AbInitioSoftwareBase.Inputs: set_verbosity, set_press_vol
+using AbInitioSoftwareBase.Inputs: Setter
 using Crystallography: cellvolume
 using Dates: format, now
 using Distributed: LocalManager
@@ -99,17 +99,18 @@ shortname(::Type{SelfConsistentField}) = "scf"
 shortname(::Type{StOptim}) = "relax"
 shortname(::Type{VcOptim}) = "vc-relax"
 
-function standardize(template::PWInput, calc)::PWInput
-    @set! template.control.calculation = if calc isa SelfConsistentField  # Functions can be extended, not safe
+struct CalculationSetter{T<:Union{Scf,Optim}} <: Setter
+    calc::T
+end
+function (::CalculationSetter{T})(template::PWInput) where {T}
+    @set! template.control.calculation = if T == SelfConsistentField  # Functions can be extended, not safe
         "scf"
-    elseif calc isa StOptim
+    elseif T == StOptim
         "relax"
-    elseif calc isa VcOptim
-        "vc-relax"
     else
-        error("this should never happen!")
+        "vc-relax"
     end
-    return set_verbosity(template, "high")
+    return template
 end
 
 function customize(template::PWInput, pressure, eos_or_volume)::PWInput
@@ -117,6 +118,10 @@ function customize(template::PWInput, pressure, eos_or_volume)::PWInput
         mkpath(template.control.outdir);
         prefix = template.control.prefix * format(now(), "_Y-m-d_H:M:S_"),
         cleanup = false,
+function standardize(template::PWInput, calc)::PWInput
+    set = VerbositySetter("high") ∘ CalculationSetter(calc)
+    return set(template)
+end
     ))
     return set_press_vol(template, pressure, eos_or_volume)
 end
