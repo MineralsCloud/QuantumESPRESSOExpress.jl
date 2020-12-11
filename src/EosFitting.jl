@@ -6,7 +6,8 @@ using Dates: format, now
 using Distributed: LocalManager
 using EquationsOfStateOfSolids.Collections: EquationOfStateOfSolids, PressureEOS, getparam
 using EquationsOfStateOfSolids.Volume: mustfindvolume
-using QuantumESPRESSO.Inputs.PWscf: CellParametersCard, PWInput
+using QuantumESPRESSO.Inputs.PWscf:
+    CellParametersCard, PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using QuantumESPRESSO.Outputs.PWscf:
     Preamble, parse_electrons_energies, parsefinal, isjobdone, tryparsefinal
 using QuantumESPRESSO.CLI: PWX
@@ -15,7 +16,7 @@ using Unitful: Pressure, Volume, uparse, ustrip, dimension, @u_str
 import Unitful
 using UnitfulAtomic
 
-using Express: SelfConsistentField
+using Express: SelfConsistentField, Optimization
 import Express.EosFitting:
     StOptim,
     VcOptim,
@@ -101,7 +102,7 @@ shortname(::Type{SelfConsistentField}) = "scf"
 shortname(::Type{StOptim}) = "relax"
 shortname(::Type{VcOptim}) = "vc-relax"
 
-struct CalculationSetter{T<:Union{Scf,Optim}} <: Setter
+struct CalculationSetter{T<:Union{SelfConsistentField,Optimization}} <: Setter
     calc::T
 end
 function (::CalculationSetter{T})(template::PWInput) where {T}
@@ -139,7 +140,7 @@ end
 customize(template::PWInput, volume::Volume, pressure::Pressure) =
     customize(template, pressure, volume)
 function customize(template::PWInput, pressure::Pressure, eos::PressureEOS)::PWInput
-    volume = mustfindvolume(eos, pressure; volume_scale = vscaling())
+    volume = mustfindvolume(eos, pressure; volume_scale = (0.5, 1.5))
     set = OutdirSetter() ∘ VolumeSetter(volume) ∘ PressureSetter(pressure)
     return set(template)
 end
