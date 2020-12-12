@@ -1,6 +1,6 @@
 module QuantumESPRESSOExpress
 
-include("EosFitting.jl")
-include("Phonon.jl")
+include("EosFitting/EosFitting.jl")
+# include("Phonon.jl")
 
 end
