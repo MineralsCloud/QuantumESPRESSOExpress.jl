@@ -20,6 +20,7 @@ using Express: SelfConsistentField, Optimization
 import Express.EosFitting:
     StOptim,
     VcOptim,
+    ScfOrOptim,
     standardize,
     customize,
     check_software_settings,
@@ -116,9 +117,11 @@ function (::CalculationSetter{T})(template::PWInput) where {T}
     return template
 end
 
-function standardize(template::PWInput, calc)::PWInput
-    set = VerbositySetter("high") ∘ CalculationSetter(calc)
-    return set(template)
+function standardize(x::ScfOrOptim)
+    function _standardize(template::PWInput)::PWInput
+        set = VerbositySetter("high") ∘ CalculationSetter(x)
+        return set(template)
+    end
 end
 
 struct OutdirSetter{T} <: Setter
