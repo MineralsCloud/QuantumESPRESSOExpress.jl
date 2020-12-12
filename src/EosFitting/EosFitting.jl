@@ -29,13 +29,13 @@ import Express.EosFitting:
     shortname,
     parseoutput
 
-shortname(::Type{SelfConsistentField}) = "scf"
-shortname(::Type{StOptim}) = "relax"
-shortname(::Type{VcOptim}) = "vc-relax"
-
 include("settings.jl")
 include("standardize.jl")
 include("customize.jl")
+
+shortname(::Type{SelfConsistentField}) = "scf"
+shortname(::Type{StOptim}) = "relax"
+shortname(::Type{VcOptim}) = "vc-relax"
 
 function parseoutput(::SelfConsistentField)
     function (file)
