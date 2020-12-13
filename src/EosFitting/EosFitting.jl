@@ -26,7 +26,7 @@ import Express.EosFitting:
     adjust,
     checkconfig,
     materialize,
-    expandeos,
+    materialize_eos,
     shortname,
     parseoutput
 

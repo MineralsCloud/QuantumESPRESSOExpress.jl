@@ -60,7 +60,7 @@ function materialize(config)
     return (
         templates = templates,
         pressures_or_volumes = pressures_or_volumes,
-        trial_eos = expandeos(config["trial_eos"]),
+        trial_eos = materialize_eos(config["trial_eos"]),
         dirs = dirs,
         bin = PWX(; bin = bin),
         manager = manager,
