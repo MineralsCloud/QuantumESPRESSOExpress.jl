@@ -10,6 +10,7 @@ function checkconfig(::QE, config)
     else
         error("unknown manager `$(config["manager"])`!")
     end
+    return
 end
 
 function _expandtmpl(settings, pressures)  # Can be pressures or volumes
