@@ -4,7 +4,7 @@ qe:
   manager: local
   n: 24
 workdir: examples/Ge
-save: examples/Ge/Ge.eos
+save: examples/Ge/Ge.jls
 templates:
   - examples/Ge/template.in
 pressures:
@@ -19,14 +19,14 @@ pressures:
     - 17
     - 20
 trial_eos:
-  type: bm3
+  name: bm3
   parameters:
     - - 300.44
       - bohr^3
     - - 74.88
       - GPa
     - - 4.82
-      - "1"
+      - 1
     - - -612.43149513
       - Ry
 use_shell: true
