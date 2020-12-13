@@ -21,8 +21,7 @@ import Express.EosFitting:
     StOptim,
     VcOptim,
     ScfOrOptim,
-    standardize,
-    customize,
+    adjust,
     check_software_settings,
     expand_settings,
     expandeos,
@@ -32,6 +31,9 @@ import Express.EosFitting:
 include("settings.jl")
 include("standardize.jl")
 include("customize.jl")
+
+adjust(template::PWInput, x::ScfOrOptim, args...) =
+    (customize(args...) ∘ standardize(x))(template)
 
 shortname(::Type{SelfConsistentField}) = "scf"
 shortname(::Type{StOptim}) = "relax"
