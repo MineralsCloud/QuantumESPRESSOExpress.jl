@@ -35,6 +35,19 @@ function _expanddirs(settings, pressures)
     end
 end
 
+function _materialize_press(subconfig)
+    unit = uparse(
+        if haskey(subconfig, "unit")
+            subconfig["unit"]
+        else
+            @info "no unit provided for `\"pressures\"`! \"GPa\" is assumed!"
+            u"GPa"
+        end;
+        unit_context = UNIT_CONTEXT,
+    )
+    return map(Base.Fix1(*, unit), subconfig["values"])
+end
+
 function _materialize_vol(config, templates)
     if haskey(config, "volumes")
         subconfig = config["volumes"]
@@ -65,9 +78,7 @@ function materialize(config)
     else
     end
 
-    pressures = map(config["pressures"]["values"]) do pressure
-        pressure * uparse(config["pressures"]["unit"]; unit_context = UNIT_CONTEXT)
-    end
+    pressures = _materialize_press(config["pressures"])
 
     templates = _expandtmpl(config["templates"], pressures)
 
