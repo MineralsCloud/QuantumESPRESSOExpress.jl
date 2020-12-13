@@ -1,5 +1,3 @@
-const UNIT_CONTEXT = [Unitful, UnitfulAtomic]
-
 function checkconfig(::QE, config)
     map(("manager", "bin", "n")) do key
         @assert haskey(config, key)
