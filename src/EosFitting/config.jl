@@ -13,18 +13,16 @@ function checkconfig(::QE, config)
     return
 end
 
-function _expandtmpl(settings, pressures)  # Can be pressures or volumes
-    templates = map(settings) do file
+function _materialize_tmpl(config, pressures)
+    templates = map(config) do file
         str = read(expanduser(file), String)
         parse(PWInput, str)
     end
     M, N = length(templates), length(pressures)
-    if M == 1
-        return fill(first(templates), N)
-    elseif M == N
+    if templates isa Vector  # Length of `templates` = length of `pressures`
         return templates
-    else
-        throw(DimensionMismatch("`\"templates\"` should be the same length as `\"pressures\"` or `\"volumes\"`!"))
+    else  # `templates` is a single file
+        return fill(templates, length(pressures))
     end
 end
 
@@ -80,7 +78,7 @@ function materialize(config)
 
     pressures = _materialize_press(config["pressures"])
 
-    templates = _expandtmpl(config["templates"], pressures)
+    templates = _materialize_tmpl(config["templates"], pressures)
 
     if haskey(config, "trial_eos")  # "trial_eos" and "volumes" are mutually exclusive
         trial_eos = materialize_eos(config["trial_eos"])
