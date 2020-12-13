@@ -16,14 +16,16 @@ using Unitful: Pressure, Volume, uparse, ustrip, dimension, @u_str
 import Unitful
 using UnitfulAtomic
 
+using ..QuantumESPRESSOExpress: QE
+
 using Express: SelfConsistentField, Optimization
 import Express.EosFitting:
     StOptim,
     VcOptim,
     ScfOrOptim,
     adjust,
-    check_software_settings,
     expand_settings,
+    checkconfig,
     expandeos,
     shortname,
     parseoutput

@@ -1,16 +1,16 @@
 const UNIT_CONTEXT = [Unitful, UnitfulAtomic]
 
-function check_software_settings(settings)
+function checkconfig(::QE, config)
     map(("manager", "bin", "n")) do key
-        @assert haskey(settings, key)
+        @assert haskey(config, key)
     end
-    @assert isinteger(settings["n"]) && settings["n"] >= 1
-    if settings["manager"] == "docker"
-        @assert haskey(settings, "container")
-    elseif settings["manager"] == "ssh"
-    elseif settings["manager"] == "local"  # Do nothing
+    @assert isinteger(config["n"]) && config["n"] >= 1
+    if config["manager"] == "docker"
+        @assert haskey(config, "container")
+    elseif config["manager"] == "ssh"
+    elseif config["manager"] == "local"  # Do nothing
     else
-        error("unknown manager `$(settings["manager"])`!")
+        error("unknown manager `$(config["manager"])`!")
     end
 end
 
