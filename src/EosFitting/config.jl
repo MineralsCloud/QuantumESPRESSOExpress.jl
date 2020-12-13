@@ -35,6 +35,24 @@ function _expanddirs(settings, pressures)
     end
 end
 
+function _materialize_vol(config, templates)
+    if haskey(config, "volumes")
+        subconfig = config["volumes"]
+        unit = uparse(
+            if haskey(subconfig, "unit")
+                subconfig["unit"]
+            else
+                @info "no unit provided for `\"volumes\"`! \"bohr^3\" is assumed!"
+                u"bohr^3"
+            end;
+            unit_context = UNIT_CONTEXT,
+        )
+        return map(Base.Fix1(*, unit), subconfig["values"])
+    else
+        return map(cellvolume, templates) * u"bohr^3"
+    end
+end
+
 function materialize(config)
     qe = config["qe"]
     if qe["manager"] == "local"
@@ -53,12 +71,21 @@ function materialize(config)
 
     templates = _expandtmpl(config["templates"], pressures)
 
-    dirs = _expanddirs(config["workdir"], pressures_or_volumes)
+    if haskey(config, "trial_eos")  # "trial_eos" and "volumes" are mutually exclusive
+        trial_eos = materialize_eos(config["trial_eos"])
+        volumes = nothing
+    else
+        trial_eos = nothing
+        volumes = _materialize_vol(config, templates)
+    end
+
+    dirs = _expanddirs(config["workdir"], pressures)
 
     return (
         templates = templates,
-        pressures_or_volumes = pressures,
-        trial_eos = materialize_eos(config["trial_eos"]),
+        pressures = pressures,
+        trial_eos = trial_eos,
+        volumes = volumes,
         dirs = dirs,
         bin = PWX(; bin = bin),
         manager = manager,
