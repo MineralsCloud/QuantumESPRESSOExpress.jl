@@ -4,7 +4,8 @@ using AbInitioSoftwareBase.Inputs: Setter
 using Crystallography: cellvolume
 using Dates: format, now
 using Distributed: LocalManager
-using EquationsOfStateOfSolids.Collections: EquationOfStateOfSolids, PressureEOS, getparam
+using EquationsOfStateOfSolids.Collections:
+    EquationOfStateOfSolids, PressureEOS, Parameters, getparam
 using EquationsOfStateOfSolids.Volume: mustfindvolume
 using QuantumESPRESSO.Inputs.PWscf:
     CellParametersCard, PWInput, VerbositySetter, VolumeSetter, PressureSetter
