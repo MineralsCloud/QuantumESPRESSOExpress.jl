@@ -24,13 +24,13 @@ import Express.EosFitting:
     VcOptim,
     ScfOrOptim,
     adjust,
-    expand_settings,
     checkconfig,
+    materialize,
     expandeos,
     shortname,
     parseoutput
 
-include("settings.jl")
+include("config.jl")
 include("normalizer.jl")
 include("customizer.jl")
 
