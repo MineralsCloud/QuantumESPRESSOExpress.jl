@@ -12,14 +12,22 @@ using QuantumESPRESSO.Outputs.PWscf:
     Preamble, parse_electrons_energies, parsefinal, isjobdone, tryparsefinal
 using QuantumESPRESSO.CLI: PWX
 using Setfield: @set!
-using Unitful: Pressure, Volume, uparse, ustrip, dimension, @u_str
+using Unitful: Pressure, Volume, @u_str
 import Unitful
 using UnitfulAtomic
 
 using ..QuantumESPRESSOExpress: QE
 
 using Express: SelfConsistentField, Optimization
-using Express.EosFitting: UNIT_CONTEXT, StOptim, VcOptim, ScfOrOptim, materialize_eos
+using Express.EosFitting:
+    UNIT_CONTEXT,
+    StOptim,
+    VcOptim,
+    ScfOrOptim,
+    materialize_eos,
+    materialize_press,
+    materialize_vol,
+    materialize_dirs
 import Express.EosFitting: checkconfig, materialize, shortname
 import Express.EosFitting.DefaultActions: adjust, parseoutput
 

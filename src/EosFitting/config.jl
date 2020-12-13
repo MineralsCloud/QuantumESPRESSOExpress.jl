@@ -26,43 +26,6 @@ function _materialize_tmpl(config, pressures)
     end
 end
 
-function _materialize_dirs(config, pressures)
-    return map(pressures) do pressure
-        abspath(joinpath(expanduser(config), "p" * string(ustrip(pressure))))
-    end
-end
-
-function _materialize_press(config)
-    unit = uparse(
-        if haskey(config, "unit")
-            config["unit"]
-        else
-            @info "no unit provided for `\"pressures\"`! \"GPa\" is assumed!"
-            u"GPa"
-        end;
-        unit_context = UNIT_CONTEXT,
-    )
-    return map(Base.Fix1(*, unit), config["values"])
-end
-
-function _materialize_vol(config, templates)
-    if haskey(config, "volumes")
-        subconfig = config["volumes"]
-        unit = uparse(
-            if haskey(subconfig, "unit")
-                subconfig["unit"]
-            else
-                @info "no unit provided for `\"volumes\"`! \"bohr^3\" is assumed!"
-                u"bohr^3"
-            end;
-            unit_context = UNIT_CONTEXT,
-        )
-        return map(Base.Fix1(*, unit), subconfig["values"])
-    else
-        return map(cellvolume, templates) * u"bohr^3"
-    end
-end
-
 function materialize(config)
     qe = config["qe"]
     if qe["manager"] == "local"
@@ -75,7 +38,7 @@ function materialize(config)
     else
     end
 
-    pressures = _materialize_press(config["pressures"])
+    pressures = materialize_press(config["pressures"])
 
     templates = _materialize_tmpl(config["templates"], pressures)
 
@@ -84,10 +47,10 @@ function materialize(config)
         volumes = nothing
     else
         trial_eos = nothing
-        volumes = _materialize_vol(config, templates)
+        volumes = materialize_vol(config, templates)
     end
 
-    dirs = _materialize_dirs(config["workdir"], pressures)
+    dirs = materialize_dirs(config["workdir"], pressures)
 
     return (
         templates = templates,
