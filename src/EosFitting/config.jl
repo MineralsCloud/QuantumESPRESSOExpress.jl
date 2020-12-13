@@ -14,15 +14,14 @@ function checkconfig(::QE, config)
 end
 
 function _materialize_tmpl(config, pressures)
-    templates = map(config) do file
-        str = read(expanduser(file), String)
-        parse(PWInput, str)
-    end
-    M, N = length(templates), length(pressures)
-    if templates isa Vector  # Length of `templates` = length of `pressures`
-        return templates
+    if config["templates"] isa Vector  # Length of `templates` = length of `pressures`
+        return map(config) do file
+            str = read(expanduser(file), String)
+            parse(PWInput, str)
+        end
     else  # `templates` is a single file
-        return fill(templates, length(pressures))
+        str = read(expanduser(config["templates"]), String)
+        return fill(parse(PWInput, str), length(pressures))
     end
 end
 
