@@ -30,10 +30,10 @@ import Express.EosFitting:
 
 include("settings.jl")
 include("normalizer.jl")
-include("customize.jl")
+include("customizer.jl")
 
 adjust(template::PWInput, x::ScfOrOptim, args...) =
-    (customize(args...) ∘ Normalizer(x))(template)
+    (Customizer(args...) ∘ Normalizer(x))(template)
 
 shortname(::Type{SelfConsistentField}) = "scf"
 shortname(::Type{StOptim}) = "relax"
