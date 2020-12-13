@@ -1,5 +1,3 @@
-const UNIT_CONTEXT = [Unitful, UnitfulAtomic]
-
 function checkconfig(::QE, config)
     map(("manager", "bin", "n")) do key
         @assert haskey(config, key)
@@ -12,27 +10,19 @@ function checkconfig(::QE, config)
     else
         error("unknown manager `$(config["manager"])`!")
     end
+    return
 end
 
-function _expandtmpl(settings, pressures)  # Can be pressures or volumes
-    templates = map(settings) do file
+function _materialize_tmpl(config, pressures)
+    templates = map(config) do file
         str = read(expanduser(file), String)
         parse(PWInput, str)
     end
     M, N = length(templates), length(pressures)
-    if M == 1
-        return fill(first(templates), N)
-    elseif M == N
+    if templates isa Vector  # Length of `templates` = length of `pressures`
         return templates
-    else
-        throw(DimensionMismatch("`\"templates\"` should be the same length as `\"pressures\"` or `\"volumes\"`!"))
-    end
-end
-
-function _expanddirs(settings, pressures_or_volumes)
-    prefix = dimension(eltype(pressures_or_volumes)) == dimension(u"Pa") ? "p" : "v"
-    return map(pressures_or_volumes) do pressure_or_volume
-        abspath(joinpath(expanduser(settings), prefix * string(ustrip(pressure_or_volume))))
+    else  # `templates` is a single file
+        return fill(templates, length(pressures))
     end
 end
 
@@ -48,19 +38,26 @@ function materialize(config)
     else
     end
 
-    key = haskey(config, "pressures") ? "pressures" : "volumes"
-    pressures_or_volumes = map(config[key]["values"]) do pressure_or_volume
-        pressure_or_volume * uparse(config[key]["unit"]; unit_context = UNIT_CONTEXT)
+    pressures = materialize_press(config["pressures"])
+
+    templates = _materialize_tmpl(config["templates"], pressures)
+
+    if haskey(config, "trial_eos")  # "trial_eos" and "volumes" are mutually exclusive
+        trial_eos = materialize_eos(config["trial_eos"])
+        volumes = nothing
+    else
+        trial_eos = nothing
+        volumes = materialize_vol(config, templates)
     end
 
-    templates = _expandtmpl(config["templates"], pressures_or_volumes)
-
-    dirs = _expanddirs(config["workdir"], pressures_or_volumes)
+    dirs = materialize_dirs(config["workdir"], pressures)
 
     return (
         templates = templates,
-        pressures_or_volumes = pressures_or_volumes,
-        trial_eos = materialize_eos(config["trial_eos"]),
+        pressures = pressures,
+        trial_eos = trial_eos,
+        volumes = volumes,
+        workdir = config["workdir"],
         dirs = dirs,
         bin = PWX(; bin = bin),
         manager = manager,
