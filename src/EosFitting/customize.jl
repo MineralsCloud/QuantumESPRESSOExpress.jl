@@ -10,19 +10,18 @@ function (x::OutdirSetter)(template::PWInput)
     return template
 end
 
-customize(a, b) = customize(b, a)  # If no method found, switch arguments & try again
-function customize(pressure::Pressure, volume::Volume)
-    function _customize(template::PWInput)::PWInput
-        set = OutdirSetter() ∘ VolumeSetter(volume) ∘ PressureSetter(pressure)
-        return set(template)
-    end
+struct Customizer{A,B}
+    a::A
+    b::B
 end
-function customize(pressure::Pressure, eos::PressureEOS)
-    function _customize(template::PWInput)::PWInput
-        volume = mustfindvolume(eos, pressure; volume_scale = (0.5, 1.5))
-        set = OutdirSetter() ∘ VolumeSetter(volume) ∘ PressureSetter(pressure)
-        return set(template)
-    end
+function (x::Customizer{<:Pressure,<:Volume})(template::PWInput)::PWInput
+    customize = OutdirSetter() ∘ VolumeSetter(x.b) ∘ PressureSetter(x.a)
+    return customize(template)
 end
-customize(pressure::Pressure, eos::EquationOfStateOfSolids) =
-    customize(pressure, PressureEOS(getparam(eos)))
+function (x::Customizer{<:Pressure,<:PressureEOS})(template::PWInput)
+    volume = mustfindvolume(x.b, x.a; volume_scale = (0.5, 1.5))
+    return Customizer(x.a, volume)(template)
+end
+(x::Customizer{<:Pressure,<:EquationOfStateOfSolids})(template::PWInput) =
+    Customizer(x.a, PressureEOS(getparam(x.b)))(template)
+(x::Customizer)(template::PWInput) = Customizer(x.b, x.a)(template)  # If no method found, switch arguments & try again
