@@ -26,10 +26,9 @@ function _materialize_tmpl(config, pressures)
     end
 end
 
-function _expanddirs(settings, pressures)
-    prefix = dimension(eltype(pressures)) == dimension(u"Pa") ? "p" : "v"
-    return map(pressures) do pressure_or_volume
-        abspath(joinpath(expanduser(settings), prefix * string(ustrip(pressure_or_volume))))
+function _materialize_dirs(config, pressures)
+    return map(pressures) do pressure
+        abspath(joinpath(expanduser(config), "p" * string(ustrip(pressure))))
     end
 end
 
@@ -88,13 +87,14 @@ function materialize(config)
         volumes = _materialize_vol(config, templates)
     end
 
-    dirs = _expanddirs(config["workdir"], pressures)
+    dirs = _materialize_dirs(config["workdir"], pressures)
 
     return (
         templates = templates,
         pressures = pressures,
         trial_eos = trial_eos,
         volumes = volumes,
+        workdir = config["workdir"],
         dirs = dirs,
         bin = PWX(; bin = bin),
         manager = manager,
