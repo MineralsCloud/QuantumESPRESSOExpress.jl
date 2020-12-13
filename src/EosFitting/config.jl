@@ -28,9 +28,9 @@ function _expandtmpl(settings, pressures)  # Can be pressures or volumes
     end
 end
 
-function _expanddirs(settings, pressures_or_volumes)
-    prefix = dimension(eltype(pressures_or_volumes)) == dimension(u"Pa") ? "p" : "v"
-    return map(pressures_or_volumes) do pressure_or_volume
+function _expanddirs(settings, pressures)
+    prefix = dimension(eltype(pressures)) == dimension(u"Pa") ? "p" : "v"
+    return map(pressures) do pressure_or_volume
         abspath(joinpath(expanduser(settings), prefix * string(ustrip(pressure_or_volume))))
     end
 end
@@ -47,18 +47,17 @@ function materialize(config)
     else
     end
 
-    key = haskey(config, "pressures") ? "pressures" : "volumes"
-    pressures_or_volumes = map(config[key]["values"]) do pressure_or_volume
-        pressure_or_volume * uparse(config[key]["unit"]; unit_context = UNIT_CONTEXT)
+    pressures = map(config["pressures"]["values"]) do pressure
+        pressure * uparse(config["pressures"]["unit"]; unit_context = UNIT_CONTEXT)
     end
 
-    templates = _expandtmpl(config["templates"], pressures_or_volumes)
+    templates = _expandtmpl(config["templates"], pressures)
 
     dirs = _expanddirs(config["workdir"], pressures_or_volumes)
 
     return (
         templates = templates,
-        pressures_or_volumes = pressures_or_volumes,
+        pressures_or_volumes = pressures,
         trial_eos = materialize_eos(config["trial_eos"]),
         dirs = dirs,
         bin = PWX(; bin = bin),
