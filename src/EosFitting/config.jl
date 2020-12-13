@@ -33,17 +33,17 @@ function _expanddirs(settings, pressures)
     end
 end
 
-function _materialize_press(subconfig)
+function _materialize_press(config)
     unit = uparse(
-        if haskey(subconfig, "unit")
-            subconfig["unit"]
+        if haskey(config, "unit")
+            config["unit"]
         else
             @info "no unit provided for `\"pressures\"`! \"GPa\" is assumed!"
             u"GPa"
         end;
         unit_context = UNIT_CONTEXT,
     )
-    return map(Base.Fix1(*, unit), subconfig["values"])
+    return map(Base.Fix1(*, unit), config["values"])
 end
 
 function _materialize_vol(config, templates)
