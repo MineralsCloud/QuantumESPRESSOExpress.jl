@@ -12,9 +12,10 @@ function (::CalculationSetter{T})(template::PWInput) where {T}
     return template
 end
 
-function standardize(x::ScfOrOptim)
-    function _standardize(template::PWInput)::PWInput
-        set = VerbositySetter("high") ∘ CalculationSetter(x)
-        return set(template)
-    end
+struct Normalizer{T}
+    calc::T
+end
+function (x::Normalizer)(template::PWInput)::PWInput
+    normalize = VerbositySetter("high") ∘ CalculationSetter(x.calc)
+    return normalize(template)
 end
