@@ -1,16 +1,16 @@
 const UNIT_CONTEXT = [Unitful, UnitfulAtomic]
 
-function check_software_settings(settings)
+function checkconfig(::QE, config)
     map(("manager", "bin", "n")) do key
-        @assert haskey(settings, key)
+        @assert haskey(config, key)
     end
-    @assert isinteger(settings["n"]) && settings["n"] >= 1
-    if settings["manager"] == "docker"
-        @assert haskey(settings, "container")
-    elseif settings["manager"] == "ssh"
-    elseif settings["manager"] == "local"  # Do nothing
+    @assert isinteger(config["n"]) && config["n"] >= 1
+    if config["manager"] == "docker"
+        @assert haskey(config, "container")
+    elseif config["manager"] == "ssh"
+    elseif config["manager"] == "local"  # Do nothing
     else
-        error("unknown manager `$(settings["manager"])`!")
+        error("unknown manager `$(config["manager"])`!")
     end
 end
 
@@ -36,8 +36,8 @@ function _expanddirs(settings, pressures_or_volumes)
     end
 end
 
-function expand_settings(settings)
-    qe = settings["qe"]
+function materialize(config)
+    qe = config["qe"]
     if qe["manager"] == "local"
         bin = qe["bin"]
         manager = LocalManager(qe["n"], true)
@@ -48,22 +48,22 @@ function expand_settings(settings)
     else
     end
 
-    key = haskey(settings, "pressures") ? "pressures" : "volumes"
-    pressures_or_volumes = map(settings[key]["values"]) do pressure_or_volume
-        pressure_or_volume * uparse(settings[key]["unit"]; unit_context = UNIT_CONTEXT)
+    key = haskey(config, "pressures") ? "pressures" : "volumes"
+    pressures_or_volumes = map(config[key]["values"]) do pressure_or_volume
+        pressure_or_volume * uparse(config[key]["unit"]; unit_context = UNIT_CONTEXT)
     end
 
-    templates = _expandtmpl(settings["templates"], pressures_or_volumes)
+    templates = _expandtmpl(config["templates"], pressures_or_volumes)
 
-    dirs = _expanddirs(settings["workdir"], pressures_or_volumes)
+    dirs = _expanddirs(config["workdir"], pressures_or_volumes)
 
     return (
         templates = templates,
         pressures_or_volumes = pressures_or_volumes,
-        trial_eos = expandeos(settings["trial_eos"]),
+        trial_eos = materialize_eos(config["trial_eos"]),
         dirs = dirs,
         bin = PWX(; bin = bin),
         manager = manager,
-        use_shell = settings["use_shell"],
+        use_shell = config["use_shell"],
     )
 end

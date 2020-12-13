@@ -16,22 +16,26 @@ using Unitful: Pressure, Volume, uparse, ustrip, dimension, @u_str
 import Unitful
 using UnitfulAtomic
 
+using ..QuantumESPRESSOExpress: QE
+
 using Express: SelfConsistentField, Optimization
 import Express.EosFitting:
     StOptim,
     VcOptim,
     ScfOrOptim,
-    standardize,
-    customize,
-    check_software_settings,
-    expand_settings,
-    expandeos,
+    adjust,
+    checkconfig,
+    materialize,
+    materialize_eos,
     shortname,
     parseoutput
 
-include("settings.jl")
-include("standardize.jl")
-include("customize.jl")
+include("config.jl")
+include("normalizer.jl")
+include("customizer.jl")
+
+adjust(template::PWInput, x::ScfOrOptim, args...) =
+    (Customizer(args...) ∘ Normalizer(x))(template)
 
 shortname(::Type{SelfConsistentField}) = "scf"
 shortname(::Type{StOptim}) = "relax"
