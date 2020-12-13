@@ -19,16 +19,9 @@ using UnitfulAtomic
 using ..QuantumESPRESSOExpress: QE
 
 using Express: SelfConsistentField, Optimization
-import Express.EosFitting:
-    StOptim,
-    VcOptim,
-    ScfOrOptim,
-    adjust,
-    checkconfig,
-    materialize,
-    materialize_eos,
-    shortname,
-    parseoutput
+using Express.EosFitting: StOptim, VcOptim, ScfOrOptim, materialize_eos
+import Express.EosFitting: checkconfig, materialize, shortname
+import Express.EosFitting.DefaultActions: adjust, parseoutput
 
 include("config.jl")
 include("normalizer.jl")
