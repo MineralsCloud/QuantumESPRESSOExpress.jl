@@ -28,7 +28,8 @@ using Express.EosFitting:
     materialize_eos,
     materialize_press,
     materialize_vol,
-    materialize_dirs
+    materialize_dirs,
+    vscale
 import Express.EosFitting: checkconfig, materialize, shortname
 import Express.EosFitting.DefaultActions: adjust, parseoutput
 
