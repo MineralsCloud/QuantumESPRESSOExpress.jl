@@ -1,11 +1,10 @@
-struct OutdirSetter{T} <: Setter
-    timefmt::T
+struct OutdirSetter <: Setter
+    timefmt::String
 end
-OutdirSetter() = OutdirSetter("Y-m-d_H:M:S")
 function (x::OutdirSetter)(template::PWInput)
     @set! template.control.outdir = abspath(joinpath(
         template.control.outdir,
-        template.control.prefix * format(now(), x.timefmt),
+        join((template.control.prefix, format(now(), x.timefmt), rand(UInt)), '_'),
     ))
     return template
 end
