@@ -4,7 +4,6 @@ qe:
   manager: local
   n: 16
 workdir: examples/GaN
-save: GaN.eos
 templates:
   - examples/GaN/template.in
 pressures:
@@ -19,7 +18,7 @@ pressures:
     - 25
     - 30
 trial_eos:
-  type: bm3
+  name: bm3
   parameters:
     - - 317
       - bohr^3
@@ -29,3 +28,4 @@ trial_eos:
       - "1"
     - - -612.43149513
       - Ry
+use_shell: false
