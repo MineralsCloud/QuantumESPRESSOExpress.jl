@@ -12,13 +12,11 @@ using Unitful: uparse, ustrip, @u_str
 import Unitful
 using UnitfulAtomic
 
-using Express: SelfConsistentField
+using Express: SelfConsistentField, _uparse
 using Express.EosFitting: VcOptim
 using Express.Phonon: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos
 import Express.Phonon:
     standardize, customize, expand_settings, parsecell, inputtype, shortname
-
-const UNIT_CONTEXT = [Unitful, UnitfulAtomic]
 
 # This is a helper function and should not be exported.
 standardize(template::PWInput, ::SelfConsistentField)::PWInput =
@@ -48,7 +46,7 @@ customize(template::MatdynInput, ph::PhInput, q2r::Q2rInput) = customize(templat
 
 function expand_settings(settings)
     pressures = map(settings["pressures"]["values"]) do pressure
-        pressure * uparse(settings["pressures"]["unit"]; unit_context = UNIT_CONTEXT)
+        pressure * _uparse(settings["pressures"]["unit"])
     end
 
     function expandtmpl(settings)
