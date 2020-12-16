@@ -21,7 +21,6 @@ using ..QuantumESPRESSOExpress: QE
 
 using Express: SelfConsistentField, Optimization
 using Express.EosFitting:
-    UNIT_CONTEXT,
     StOptim,
     VcOptim,
     ScfOrOptim,
