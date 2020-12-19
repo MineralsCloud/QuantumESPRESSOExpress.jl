@@ -1,11 +1,13 @@
 module Phonon
 
+using AbInitioSoftwareBase.Inputs: Setter
 using Dates: format, now
 using Distributed: LocalManager
 using QuantumESPRESSO.CLI: PhX, PWX, Q2rX, MatdynX
 using QuantumESPRESSO.Inputs.PWscf:
-    AtomicPositionsCard, CellParametersCard, PWInput, set_verbosity, set_cell
-using QuantumESPRESSO.Inputs.PHonon: PhInput, Q2rInput, MatdynInput, relayinfo
+    AtomicPositionsCard, CellParametersCard, PWInput, StructureSetter
+using QuantumESPRESSO.Inputs.PHonon:
+    PhInput, Q2rInput, MatdynInput, VerbositySetter, relayinfo
 using QuantumESPRESSO.Outputs.PWscf: tryparsefinal
 using Setfield: @set!, @set
 using Unitful: uparse, ustrip, @u_str
