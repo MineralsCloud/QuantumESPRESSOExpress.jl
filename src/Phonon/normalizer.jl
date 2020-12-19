@@ -7,9 +7,10 @@ function (::CalculationSetter{Scf})(template::PWInput)
 end
 
 struct Normalizer{T}
+    calc::T
 end
 function (x::Normalizer{Scf})(template::PWInput)::PWInput
-    normalize = VerbositySetter("high") ∘ CalculationSetter("scf")
+    normalize = VerbositySetter("high") ∘ CalculationSetter(Scf())
     return normalize(template)
 end
 (x::Normalizer{Dfpt})(template::PhInput)::PhInput = VerbositySetter("high")(template)
