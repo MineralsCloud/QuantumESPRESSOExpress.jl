@@ -1,14 +1,24 @@
-function customize(template::PWInput, new_structure)::PWInput
-    @set! template.control.outdir = abspath(mktempdir(
-        mkpath(template.control.outdir);
-        prefix = template.control.prefix * format(now(), "_Y-m-d_H:M:S_"),
-        cleanup = false,
+struct OutdirSetter <: Setter
+    timefmt::String
+end
+function (x::OutdirSetter)(template::PWInput)
+    @set! template.control.outdir = abspath(joinpath(
+        template.control.outdir,
+        join((template.control.prefix, format(now(), x.timefmt), rand(UInt)), '_'),
     ))
-    template = set_cell(template, new_structure...)
-    template = set_verbosity(template, "high")
     return template
 end
-customize(template::PWInput) = template
+
+struct Customizer{A,B}
+    a::A
+    b::B
+    timefmt::String
+end
+
+function (::Customizer)(template::PWInput, new_structure)::PWInput
+    customize = OutdirSetter(x.timefmt) ∘ VolumeSetter(x.b) ∘ PressureSetter(x.a)
+    template = set_cell(template, new_structure...)
+end
 customize(template::PhInput, pw::PWInput)::PhInput = relayinfo(pw, template)
 customize(template::Q2rInput, ph::PhInput)::Q2rInput = relayinfo(ph, template)
 customize(template::MatdynInput, q2r::Q2rInput, ph::PhInput)::MatdynInput =

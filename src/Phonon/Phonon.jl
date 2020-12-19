@@ -14,7 +14,7 @@ using Unitful: uparse, ustrip, @u_str
 import Unitful
 using UnitfulAtomic
 
-using Express: SelfConsistentField, _uparse
+using Express: Scf, _uparse
 using Express.EosFitting: VcOptim
 using Express.Phonon: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos
 import Express.Phonon:
@@ -22,6 +22,10 @@ import Express.Phonon:
 
 include("normalizer.jl")
 include("customizer.jl")
+
+adjust(template::PWInput, x::Scf, args...) = (Customizer(args...) ∘ Normalizer(x))(template)
+adjust(template::PhInput, x::Dfpt, args...) =
+    (Customizer(args...) ∘ Normalizer(x))(template)
 
 function expand_settings(settings)
     pressures = map(settings["pressures"]["values"]) do pressure
