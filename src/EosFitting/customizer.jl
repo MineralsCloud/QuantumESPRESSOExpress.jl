@@ -25,7 +25,7 @@ function (x::Customizer{<:Pressure,<:EquationOfStateOfSolids})(template::PWInput
     return x(template)
 end
 function (x::Customizer{<:Pressure,<:Parameters})(template::PWInput)
-    x = @set! x.b = PressureEOS(x.b)
+    x = @set! x.b = PressureEos(x.b)
     return x(template)
 end
 (x::Customizer)(template::PWInput) = Customizer(x.b, x.a, x.timefmt)(template)  # If no method found, switch arguments & try again
