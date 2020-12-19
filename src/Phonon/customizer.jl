@@ -9,18 +9,24 @@ function (x::OutdirSetter)(template::PWInput)
     return template
 end
 
-struct Customizer{A,B}
-    a::A
-    b::B
+struct Customizer{T<:Scf,A,B}
+    cp::A
+    ap::B
     timefmt::String
 end
-
-function (::Customizer)(template::PWInput, new_structure)::PWInput
-    customize = OutdirSetter(x.timefmt) ∘ VolumeSetter(x.b) ∘ PressureSetter(x.a)
-    template = set_cell(template, new_structure...)
+function (x::Customizer{Scf})(template::PWInput)
+    customize = OutdirSetter(x.timefmt) ∘ StructureSetter(x.cp, x.ap)
+    template = customize(template)
 end
-customize(template::PhInput, pw::PWInput)::PhInput = relayinfo(pw, template)
-customize(template::Q2rInput, ph::PhInput)::Q2rInput = relayinfo(ph, template)
-customize(template::MatdynInput, q2r::Q2rInput, ph::PhInput)::MatdynInput =
+function (x::Customizer{Dfpt})(template::PhInput)
+    relayinfo(pw, template)
+    template = customize(template)
+end
+function (x::Customizer{RealSpaceForceConstants})(template::Q2rInput)
+    relayinfo(ph, template)
+    template = customize(template)
+end
+function (x::Customizer{<:Union{PhononDispersion,VDos}})(template::MatdynInput)
     relayinfo(q2r, relayinfo(ph, template))
-customize(template::MatdynInput, ph::PhInput, q2r::Q2rInput) = customize(template, q2r, ph)
+    template = customize(template)
+end

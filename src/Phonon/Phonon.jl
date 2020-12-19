@@ -14,7 +14,7 @@ using Unitful: uparse, ustrip, @u_str
 import Unitful
 using UnitfulAtomic
 
-using Express: Scf, _uparse
+using Express: Calculation, Scf, _uparse
 using Express.EosFitting: VcOptim
 using Express.Phonon: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos
 import Express.Phonon:
