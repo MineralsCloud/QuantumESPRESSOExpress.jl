@@ -3,7 +3,7 @@ module Phonon
 using AbInitioSoftwareBase.Inputs: Setter
 using Dates: format, now
 using Distributed: LocalManager
-using Express: Calculation, Scf, _uparse
+using Express: Calculation, Scf, myuparse
 using Express.EosFitting: VcOptim
 using Express.Phonon: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos
 using QuantumESPRESSO.CLI: PhX, PWX, Q2rX, MatdynX
@@ -31,7 +31,7 @@ adjust(template::MatdynInput, x::Union{PhononDispersion,VDos}, args...) =
 
 function expand_settings(settings)
     pressures = map(settings["pressures"]["values"]) do pressure
-        pressure * _uparse(settings["pressures"]["unit"])
+        pressure * myuparse(settings["pressures"]["unit"])
     end
 
     function expandtmpl(settings)
