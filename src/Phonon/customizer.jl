@@ -9,24 +9,12 @@ function (x::OutdirSetter)(template::PWInput)
     return template
 end
 
-struct Customizer{T<:Scf,A,B}
+struct Customizer{A,B}
     cp::A
     ap::B
     timefmt::String
 end
-function (x::Customizer{Scf})(template::PWInput)
+function (x::Customizer)(template::PWInput)::PWInput
     customize = OutdirSetter(x.timefmt) ∘ StructureSetter(x.cp, x.ap)
-    template = customize(template)
-end
-function (x::Customizer{Dfpt})(template::PhInput)
-    relayinfo(pw, template)
-    template = customize(template)
-end
-function (x::Customizer{RealSpaceForceConstants})(template::Q2rInput)
-    relayinfo(ph, template)
-    template = customize(template)
-end
-function (x::Customizer{<:Union{PhononDispersion,VDos}})(template::MatdynInput)
-    relayinfo(q2r, relayinfo(ph, template))
-    template = customize(template)
+    return customize(template)
 end
