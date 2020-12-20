@@ -1,29 +1,37 @@
 module Phonon
 
+using AbInitioSoftwareBase.Inputs: Setter
 using Dates: format, now
 using Distributed: LocalManager
+using Express: Calculation, Scf, myuparse
+using Express.EosFitting: VcOptim
+using Express.Phonon: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos
 using QuantumESPRESSO.CLI: PhX, PWX, Q2rX, MatdynX
 using QuantumESPRESSO.Inputs.PWscf:
-    AtomicPositionsCard, CellParametersCard, PWInput, set_verbosity, set_cell
-using QuantumESPRESSO.Inputs.PHonon: PhInput, Q2rInput, MatdynInput, relayinfo
+    AtomicPositionsCard, CellParametersCard, PWInput, StructureSetter
+using QuantumESPRESSO.Inputs.PHonon:
+    PhInput, Q2rInput, MatdynInput, VerbositySetter, relayinfo
 using QuantumESPRESSO.Outputs.PWscf: tryparsefinal
 using Setfield: @set!, @set
 using Unitful: uparse, ustrip, @u_str
 import Unitful
 using UnitfulAtomic
 
-using Express: SelfConsistentField, _uparse
-using Express.EosFitting: VcOptim
-using Express.Phonon: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos
-import Express.Phonon:
-    standardize, customize, expand_settings, parsecell, inputtype, shortname
+import Express.Phonon: expand_settings, parsecell, inputtype, shortname
 
 include("normalizer.jl")
 include("customizer.jl")
 
+adjust(template::PWInput, x::Scf, args...) = (Customizer(args...) ∘ Normalizer(x))(template)
+adjust(template::PhInput, x::Dfpt, args...) = Normalizer(x, args...)(template)
+adjust(template::Q2rInput, x::RealSpaceForceConstants, args...) =
+    Normalizer(x, args...)(template)
+adjust(template::MatdynInput, x::Union{PhononDispersion,VDos}, args...) =
+    Normalizer(x, args...)(template)
+
 function expand_settings(settings)
     pressures = map(settings["pressures"]["values"]) do pressure
-        pressure * _uparse(settings["pressures"]["unit"])
+        pressure * myuparse(settings["pressures"]["unit"])
     end
 
     function expandtmpl(settings)
