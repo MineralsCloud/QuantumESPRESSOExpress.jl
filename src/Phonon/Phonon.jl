@@ -17,7 +17,7 @@ using Unitful: uparse, ustrip, @u_str
 import Unitful
 using UnitfulAtomic
 
-import Express.Phonon: expand_settings, parsecell, inputtype, shortname
+import Express.Phonon: materialize, parsecell, inputtype, shortname
 
 include("normalizer.jl")
 include("customizer.jl")
@@ -29,9 +29,9 @@ adjust(template::Q2rInput, x::RealSpaceForceConstants, args...) =
 adjust(template::MatdynInput, x::Union{PhononDispersion,VDos}, args...) =
     Normalizer(x, args...)(template)
 
-function expand_settings(settings)
-    pressures = map(settings["pressures"]["values"]) do pressure
-        pressure * myuparse(settings["pressures"]["unit"])
+function materialize(config)
+    pressures = map(config["pressures"]["values"]) do pressure
+        pressure * myuparse(config["pressures"]["unit"])
     end
 
     function expandtmpl(settings)
@@ -49,9 +49,9 @@ function expand_settings(settings)
             end
         end
     end
-    templates = expandtmpl(settings["templates"])
+    templates = expandtmpl(config["templates"])
 
-    qe = settings["qe"]
+    qe = config["qe"]
     if qe["manager"] == "local"
         bin = qe["bin"]
         manager = LocalManager(qe["n"], true)
@@ -70,7 +70,7 @@ function expand_settings(settings)
             ))
         end
     end
-    dirs = expanddirs(settings)
+    dirs = expanddirs(config)
 
     return (
         templates = templates,
@@ -83,7 +83,7 @@ function expand_settings(settings)
             MatdynX(bin = bin[4]),
         ],
         manager = manager,
-        use_shell = settings["use_shell"],
+        use_shell = config["use_shell"],
     )
 end
 
