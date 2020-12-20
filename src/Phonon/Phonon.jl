@@ -17,7 +17,9 @@ using Unitful: uparse, ustrip, @u_str
 import Unitful
 using UnitfulAtomic
 
-import Express.Phonon: materialize, parsecell, inputtype, shortname
+using ..QuantumESPRESSOExpress: QE
+
+import Express.Phonon: materialize, parsecell, inputtype, shortname, checkconfig
 
 include("normalizer.jl")
 include("customizer.jl")
