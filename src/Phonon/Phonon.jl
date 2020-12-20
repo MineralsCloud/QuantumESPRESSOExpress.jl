@@ -87,12 +87,12 @@ function materialize(config)
     )
 end
 
-inputtype(::SelfConsistentField) = PWInput
+inputtype(::Scf) = PWInput
 inputtype(::Dfpt) = PhInput
 inputtype(::RealSpaceForceConstants) = Q2rInput
 inputtype(::Union{PhononDispersion,VDos}) = MatdynInput
 
-shortname(::Type{SelfConsistentField}) = "phscf"
+shortname(::Type{Scf}) = "phscf"
 shortname(::Type{VcOptim}) = "vc-relax"
 shortname(::Type{Dfpt}) = "dfpt"
 shortname(::Type{RealSpaceForceConstants}) = "q2r"
