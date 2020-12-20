@@ -5,7 +5,7 @@ using Crystallography: cellvolume
 using Dates: format, now
 using Distributed: LocalManager
 using EquationsOfStateOfSolids.Collections:
-    EquationOfStateOfSolids, PressureEOS, Parameters, getparam
+    EquationOfStateOfSolids, PressureEos, Parameters, getparam
 using EquationsOfStateOfSolids.Volume: mustfindvolume
 using QuantumESPRESSO.Inputs.PWscf:
     CellParametersCard, PWInput, VerbositySetter, VolumeSetter, PressureSetter
