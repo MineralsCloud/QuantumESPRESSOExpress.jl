@@ -8,24 +8,34 @@ end
 
 struct Normalizer{T,S}
     calc::T
-    previnput::S
+    args::S
 end
 function (x::Normalizer{Scf})(template::PWInput)::PWInput
     normalize = VerbositySetter("high") ∘ CalculationSetter(Scf())
     return normalize(template)
 end
 function (x::Normalizer{Dfpt,PWInput})(template::PhInput)::PhInput
-    normalize = Base.Fix1(relayinfo, x.previnput) ∘ VerbositySetter("high")
+    normalize = Base.Fix1(relayinfo, x.args) ∘ VerbositySetter("high")
     return normalize(template)
 end
 (x::Normalizer{RealSpaceForceConstants,PhInput})(template::Q2rInput)::Q2rInput =
-    relayinfo(x.previnput, template)
-function (x::Normalizer{PhononDispersion,Q2rInput})(template::MatdynInput)::MatdynInput
+    relayinfo(x.args, template)
+function (
+    x::Normalizer{
+        PhononDispersion,
+        <:Union{Tuple{Q2rInput,PhInput},Tuple{PhInput,Q2rInput}},
+    }
+)(
+    template::MatdynInput,
+)::MatdynInput
     @set! template.input.dos = false
-    return relayinfo(x.previnput, template)
+    normalize = Base.Fix1(relayinfo, x.args[2]) ∘ Base.Fix1(relayinfo, x.args[1])
+    return normalize(template)
 end
-function (x::Normalizer{VDos,Q2rInput,PhInput})(template::MatdynInput)::MatdynInput
+function (x::Normalizer{VDos,<:Union{Tuple{Q2rInput,PhInput},Tuple{PhInput,Q2rInput}}})(
+    template::MatdynInput,
+)::MatdynInput
     @set! template.input.dos = true
-    normalize = Base.Fix1(relayinfo, x.previnput) ∘ Base.Fix1(relayinfo, x.previnput)
+    normalize = Base.Fix1(relayinfo, x.args[2]) ∘ Base.Fix1(relayinfo, x.args[1])
     return normalize(template)
 end
