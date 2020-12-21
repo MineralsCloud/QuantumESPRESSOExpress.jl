@@ -50,7 +50,7 @@ function materialize(config)
         return map(pressures) do pressure
             abspath(joinpath(
                 expanduser(settings["workdir"]),
-                "p=" * string(ustrip(pressure)),
+                "p" * string(ustrip(pressure)),
             ))
         end
     end
