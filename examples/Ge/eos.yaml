@@ -3,7 +3,6 @@ qe:
   bin: pw.x
   manager: local
   n: 24
-workdir: examples/Ge
 save: examples/Ge/Ge.jls
 templates:
   - examples/Ge/template.in
