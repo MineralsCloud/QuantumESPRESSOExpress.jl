@@ -19,12 +19,13 @@ using UnitfulAtomic
 
 using ..QuantumESPRESSOExpress: QE
 
-import Express.Phonon: materialize, parsecell, inputtype, shortname, checkconfig
+import Express.Phonon: materialize, shortname, checkconfig
+import Express.Phonon.DefaultActions: adjust, parsecell, inputtype
 
 include("normalizer.jl")
 include("customizer.jl")
 
-adjust(template::PWInput, x::Scf, args...) = (Customizer(args...) ∘ Normalizer(x))(template)
+adjust(template::PWInput, x::Scf, args...) = (Customizer(args...) ∘ Normalizer(x, template))(template)
 adjust(template::PhInput, x::Dfpt, args...) = Normalizer(x, args...)(template)
 adjust(template::Q2rInput, x::RealSpaceForceConstants, args...) =
     Normalizer(x, args...)(template)
