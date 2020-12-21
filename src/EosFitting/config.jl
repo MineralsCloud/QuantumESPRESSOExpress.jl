@@ -49,15 +49,13 @@ function materialize(config)
         volumes = materialize_vol(config, templates)
     end
 
-    dirs = materialize_dirs(config["workdir"], pressures)
-
     return (
         templates = templates,
         pressures = pressures,
         trial_eos = trial_eos,
         volumes = volumes,
-        workdir = config["workdir"],
-        dirs = dirs,
+        workdir = dirname(config),
+        dirs = materialize_dirs(workdir, pressures),
         bin = PWX(; bin = bin),
         manager = manager,
         use_shell = config["use_shell"],
