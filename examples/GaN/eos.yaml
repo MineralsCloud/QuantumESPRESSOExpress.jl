@@ -3,7 +3,6 @@ qe:
   bin: pw.x
   manager: local
   n: 16
-workdir: examples/GaN
 templates:
   - examples/GaN/template.in
 pressures:

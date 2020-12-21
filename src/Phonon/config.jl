@@ -46,15 +46,9 @@ function materialize(config)
     else
     end
 
-    function expanddirs(settings)
-        return map(pressures) do pressure
-            abspath(joinpath(
-                expanduser(settings["workdir"]),
-                "p" * string(ustrip(pressure)),
-            ))
-        end
+    dirs = map(pressures) do pressure
+        abspath(joinpath(expanduser(dirname(config)), "p" * string(ustrip(pressure))))
     end
-    dirs = expanddirs(config)
 
     return (
         templates = templates,

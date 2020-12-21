@@ -7,7 +7,6 @@ qe:
     - matdyn.x
   manager: local
   n: 16
-workdir: examples/GaN
 templates:
   - - examples/GaN/template.in
   - - examples/GaN/ph.in
