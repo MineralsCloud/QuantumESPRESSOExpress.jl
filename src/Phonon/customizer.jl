@@ -14,6 +14,7 @@ struct Customizer{A,B}
     ap::B
     timefmt::String
 end
+Customizer(a, b) = Customizer(a, b, "Y-m-d_H:M:S")
 function (x::Customizer)(template::PWInput)::PWInput
     customize = OutdirSetter(x.timefmt) ∘ StructureSetter(x.cp, x.ap)
     return customize(template)

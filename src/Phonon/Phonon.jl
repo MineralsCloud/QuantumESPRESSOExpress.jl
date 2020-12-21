@@ -19,24 +19,29 @@ using UnitfulAtomic
 
 using ..QuantumESPRESSOExpress: QE
 
-import Express.Phonon: materialize, parsecell, inputtype, shortname, checkconfig
+import Express.Phonon: materialize, shortname, checkconfig
+import Express.Phonon.DefaultActions: adjust, parsecell, inputtype
 
 include("normalizer.jl")
 include("customizer.jl")
 
-adjust(template::PWInput, x::Scf, args...) = (Customizer(args...) ∘ Normalizer(x))(template)
-adjust(template::PhInput, x::Dfpt, args...) = Normalizer(x, args...)(template)
-adjust(template::Q2rInput, x::RealSpaceForceConstants, args...) =
-    Normalizer(x, args...)(template)
-adjust(template::MatdynInput, x::Union{PhononDispersion,VDos}, args...) =
-    Normalizer(x, args...)(template)
+adjust(template::PWInput, x::Scf, args...) =
+    (Customizer(args...) ∘ Normalizer(x, template))(template)
+adjust(template::PhInput, x::Dfpt, previnp::PWInput) = Normalizer(x, previnp)(template)
+adjust(template::Q2rInput, x::RealSpaceForceConstants, previnp::PhInput) =
+    Normalizer(x, previnp)(template)
+adjust(template::MatdynInput, x::Union{PhononDispersion,VDos}, a::Q2rInput, b::PhInput) =
+    Normalizer(x, (a, b))(template)
+adjust(template::MatdynInput, x::Union{PhononDispersion,VDos}, a::PhInput, b::Q2rInput) =
+    adjust(template, x, b, a)
 
 include("config.jl")
 
-inputtype(::Scf) = PWInput
-inputtype(::Dfpt) = PhInput
-inputtype(::RealSpaceForceConstants) = Q2rInput
-inputtype(::Union{PhononDispersion,VDos}) = MatdynInput
+inputtype(x::Calculation) = inputtype(typeof(x))
+inputtype(::Type{Scf}) = PWInput
+inputtype(::Type{Dfpt}) = PhInput
+inputtype(::Type{RealSpaceForceConstants}) = Q2rInput
+inputtype(::Type{<:Union{PhononDispersion,VDos}}) = MatdynInput
 
 shortname(::Type{Scf}) = "phscf"
 shortname(::Type{VcOptim}) = "vc-relax"
