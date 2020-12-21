@@ -17,7 +17,9 @@ using Unitful: uparse, ustrip, @u_str
 import Unitful
 using UnitfulAtomic
 
-import Express.Phonon: expand_settings, parsecell, inputtype, shortname
+using ..QuantumESPRESSOExpress: QE
+
+import Express.Phonon: materialize, parsecell, inputtype, shortname, checkconfig
 
 include("normalizer.jl")
 include("customizer.jl")
@@ -29,70 +31,14 @@ adjust(template::Q2rInput, x::RealSpaceForceConstants, args...) =
 adjust(template::MatdynInput, x::Union{PhononDispersion,VDos}, args...) =
     Normalizer(x, args...)(template)
 
-function expand_settings(settings)
-    pressures = map(settings["pressures"]["values"]) do pressure
-        pressure * myuparse(settings["pressures"]["unit"])
-    end
+include("config.jl")
 
-    function expandtmpl(settings)
-        return map(settings, (PWInput, PhInput, Q2rInput, MatdynInput)) do files, T
-            temps = map(files) do file
-                str = read(expanduser(file), String)
-                parse(T, str)
-            end
-            if length(temps) == 1
-                fill(temps[1], length(pressures))
-            elseif length(temps) != length(pressures)
-                throw(DimensionMismatch("!!!"))
-            else
-                temps
-            end
-        end
-    end
-    templates = expandtmpl(settings["templates"])
-
-    qe = settings["qe"]
-    if qe["manager"] == "local"
-        bin = qe["bin"]
-        manager = LocalManager(qe["n"], true)
-    elseif qe["manager"] == "docker"
-        n = qe["n"]
-        bin = qe["bin"]
-        # manager = DockerEnvironment(n, qe["container"], bin)
-    else
-    end
-
-    function expanddirs(settings)
-        return map(pressures) do pressure
-            abspath(joinpath(
-                expanduser(settings["workdir"]),
-                "p=" * string(ustrip(pressure)),
-            ))
-        end
-    end
-    dirs = expanddirs(settings)
-
-    return (
-        templates = templates,
-        pressures = pressures,
-        dirs = dirs,
-        bin = [
-            PWX(bin = bin[1]),
-            PhX(bin = bin[2]),
-            Q2rX(bin = bin[3]),
-            MatdynX(bin = bin[4]),
-        ],
-        manager = manager,
-        use_shell = settings["use_shell"],
-    )
-end
-
-inputtype(::SelfConsistentField) = PWInput
+inputtype(::Scf) = PWInput
 inputtype(::Dfpt) = PhInput
 inputtype(::RealSpaceForceConstants) = Q2rInput
 inputtype(::Union{PhononDispersion,VDos}) = MatdynInput
 
-shortname(::Type{SelfConsistentField}) = "phscf"
+shortname(::Type{Scf}) = "phscf"
 shortname(::Type{VcOptim}) = "vc-relax"
 shortname(::Type{Dfpt}) = "dfpt"
 shortname(::Type{RealSpaceForceConstants}) = "q2r"
