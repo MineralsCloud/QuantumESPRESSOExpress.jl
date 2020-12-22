@@ -47,7 +47,7 @@ function materialize(config)
     end
 
     dirs = map(pressures) do pressure
-        abspath(joinpath(expanduser(dirname(config)), "p" * string(ustrip(pressure))))
+        abspath(joinpath(config["workdir"], "p" * string(ustrip(pressure))))
     end
 
     return (
