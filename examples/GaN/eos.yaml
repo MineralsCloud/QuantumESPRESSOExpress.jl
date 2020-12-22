@@ -1,8 +1,8 @@
 workflow: eos
-qe:
-  bin: pw.x
-  manager: local
-  n: 16
+np: 16
+bin:
+  qe:
+    - pw.x
 templates:
   - examples/GaN/template.in
 pressures:

@@ -1,12 +1,11 @@
 workflow: vdos
-qe:
-  bin:
+np: 24
+bin:
+  qe:
     - pw.x
     - ph.x
     - q2r.x
     - matdyn.x
-  manager: local
-  n: 48
 templates:
   - - examples/Ge/template.in
   - - examples/Ge/ph.in

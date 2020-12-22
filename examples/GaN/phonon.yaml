@@ -1,12 +1,11 @@
-workflow: eos+phonon
-qe:
-  bin:
+workflow: phonon dispersion
+np: 16
+bin:
+  qe:
     - pw.x
     - ph.x
     - q2r.x
     - matdyn.x
-  manager: local
-  n: 16
 templates:
   - - examples/GaN/template.in
   - - examples/GaN/ph.in

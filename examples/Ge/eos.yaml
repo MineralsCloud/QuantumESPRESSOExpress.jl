@@ -1,9 +1,8 @@
 workflow: eos
-qe:
-  bin: pw.x
-  manager: local
-  n: 24
-save: examples/Ge/Ge.jls
+np: 24
+bin:
+  qe:
+    - pw.x
 templates:
   - examples/Ge/template.in
 pressures:
