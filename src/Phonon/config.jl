@@ -1,15 +1,12 @@
 function checkconfig(::QE, config)
-    map(("manager", "bin", "n")) do key
-        @assert haskey(config, key)
-    end
-    @assert isinteger(config["n"]) && config["n"] >= 1
-    if config["manager"] == "docker"
-        @assert haskey(config, "container")
-    elseif config["manager"] == "ssh"
-    elseif config["manager"] == "local"  # Do nothing
-    else
-        error("unknown manager `$(config["manager"])`!")
-    end
+    @assert haskey(config, "qe")
+    # if config["manager"] == "docker"
+    #     @assert haskey(config, "container")
+    # elseif config["manager"] == "ssh"
+    # elseif config["manager"] == "local"  # Do nothing
+    # else
+    #     error("unknown manager `$(config["manager"])`!")
+    # end
     return
 end
 
@@ -35,16 +32,8 @@ function materialize(config)
     end
     templates = expandtmpl(config["templates"])
 
-    qe = config["qe"]
-    if qe["manager"] == "local"
-        bin = qe["bin"]
-        manager = LocalManager(qe["n"], true)
-    elseif qe["manager"] == "docker"
-        n = qe["n"]
-        bin = qe["bin"]
-        # manager = DockerEnvironment(n, qe["container"], bin)
-    else
-    end
+    manager = LocalManager(config["np"], true)
+    bin = config["bin"]["qe"]
 
     dirs = map(pressures) do pressure
         abspath(joinpath(config["workdir"], "p" * string(ustrip(pressure))))
