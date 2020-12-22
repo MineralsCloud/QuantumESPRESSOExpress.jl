@@ -1,15 +1,12 @@
 function checkconfig(::QE, config)
-    map(("manager", "bin", "n")) do key
-        @assert haskey(config, key)
-    end
-    @assert isinteger(config["n"]) && config["n"] >= 1
-    if config["manager"] == "docker"
-        @assert haskey(config, "container")
-    elseif config["manager"] == "ssh"
-    elseif config["manager"] == "local"  # Do nothing
-    else
-        error("unknown manager `$(config["manager"])`!")
-    end
+    @assert haskey(config, "qe")
+    # if config["manager"] == "docker"
+    #     @assert haskey(config, "container")
+    # elseif config["manager"] == "ssh"
+    # elseif config["manager"] == "local"  # Do nothing
+    # else
+    #     error("unknown manager `$(config["manager"])`!")
+    # end
     return
 end
 
@@ -26,16 +23,8 @@ function _materialize_tmpl(config, pressures)
 end
 
 function materialize(config)
-    qe = config["qe"]
-    if qe["manager"] == "local"
-        bin = qe["bin"]
-        manager = LocalManager(qe["n"], true)
-    elseif qe["manager"] == "docker"
-        n = qe["n"]
-        bin = qe["bin"]
-        # manager = DockerEnvironment(n, qe["container"], bin)
-    else
-    end
+    manager = LocalManager(config["np"], true)
+    bin = PWX(; bin = first(config["bin"]["qe"]))
 
     pressures = materialize_press(config["pressures"])
 
@@ -58,7 +47,7 @@ function materialize(config)
         volumes = volumes,
         workdir = workdir,
         dirs = materialize_dirs(workdir, pressures),
-        bin = PWX(; bin = bin),
+        bin = bin,
         manager = manager,
         use_shell = config["use_shell"],
     )
