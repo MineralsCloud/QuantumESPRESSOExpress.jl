@@ -6,7 +6,7 @@ using Distributed: LocalManager
 using Express: Calculation, Scf, myuparse
 using Express.EosFitting: VcOptim
 using Express.Phonon: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos
-using QuantumESPRESSO.CLI: PhX, PWX, Q2rX, MatdynX
+using QuantumESPRESSO.CLI: PhExec, PWExec, Q2rExec, MatdynExec
 using QuantumESPRESSO.Inputs.PWscf:
     AtomicPositionsCard, CellParametersCard, PWInput, StructureSetter
 using QuantumESPRESSO.Inputs.PHonon:

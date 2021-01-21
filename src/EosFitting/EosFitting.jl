@@ -11,7 +11,7 @@ using QuantumESPRESSO.Inputs.PWscf:
     CellParametersCard, PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using QuantumESPRESSO.Outputs.PWscf:
     Preamble, parse_electrons_energies, parsefinal, isjobdone, tryparsefinal
-using QuantumESPRESSO.CLI: PWX
+using QuantumESPRESSO.CLI: PWExec
 using Setfield: @set!
 using Unitful: Pressure, Volume, @u_str
 import Unitful

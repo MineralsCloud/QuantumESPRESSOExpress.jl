@@ -24,7 +24,7 @@ end
 
 function materialize(config)
     manager = LocalManager(config["np"], true)
-    bin = PWX(; bin = first(config["bin"]["qe"]))
+    bin = PWExec(; bin = first(config["bin"]["qe"]))
 
     pressures = materialize_press(config["pressures"])
 
