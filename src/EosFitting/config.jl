@@ -24,7 +24,7 @@ end
 
 function materialize(config)
     manager = LocalManager(config["np"], true)
-    bin = PWX(; bin = first(config["bin"]["qe"]))
+    bin = PWExec(; bin = first(config["bin"]["qe"]))
 
     pressures = materialize_press(config["pressures"])
 
@@ -49,6 +49,9 @@ function materialize(config)
         dirs = materialize_dirs(workdir, pressures),
         bin = bin,
         manager = manager,
-        use_shell = config["use_shell"],
+        use_shell = haskey(config, "use_shell") ? config["use_shell"] : false,
+        script_template = haskey(config, "script_template") ? config["script_template"] :
+                          nothing,
+        shell_args = haskey(config, "shell_args") ? config["shell_args"] : Dict(),
     )
 end
