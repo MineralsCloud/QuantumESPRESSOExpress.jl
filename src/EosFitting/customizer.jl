@@ -2,10 +2,12 @@ struct OutdirSetter <: Setter
     timefmt::String
 end
 function (x::OutdirSetter)(template::PWInput)
-    @set! template.control.outdir = abspath(joinpath(
-        template.control.outdir,
-        join((template.control.prefix, format(now(), x.timefmt), rand(UInt)), '_'),
-    ))
+    @set! template.control.outdir = abspath(
+        joinpath(
+            template.control.outdir,
+            join((template.control.prefix, format(now(), x.timefmt), rand(UInt)), '_'),
+        ),
+    )
     return template
 end
 
@@ -20,12 +22,12 @@ function (x::Customizer{<:Pressure,<:Volume})(template::PWInput)::PWInput
     return customize(template)
 end
 function (x::Customizer{<:Pressure,<:EquationOfStateOfSolids})(template::PWInput)
-    volume = mustfindvolume(x.b, x.a; vscale = vscale())
+    volume = inverse(x.b)(x.a)  # FIXME: `vscale` is removed
     x = @set! x.b = volume
     return x(template)
 end
 function (x::Customizer{<:Pressure,<:Parameters})(template::PWInput)
-    x = @set! x.b = PressureEos(x.b)
+    x = @set! x.b = PressureEquation(x.b)
     return x(template)
 end
 (x::Customizer)(template::PWInput) = Customizer(x.b, x.a, x.timefmt)(template)  # If no method found, switch arguments & try again
