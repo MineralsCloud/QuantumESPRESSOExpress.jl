@@ -50,7 +50,7 @@ function parseoutput(::SelfConsistentField)
             parse_electrons_energies(str, :converged)
         catch
         end
-        if preamble !== nothing && e !== nothing
+        if preamble !== nothing && !isempty(e)
             return preamble.omega * u"bohr^3" => e.ε[end] * u"Ry"  # volume, energy
         else
             return
