@@ -8,6 +8,7 @@ function (x::OutdirSetter)(template::PWInput)
             join((template.control.prefix, format(now(), x.timefmt), rand(UInt)), '_'),
         ),
     )
+    mkpath(template.control.outdir)
     return template
 end
 
