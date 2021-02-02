@@ -19,12 +19,8 @@ pressures:
 trial_eos:
   name: bm3
   parameters:
-    - - 317
-      - bohr^3
-    - - 210
-      - GPa
-    - - 4
-      - "1"
-    - - -612.43149513
-      - Ry
+    v0: 317 bohr^3
+    b0: 210 GPa
+    b′0: 4
+    e0: -612.43149513 Ry
 use_shell: false
