@@ -45,7 +45,7 @@ function materialize(config)
         pressures = pressures,
         trial_eos = trial_eos,
         volumes = volumes,
-        # workdir = config.workdir,
+        workdir = config.workdir,
         dirs = materialize_dir(config),
         bin = config.cli,
     )
