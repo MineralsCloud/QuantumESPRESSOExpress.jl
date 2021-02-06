@@ -19,7 +19,7 @@ using UnitfulAtomic
 
 using ..QuantumESPRESSOExpress: QE
 
-import Express.Phonon: materialize, shortname, checkconfig
+import Express.Phonon: materialize, shortname
 import Express.Phonon.DefaultActions: adjust, parsecell, inputtype
 
 include("normalizer.jl")
