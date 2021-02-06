@@ -1,11 +1,13 @@
 module EosFitting
 
 using AbInitioSoftwareBase.Inputs: Setter
+using AbInitioSoftwareBase.Cli: MpiexecOptions
 using Crystallography: cellvolume
 using Dates: format, now
 using Distributed: LocalManager
 using EquationsOfStateOfSolids: EquationOfStateOfSolids, PressureEquation, Parameters
 using EquationsOfStateOfSolids.Inverse: inverse
+using QuantumESPRESSOCli: PwxConfig, makecmd
 using QuantumESPRESSO.Inputs.PWscf:
     CellParametersCard, PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using QuantumESPRESSO.Outputs.PWscf:
@@ -18,6 +20,7 @@ using UnitfulAtomic
 using ..QuantumESPRESSOExpress: QE
 
 using Express.EosFitting: SelfConsistentField, Optimization, StOptim, VcOptim, ScfOrOptim
+import Express.Shell: MakeCmd, distprocs
 import Express.EosFitting: shortname
 import Express.EosFitting.DefaultActions: adjust, parseoutput
 
@@ -31,6 +34,30 @@ adjust(template::PWInput, x::ScfOrOptim, args...) =
 shortname(::Type{SelfConsistentField}) = "scf"
 shortname(::Type{StOptim}) = "relax"
 shortname(::Type{VcOptim}) = "vc-relax"
+
+(::MakeCmd)(
+    input;
+    output = tempname(; cleanup = false),
+    error = "",
+    mpi = MpiexecOptions(),
+    options = PwxConfig(),
+) = makecmd(input; output = output, error = error, mpi = mpi, options = options)
+function (x::MakeCmd)(inputs::AbstractArray; outputs, errors, mpi, options = PwxConfig())
+    if !isempty(outputs)
+        if size(inputs) != size(outputs)
+            throw(DimensionMismatch("size of inputs and outputs are different!"))
+        end
+    end
+    if !isempty(errors)
+        if size(inputs) != size(errors)
+            throw(DimensionMismatch("size of inputs and outputs are different!"))
+        end
+    end
+    @set! mpi.np = distprocs(mpi.np, length(inputs))
+    map(inputs, outputs, errors) do input, output, error
+        x(input; output = output, error = error, mpi = mpi, options = options)
+    end
+end
 
 function parseoutput(::SelfConsistentField)
     function (file)
