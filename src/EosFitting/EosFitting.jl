@@ -13,15 +13,18 @@ using QuantumESPRESSO.Inputs.PWscf:
 using QuantumESPRESSO.Outputs.PWscf:
     Preamble, parse_electrons_energies, parsefinal, isjobdone, tryparsefinal
 using Setfield: @set!
+using SimpleWorkflow: ExternalAtomicJob, parallel
 using Unitful: Pressure, Volume, @u_str
 import Unitful
 using UnitfulAtomic
 
 using ..QuantumESPRESSOExpress: QE
 
-using Express.EosFitting: SelfConsistentField, Optimization, StOptim, VcOptim, ScfOrOptim
+using Express: loadconfig
+using Express.EosFitting:
+    SelfConsistentField, Optimization, StOptim, VcOptim, ScfOrOptim, iofiles
 import Express.Shell: MakeCmd, distprocs
-import Express.EosFitting: shortname
+import Express.EosFitting: shortname, buildjob
 import Express.EosFitting.DefaultActions: adjust, parseoutput
 
 include("Config.jl")
@@ -57,6 +60,18 @@ function (x::MakeCmd)(inputs::AbstractArray; outputs, errors, mpi, options = Pwx
     map(inputs, outputs, errors) do input, output, error
         x(input; output = output, error = error, mpi = mpi, options = options)
     end
+end
+
+function buildjob(x::MakeCmd{T}, cfgfile) where {T}
+    config = loadconfig(cfgfile)
+    io = iofiles(T(), cfgfile)
+    infiles, outfiles = first.(io), last.(io)
+    @show config
+    jobs = map(
+        ExternalAtomicJob,
+        x(infiles; outputs = outfiles, mpi = config.cli.mpi, options = config.cli.pw),
+    )
+    return parallel(jobs...)
 end
 
 function parseoutput(::SelfConsistentField)
