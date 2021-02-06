@@ -31,7 +31,7 @@ using Express.EosFitting:
 import Express.EosFitting: checkconfig, materialize, shortname
 import Express.EosFitting.DefaultActions: adjust, parseoutput
 
-include("config.jl")
+include("Config.jl")
 include("normalizer.jl")
 include("customizer.jl")
 
