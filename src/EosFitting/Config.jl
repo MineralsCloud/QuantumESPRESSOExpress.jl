@@ -30,21 +30,18 @@ function materialize(config)
 
     templates = _materialize_tmpl(config.templates, config.fixed)
 
-    if config.fixed isa Pressures
-        pressures = materialize_press(config.fixed)
-        volumes = nothing
+    fixed = if config.fixed isa Pressures
+        materialize_press(config.fixed)
     else
-        pressures = nothing
-        volumes = materialize_vol(config)
+        materialize_vol(config)
     end
 
     trial_eos = isnothing(config.trial_eos) ? nothing : materialize_eos(config.trial_eos)
 
     return (
         templates = templates,
-        pressures = pressures,
+        fixed = fixed,
         trial_eos = trial_eos,
-        volumes = volumes,
         workdir = config.workdir,
         dirs = materialize_dir(config),
         cli = config.cli,
