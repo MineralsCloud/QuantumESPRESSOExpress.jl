@@ -47,7 +47,7 @@ function materialize(config)
         volumes = volumes,
         workdir = config.workdir,
         dirs = materialize_dir(config),
-        bin = config.cli,
+        cli = config.cli,
     )
 end
 
