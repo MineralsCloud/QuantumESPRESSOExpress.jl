@@ -1,14 +1,3 @@
-function checkconfig(::QE, config)
-    @assert haskey(config, "qe")
-    # if config["manager"] == "docker"
-    #     @assert haskey(config, "container")
-    # elseif config["manager"] == "ssh"
-    # elseif config["manager"] == "local"  # Do nothing
-    # else
-    #     error("unknown manager `$(config["manager"])`!")
-    # end
-    return
-end
 
 function _materialize_tmpl(config, pressures)
     arr = map(config) do file

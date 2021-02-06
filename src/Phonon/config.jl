@@ -1,15 +1,3 @@
-function checkconfig(::QE, config)
-    @assert haskey(config, "qe")
-    # if config["manager"] == "docker"
-    #     @assert haskey(config, "container")
-    # elseif config["manager"] == "ssh"
-    # elseif config["manager"] == "local"  # Do nothing
-    # else
-    #     error("unknown manager `$(config["manager"])`!")
-    # end
-    return
-end
-
 function materialize(config)
     pressures = map(config["pressures"]["values"]) do pressure
         pressure * myuparse(config["pressures"]["unit"])
