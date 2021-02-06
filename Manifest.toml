@@ -213,7 +213,7 @@ version = "0.1.3"
 
 [[Express]]
 deps = ["AbInitioSoftwareBase", "Compat", "Configurations", "Crystallography", "Distributed", "EquationsOfStateOfSolids", "Mustache", "PyQHA", "Serialization", "Setfield", "SimpleWorkflow", "Unitful", "UnitfulAtomic", "UrlDownload"]
-git-tree-sha1 = "9de2e7362ebd268af9e86fd743f0efb8c69fd21d"
+git-tree-sha1 = "c20b7a2e5cced3dd88cde6fc07660a306991ceb7"
 repo-rev = "config"
 repo-url = "/Users/qz/.julia/dev/Express"
 uuid = "b12df14e-adf7-11e9-0606-d5813a258349"
