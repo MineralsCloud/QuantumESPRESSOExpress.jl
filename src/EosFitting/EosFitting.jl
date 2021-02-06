@@ -10,7 +10,6 @@ using QuantumESPRESSO.Inputs.PWscf:
     CellParametersCard, PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using QuantumESPRESSO.Outputs.PWscf:
     Preamble, parse_electrons_energies, parsefinal, isjobdone, tryparsefinal
-using QuantumESPRESSO.CLI: PWExec
 using Setfield: @set!
 using Unitful: Pressure, Volume, @u_str
 import Unitful
@@ -18,17 +17,8 @@ using UnitfulAtomic
 
 using ..QuantumESPRESSOExpress: QE
 
-using Express: SelfConsistentField, Optimization
-using Express.EosFitting:
-    StOptim,
-    VcOptim,
-    ScfOrOptim,
-    materialize_eos,
-    materialize_press,
-    materialize_vol,
-    materialize_dirs,
-    vscale
-import Express.EosFitting: checkconfig, materialize, shortname
+using Express.EosFitting: SelfConsistentField, Optimization, StOptim, VcOptim, ScfOrOptim
+import Express.EosFitting: shortname
 import Express.EosFitting.DefaultActions: adjust, parseoutput
 
 include("Config.jl")
