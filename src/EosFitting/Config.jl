@@ -1,46 +1,54 @@
+module Config
 
-function _materialize_tmpl(config, pressures)
-    arr = map(config) do file
+using Configurations: from_dict, @option
+using Express.EosFitting.Config:
+    Pressures,
+    EosFittingConfig,
+    materialize_eos,
+    materialize_press,
+    materialize_vol,
+    materialize_dir
+import Express.EosFitting.Config: materialize
+using QuantumESPRESSO.Cli: QuantumESPRESSOCliConfig
+using QuantumESPRESSO.Inputs.PWscf:
+    CellParametersCard, PWInput, VerbositySetter, VolumeSetter, PressureSetter
+
+function _materialize_tmpl(config, fixed)
+    arr = map(config.paths) do file
         str = read(expanduser(file), String)
         parse(PWInput, str)
     end
     if length(arr) != 1  # Length of `templates` = length of `pressures`
         return arr
     else
-        return repeat(arr, length(pressures))
+        return repeat(arr, length(fixed.values))
     end
 end
 
 function materialize(config)
-    manager = LocalManager(config["np"], true)
-    bin = PWExec(; bin = first(config["bin"]["qe"]))
+    config = from_dict(EosFittingConfig{QuantumESPRESSOCliConfig}, config)
 
-    pressures = materialize_press(config["pressures"])
+    templates = _materialize_tmpl(config.templates, config.fixed)
 
-    templates = _materialize_tmpl(config["templates"], pressures)
-
-    if haskey(config, "trial_eos")  # "trial_eos" and "volumes" are mutually exclusive
-        trial_eos = materialize_eos(config["trial_eos"])
+    if config.fixed isa Pressures
+        pressures = materialize_press(config.fixed)
         volumes = nothing
     else
-        trial_eos = nothing
-        volumes = materialize_vol(config, templates)
+        pressures = nothing
+        volumes = materialize_vol(config)
     end
 
-    workdir = config["workdir"]
+    trial_eos = isnothing(config.trial_eos) ? nothing : materialize_eos(config.trial_eos)
 
     return (
         templates = templates,
         pressures = pressures,
         trial_eos = trial_eos,
         volumes = volumes,
-        workdir = workdir,
-        dirs = materialize_dirs(workdir, pressures),
-        bin = bin,
-        manager = manager,
-        use_shell = haskey(config, "use_shell") ? config["use_shell"] : false,
-        script_template = haskey(config, "script_template") ? config["script_template"] :
-                          nothing,
-        shell_args = haskey(config, "shell_args") ? config["shell_args"] : Dict(),
+        # workdir = config.workdir,
+        dirs = materialize_dir(config),
+        bin = config.cli,
     )
+end
+
 end
