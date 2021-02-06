@@ -45,7 +45,13 @@ shortname(::Type{VcOptim}) = "vc-relax"
     mpi = MpiexecOptions(),
     options = PwxConfig(),
 ) = makecmd(input; output = output, error = error, mpi = mpi, options = options)
-function (x::MakeCmd)(inputs::AbstractArray; outputs, errors, mpi, options = PwxConfig())
+function (x::MakeCmd)(
+    inputs::AbstractArray;
+    outputs,
+    errors = outputs,
+    mpi,
+    options = PwxConfig(),
+)
     if !isempty(outputs)
         if size(inputs) != size(outputs)
             throw(DimensionMismatch("size of inputs and outputs are different!"))
