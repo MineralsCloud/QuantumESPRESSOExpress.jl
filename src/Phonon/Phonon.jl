@@ -2,7 +2,6 @@ module Phonon
 
 using AbInitioSoftwareBase.Inputs: Setter
 using Dates: format, now
-using Distributed: LocalManager
 using Express: Calculation, Scf, myuparse
 using Express.EosFitting: VcOptim
 using Express.Phonon: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos

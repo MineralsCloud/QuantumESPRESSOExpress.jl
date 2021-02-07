@@ -1,15 +1,9 @@
 module EosFitting
 
-using AbInitioSoftwareBase.Inputs: Setter
 using AbInitioSoftwareBase.Cli: MpiexecOptions
 using Crystallography: cellvolume
-using Dates: format, now
-using Distributed: LocalManager
-using EquationsOfStateOfSolids: EquationOfStateOfSolids, PressureEquation, Parameters
-using EquationsOfStateOfSolids.Inverse: inverse
 using QuantumESPRESSOCli: PwxConfig, makecmd
-using QuantumESPRESSO.Inputs.PWscf:
-    CellParametersCard, PWInput, VerbositySetter, VolumeSetter, PressureSetter
+using QuantumESPRESSO.Inputs.PWscf: CellParametersCard
 using QuantumESPRESSO.Outputs.PWscf:
     Preamble, parse_electrons_energies, parsefinal, isjobdone, tryparsefinal
 using Setfield: @set!
@@ -21,18 +15,33 @@ using UnitfulAtomic
 using ..QuantumESPRESSOExpress: QE
 
 using Express: loadconfig
-using Express.EosFitting:
-    SelfConsistentField, Optimization, StOptim, VcOptim, ScfOrOptim, iofiles
+using Express.EosFitting: SelfConsistentField, StOptim, VcOptim, ScfOrOptim, iofiles
 import Express.Shell: MakeCmd, distprocs
 import Express.EosFitting: shortname, buildjob
-import Express.EosFitting.DefaultActions: adjust, parseoutput
+import Express.EosFitting.DefaultActions: parseoutput
 
 include("Config.jl")
-include("normalizer.jl")
-include("customizer.jl")
 
-adjust(template::PWInput, x::ScfOrOptim, args...) =
-    (Customizer(args...) ∘ Normalizer(x))(template)
+module DefaultActions
+
+using AbInitioSoftwareBase.Inputs: Setter
+using Dates: format, now
+using EquationsOfStateOfSolids: EquationOfStateOfSolids, PressureEquation, Parameters
+using EquationsOfStateOfSolids.Inverse: NumericalInversionOptions, inverse
+using QuantumESPRESSOCli: PwxConfig, makecmd
+using QuantumESPRESSO.Inputs.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
+using Setfield: @set!
+using Unitful: Pressure, Volume, @u_str
+import Unitful
+using UnitfulAtomic
+
+using Express.EosFitting:
+    SelfConsistentField, Optimization, StOptim, VcOptim, ScfOrOptim, iofiles, loadconfig
+import Express.EosFitting.DefaultActions: MakeInput, FitEos
+
+include("MakeInput.jl")
+
+end
 
 shortname(::Type{SelfConsistentField}) = "scf"
 shortname(::Type{StOptim}) = "relax"
@@ -72,7 +81,6 @@ function buildjob(x::MakeCmd{T}, cfgfile) where {T}
     config = loadconfig(cfgfile)
     io = iofiles(T(), cfgfile)
     infiles, outfiles = first.(io), last.(io)
-    @show config
     jobs = map(
         ExternalAtomicJob,
         x(infiles; outputs = outfiles, mpi = config.cli.mpi, options = config.cli.pw),
