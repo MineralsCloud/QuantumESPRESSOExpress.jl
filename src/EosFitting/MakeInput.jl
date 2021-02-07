@@ -37,23 +37,20 @@ function (x::OutdirSetter)(template::PWInput)
     return template
 end
 
-struct Customizer{A,B}
-    a::A
-    b::B
+struct Customizer
+    pressure::Pressure
+    volume::Volume
     timefmt::String
 end
-Customizer(a, b) = Customizer(a, b, "Y-m-d_H:M:S")
-function (x::Customizer{<:Pressure,<:Volume})(template::PWInput)::PWInput
-    customize = OutdirSetter(x.timefmt) ∘ VolumeSetter(x.b) ∘ PressureSetter(x.a)
+Customizer(a, b, timefmt = "Y-m-d_H:M:S") = Customizer(a, b, timefmt)
+function Customizer(pressure, eos::EquationOfStateOfSolids, timefmt)
+    volume = inverse(eos)(pressure, config.num_inv)
+    return Customizer(pressure, volume, timefmt)
+end
+Customizer(pressure, params::Parameters, timefmt) =
+    Customizer(pressure, PressureEquation(params), timefmt)
+function (x::Customizer)(template::PWInput)::PWInput
+    customize =
+        OutdirSetter(x.timefmt) ∘ VolumeSetter(x.volume) ∘ PressureSetter(x.pressure)
     return customize(template)
 end
-function (x::Customizer{<:Pressure,<:EquationOfStateOfSolids})(template::PWInput)
-    volume = inverse(x.b)(x.a, config.num_inv)
-    x = @set! x.b = volume
-    return x(template)
-end
-function (x::Customizer{<:Pressure,<:Parameters})(template::PWInput)
-    x = @set! x.b = PressureEquation(x.b)
-    return x(template)
-end
-(x::Customizer)(template::PWInput) = Customizer(x.b, x.a, x.timefmt)(template)  # If no method found, switch arguments & try again
