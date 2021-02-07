@@ -1,5 +1,26 @@
 (::MakeInput{T})(template::PWInput, args...) where {T<:ScfOrOptim} =
     (Customizer(args...) ∘ Normalizer(T()))(template)
+function (x::MakeInput{T})(cfgfile) where {T}
+    config = loadconfig(cfgfile)
+    infiles = first.(iofiles(T(), cfgfile))
+    eos = PressureEquation(
+        T <: SelfConsistentField ? config.trial_eos :
+        FitEos{SelfConsistentField}()(cfgfile),
+    )
+    if eltype(config.fixed) <: Volume
+        return broadcast(x, infiles, config.templates, config.trial_eos, config.fixed)
+    else  # Pressure
+        return broadcast(
+            x,
+            infiles,
+            config.templates,
+            config.fixed,
+            fill(nothing, length(infiles)),
+            "Y-m-d_H:M:S",
+            config.num_inv,
+        )
+    end
+end
 
 struct CalculationSetter{T<:Union{SelfConsistentField,Optimization}} <: Setter
     calc::T
