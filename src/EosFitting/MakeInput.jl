@@ -56,7 +56,10 @@ end
 Customizer(params::Parameters, pressure::Pressure, timefmt) =
     Customizer(PressureEquation(params), pressure, timefmt)
 function (x::Customizer)(template::PWInput)::PWInput
-    customize =
+    customize = if x.pressure === nothing
+        OutdirSetter(x.timefmt) ∘ VolumeSetter(x.volume)
+    else
         OutdirSetter(x.timefmt) ∘ PressureSetter(x.pressure) ∘ VolumeSetter(x.volume)
+    end
     return customize(template)
 end
