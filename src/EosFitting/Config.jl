@@ -42,6 +42,7 @@ function materialize(config)
         trial_eos = materialize_eos(config.trial_eos),
         workdir = config.workdir,
         dirs = materialize_dir(config),
+        num_inv = config.num_inv,
         cli = config.cli,
     )
 end
