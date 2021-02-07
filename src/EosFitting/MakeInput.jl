@@ -1,3 +1,28 @@
+(::MakeInput{T})(template::PWInput, args...) where {T<:ScfOrOptim} =
+    (Customizer(args...) ∘ Normalizer(T()))(template)
+
+struct CalculationSetter{T<:Union{SelfConsistentField,Optimization}} <: Setter
+    calc::T
+end
+function (::CalculationSetter{T})(template::PWInput) where {T}
+    @set! template.control.calculation = if T == SelfConsistentField  # Functions can be extended, not safe
+        "scf"
+    elseif T == StOptim
+        "relax"
+    else
+        "vc-relax"
+    end
+    return template
+end
+
+struct Normalizer{T}
+    calc::T
+end
+function (x::Normalizer)(template::PWInput)::PWInput
+    normalize = VerbositySetter("high") ∘ CalculationSetter(x.calc)
+    return normalize(template)
+end
+
 struct OutdirSetter <: Setter
     timefmt::String
 end
@@ -23,7 +48,7 @@ function (x::Customizer{<:Pressure,<:Volume})(template::PWInput)::PWInput
     return customize(template)
 end
 function (x::Customizer{<:Pressure,<:EquationOfStateOfSolids})(template::PWInput)
-    volume = inverse(x.b)(x.a)  # FIXME: `vscale` is removed
+    volume = inverse(x.b)(x.a, config.num_inv)
     x = @set! x.b = volume
     return x(template)
 end
