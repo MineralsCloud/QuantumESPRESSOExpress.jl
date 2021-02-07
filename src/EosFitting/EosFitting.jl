@@ -28,7 +28,7 @@ using AbInitioSoftwareBase.Inputs: Setter
 using Dates: format, now
 using Distributed: LocalManager
 using EquationsOfStateOfSolids: EquationOfStateOfSolids, PressureEquation, Parameters
-using EquationsOfStateOfSolids.Inverse: inverse
+using EquationsOfStateOfSolids.Inverse: NumericalInversionOptions, inverse
 using QuantumESPRESSOCli: PwxConfig, makecmd
 using QuantumESPRESSO.Inputs.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using Setfield: @set!
@@ -36,8 +36,9 @@ using Unitful: Pressure, Volume, @u_str
 import Unitful
 using UnitfulAtomic
 
-using Express.EosFitting: SelfConsistentField, Optimization, StOptim, VcOptim, ScfOrOptim
-import Express.EosFitting.DefaultActions: MakeInput
+using Express.EosFitting:
+    SelfConsistentField, Optimization, StOptim, VcOptim, ScfOrOptim, iofiles, loadconfig
+import Express.EosFitting.DefaultActions: MakeInput, FitEos
 
 include("MakeInput.jl")
 
