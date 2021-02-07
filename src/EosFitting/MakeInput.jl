@@ -38,19 +38,20 @@ function (x::OutdirSetter)(template::PWInput)
 end
 
 struct Customizer
-    pressure::Pressure
     volume::Volume
+    pressure::Union{Pressure,Nothing}
     timefmt::String
 end
-Customizer(a, b, timefmt = "Y-m-d_H:M:S") = Customizer(a, b, timefmt)
-function Customizer(pressure, eos::EquationOfStateOfSolids, timefmt)
+Customizer(volume, pressure = nothing, timefmt = "Y-m-d_H:M:S") =
+    Customizer(volume, pressure, timefmt)
+function Customizer(eos::EquationOfStateOfSolids, pressure::Pressure, timefmt)
     volume = inverse(eos)(pressure, config.num_inv)
-    return Customizer(pressure, volume, timefmt)
+    return Customizer(volume, pressure, timefmt)
 end
-Customizer(pressure, params::Parameters, timefmt) =
-    Customizer(pressure, PressureEquation(params), timefmt)
+Customizer(params::Parameters, pressure::Pressure, timefmt) =
+    Customizer(PressureEquation(params), pressure, timefmt)
 function (x::Customizer)(template::PWInput)::PWInput
     customize =
-        OutdirSetter(x.timefmt) ∘ VolumeSetter(x.volume) ∘ PressureSetter(x.pressure)
+        OutdirSetter(x.timefmt) ∘ PressureSetter(x.pressure) ∘ VolumeSetter(x.volume)
     return customize(template)
 end
