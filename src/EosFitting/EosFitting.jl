@@ -82,7 +82,6 @@ function buildjob(x::MakeCmd{T}, cfgfile) where {T}
     config = loadconfig(cfgfile)
     io = iofiles(T(), cfgfile)
     infiles, outfiles = first.(io), last.(io)
-    @show config
     jobs = map(
         ExternalAtomicJob,
         x(infiles; outputs = outfiles, mpi = config.cli.mpi, options = config.cli.pw),
