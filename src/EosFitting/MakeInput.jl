@@ -44,8 +44,13 @@ struct Customizer
 end
 Customizer(volume, pressure = nothing, timefmt = "Y-m-d_H:M:S") =
     Customizer(volume, pressure, timefmt)
-function Customizer(eos::EquationOfStateOfSolids, pressure::Pressure, timefmt)
-    volume = inverse(eos)(pressure, config.num_inv)
+function Customizer(
+    eos::EquationOfStateOfSolids,
+    pressure::Pressure,
+    timefmt,
+    num_inv = NumericalInversionOptions(),
+)
+    volume = inverse(eos)(pressure, num_inv)
     return Customizer(volume, pressure, timefmt)
 end
 Customizer(params::Parameters, pressure::Pressure, timefmt) =
