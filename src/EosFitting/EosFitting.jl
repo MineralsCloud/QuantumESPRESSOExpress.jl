@@ -26,7 +26,6 @@ module DefaultActions
 
 using AbInitioSoftwareBase.Inputs: Setter
 using Dates: format, now
-using Distributed: LocalManager
 using EquationsOfStateOfSolids: EquationOfStateOfSolids, PressureEquation, Parameters
 using EquationsOfStateOfSolids.Inverse: NumericalInversionOptions, inverse
 using QuantumESPRESSOCli: PwxConfig, makecmd
