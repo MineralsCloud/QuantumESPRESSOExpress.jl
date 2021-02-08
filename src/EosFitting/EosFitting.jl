@@ -54,6 +54,7 @@ function (::MakeCmd)(
     mpi = MpiexecOptions(),
     options = PwxConfig(),
 )
+    mkpath(dirname(input))
     @set! options.script_dest = mktemp(dirname(input); cleanup = false)[1]
     return makecmd(input; output = output, error = error, mpi = mpi, options = options)
 end
