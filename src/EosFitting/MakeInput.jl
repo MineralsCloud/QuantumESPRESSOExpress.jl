@@ -8,16 +8,22 @@ function (x::MakeInput{T})(cfgfile) where {T}
         FitEos{SelfConsistentField}()(cfgfile),
     )
     if eltype(config.fixed) <: Volume
-        return broadcast(x, infiles, config.templates, config.trial_eos, config.fixed)
+        return broadcast(
+            x,
+            infiles,
+            config.templates,
+            fill(config.trial_eos, length(infiles)),
+            config.fixed,
+        )
     else  # Pressure
         return broadcast(
             x,
             infiles,
             config.templates,
+            fill(config.trial_eos, length(infiles)),
             config.fixed,
-            fill(nothing, length(infiles)),
-            "Y-m-d_H:M:S",
-            config.num_inv,
+            fill("Y-m-d_H:M:S", length(infiles)),
+            fill(config.num_inv, length(infiles)),
         )
     end
 end
@@ -74,8 +80,8 @@ function Customizer(
     volume = inverse(eos)(pressure, num_inv)
     return Customizer(volume, pressure, timefmt)
 end
-Customizer(params::Parameters, pressure::Pressure, timefmt) =
-    Customizer(PressureEquation(params), pressure, timefmt)
+Customizer(params::Parameters, pressure::Pressure, args...) =
+    Customizer(PressureEquation(params), pressure, args...)
 function (x::Customizer)(template::PWInput)::PWInput
     customize = if x.pressure === nothing
         OutdirSetter(x.timefmt) ∘ VolumeSetter(x.volume)
