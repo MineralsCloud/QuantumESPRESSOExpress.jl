@@ -47,13 +47,16 @@ shortname(::Type{SelfConsistentField}) = "scf"
 shortname(::Type{StOptim}) = "relax"
 shortname(::Type{VcOptim}) = "vc-relax"
 
-(::MakeCmd)(
+function (::MakeCmd)(
     input;
     output = tempname(; cleanup = false),
     error = "",
     mpi = MpiexecOptions(),
     options = PwxConfig(),
-) = makecmd(input; output = output, error = error, mpi = mpi, options = options)
+)
+    @set! options.script_dest = mktemp(dirname(input); cleanup = false)
+    return makecmd(input; output = output, error = error, mpi = mpi, options = options)
+end
 function (x::MakeCmd)(
     inputs::AbstractArray;
     outputs,
