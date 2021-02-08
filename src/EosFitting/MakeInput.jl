@@ -74,8 +74,8 @@ function Customizer(
     volume = inverse(eos)(pressure, num_inv)
     return Customizer(volume, pressure, timefmt)
 end
-Customizer(params::Parameters, pressure::Pressure, timefmt) =
-    Customizer(PressureEquation(params), pressure, timefmt)
+Customizer(params::Parameters, pressure::Pressure, args...) =
+    Customizer(PressureEquation(params), pressure, args...)
 function (x::Customizer)(template::PWInput)::PWInput
     customize = if x.pressure === nothing
         OutdirSetter(x.timefmt) ∘ VolumeSetter(x.volume)
