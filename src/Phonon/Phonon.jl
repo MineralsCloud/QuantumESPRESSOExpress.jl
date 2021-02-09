@@ -36,8 +36,7 @@ using ...QuantumESPRESSOExpress: QE
 import Express.Phonon: shortname
 import Express.Phonon.DefaultActions: parsecell, inputtype
 
-include("normalizer.jl")
-include("customizer.jl")
+include("MakeInput.jl")
 
 adjust(template::PWInput, x::Scf, args...) =
     (Customizer(args...) ∘ Normalizer(x, template))(template)
