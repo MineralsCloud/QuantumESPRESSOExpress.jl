@@ -2,24 +2,20 @@ module Phonon
 
 using AbInitioSoftwareBase.Inputs: Setter
 using Dates: format, now
-using Express: Calculation, Scf, myuparse
+using Express: Calculation, Scf
 using Express.EosFitting: VcOptim
 using Express.Phonon: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos
-using QuantumESPRESSO.CLI: PhExec, PWExec, Q2rExec, MatdynExec
 using QuantumESPRESSO.Inputs.PWscf:
     AtomicPositionsCard, CellParametersCard, PWInput, StructureSetter
 using QuantumESPRESSO.Inputs.PHonon:
     PhInput, Q2rInput, MatdynInput, VerbositySetter, relayinfo
 using QuantumESPRESSO.Outputs.PWscf: tryparsefinal
-using Setfield: @set!, @set
-using Unitful: uparse, ustrip, @u_str
-import Unitful
-using UnitfulAtomic
+using Setfield: @set!
 
 using ..QuantumESPRESSOExpress: QE
 
-import Express.Phonon: materialize, shortname
-import Express.Phonon.DefaultActions: adjust, parsecell, inputtype
+import Express.Phonon: shortname
+import Express.Phonon.DefaultActions: parsecell, inputtype
 
 include("normalizer.jl")
 include("customizer.jl")
@@ -34,7 +30,7 @@ adjust(template::MatdynInput, x::Union{PhononDispersion,VDos}, a::Q2rInput, b::P
 adjust(template::MatdynInput, x::Union{PhononDispersion,VDos}, a::PhInput, b::Q2rInput) =
     adjust(template, x, b, a)
 
-include("config.jl")
+include("Config.jl")
 
 inputtype(x::Calculation) = inputtype(typeof(x))
 inputtype(::Type{Scf}) = PWInput
