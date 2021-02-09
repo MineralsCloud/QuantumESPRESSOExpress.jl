@@ -1,3 +1,22 @@
+(::MakeInput{T})(template::PWInput, args...) where {T<:Scf} =
+    (Customizer(args...) ∘ Normalizer(T(), template))(template)
+(::MakeInput{T})(template::PhInput, previnp::PWInput) where {T<:Dfpt} =
+    Normalizer(T(), previnp)(template)
+(::MakeInput{T})(template::Q2rInput, previnp::PhInput) where {T<:RealSpaceForceConstants} =
+    Normalizer(T(), previnp)(template)
+(::MakeInput{T})(template::Q2rInput, previnp::PhInput) where {T<:RealSpaceForceConstants} =
+    Normalizer(T(), previnp)(template)
+(::MakeInput{T})(
+    template::MatdynInput,
+    a::Q2rInput,
+    b::PhInput,
+) where {T<:Union{PhononDispersion,VDos}} = Normalizer(T(), (a, b))(template)
+(x::MakeInput{T})(
+    template::MatdynInput,
+    a::Q2rInput,
+    b::PhInput,
+) where {T<:Union{PhononDispersion,VDos}} = x(template, b, a)
+
 struct CalculationSetter{T<:Union{Scf,Dfpt}} <: Setter
     calc::T
 end

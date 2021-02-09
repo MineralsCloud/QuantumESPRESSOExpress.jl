@@ -34,19 +34,9 @@ using Setfield: @set!
 using ...QuantumESPRESSOExpress: QE
 
 import Express.Phonon: shortname
-import Express.Phonon.DefaultActions: parsecell, inputtype
+import Express.Phonon.DefaultActions: MakeInput, parsecell, inputtype
 
 include("MakeInput.jl")
-
-adjust(template::PWInput, x::Scf, args...) =
-    (Customizer(args...) ∘ Normalizer(x, template))(template)
-adjust(template::PhInput, x::Dfpt, previnp::PWInput) = Normalizer(x, previnp)(template)
-adjust(template::Q2rInput, x::RealSpaceForceConstants, previnp::PhInput) =
-    Normalizer(x, previnp)(template)
-adjust(template::MatdynInput, x::Union{PhononDispersion,VDos}, a::Q2rInput, b::PhInput) =
-    Normalizer(x, (a, b))(template)
-adjust(template::MatdynInput, x::Union{PhononDispersion,VDos}, a::PhInput, b::Q2rInput) =
-    adjust(template, x, b, a)
 
 inputtype(x::Calculation) = inputtype(typeof(x))
 inputtype(::Type{Scf}) = PWInput
