@@ -213,7 +213,7 @@ version = "0.1.3"
 
 [[Express]]
 deps = ["AbInitioSoftwareBase", "Compat", "Configurations", "Crystallography", "Distributed", "EquationsOfStateOfSolids", "Mustache", "PyQHA", "Serialization", "Setfield", "SimpleWorkflow", "Unitful", "UnitfulAtomic", "UrlDownload"]
-git-tree-sha1 = "dedff02c47b4c256c6f7789127d4c4fd47fb130e"
+git-tree-sha1 = "c647c23922b5ca73d0fa88867dcba2632b8b6e4b"
 repo-rev = "master"
 repo-url = "git@github.com:MineralsCloud/Express.jl.git"
 uuid = "b12df14e-adf7-11e9-0606-d5813a258349"
@@ -590,7 +590,7 @@ version = "0.2.1"
 
 [[QuantumESPRESSOCli]]
 deps = ["AbInitioSoftwareBase", "Comonicon", "Configurations"]
-git-tree-sha1 = "74959780e7f33180e9bc2ec21e8f85be74447b92"
+git-tree-sha1 = "03f3bb44a6a748d10bacc8dcfa5f91f30f133f08"
 repo-rev = "master"
 repo-url = "https://github.com/MineralsCloud/QuantumESPRESSOCli.jl.git"
 uuid = "f713baf6-9299-4878-8719-8ad597e49a7b"
