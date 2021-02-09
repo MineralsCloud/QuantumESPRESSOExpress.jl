@@ -12,7 +12,26 @@ using QuantumESPRESSO.Inputs.PHonon:
 using QuantumESPRESSO.Outputs.PWscf: tryparsefinal
 using Setfield: @set!
 
-using ..QuantumESPRESSOExpress: QE
+import Express.Phonon: shortname
+import Express.Phonon.DefaultActions: parsecell, inputtype
+
+include("Config.jl")
+
+module DefaultActions
+
+using AbInitioSoftwareBase.Inputs: Setter
+using Dates: format, now
+using Express: Calculation, Scf
+using Express.EosFitting: VcOptim
+using Express.Phonon: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos
+using QuantumESPRESSO.Inputs.PWscf:
+    AtomicPositionsCard, CellParametersCard, PWInput, StructureSetter
+using QuantumESPRESSO.Inputs.PHonon:
+    PhInput, Q2rInput, MatdynInput, VerbositySetter, relayinfo
+using QuantumESPRESSO.Outputs.PWscf: tryparsefinal
+using Setfield: @set!
+
+using ...QuantumESPRESSOExpress: QE
 
 import Express.Phonon: shortname
 import Express.Phonon.DefaultActions: parsecell, inputtype
@@ -30,8 +49,6 @@ adjust(template::MatdynInput, x::Union{PhononDispersion,VDos}, a::Q2rInput, b::P
 adjust(template::MatdynInput, x::Union{PhononDispersion,VDos}, a::PhInput, b::Q2rInput) =
     adjust(template, x, b, a)
 
-include("Config.jl")
-
 inputtype(x::Calculation) = inputtype(typeof(x))
 inputtype(::Type{Scf}) = PWInput
 inputtype(::Type{Dfpt}) = PhInput
@@ -47,5 +64,7 @@ shortname(::Type{VDos}) = "vdos"
 
 parsecell(str) =
     tryparsefinal(CellParametersCard, str), tryparsefinal(AtomicPositionsCard, str)
+
+end
 
 end
