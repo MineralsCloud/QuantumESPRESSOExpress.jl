@@ -73,9 +73,9 @@ function (x::OutdirSetter)(template::PWInput)
     return template
 end
 
-struct Customizer{A,B}
-    cp::A
-    ap::B
+struct Customizer
+    cp::CellParametersCard
+    ap::AtomicPositionsCard
     timefmt::String
 end
 Customizer(a, b) = Customizer(a, b, "Y-m-d_H:M:S")
