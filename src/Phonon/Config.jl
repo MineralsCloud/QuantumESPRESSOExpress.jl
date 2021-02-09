@@ -1,49 +1,49 @@
 module Config
 
-function materialize(config)
-    pressures = map(config["pressures"]["values"]) do pressure
-        pressure * myuparse(config["pressures"]["unit"])
-    end
+using Configurations: from_dict
+using Express: myuparse
+using Express.Phonon: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos
+using QuantumESPRESSO.Cli: QuantumESPRESSOCliConfig
+using QuantumESPRESSO.Inputs.PWscf: PWInput
+using QuantumESPRESSO.Inputs.PHonon: PhInput, Q2rInput, MatdynInput
+using Unitful: ustrip
 
-    function expandtmpl(settings)
-        return map(settings, (PWInput, PhInput, Q2rInput, MatdynInput)) do files, T
-            temps = map(files) do file
-                str = read(expanduser(file), String)
-                parse(T, str)
-            end
-            if length(temps) == 1
-                fill(temps[1], length(pressures))
-            elseif length(temps) != length(pressures)
-                throw(DimensionMismatch("!!!"))
-            else
-                temps
-            end
+using Express.Phonon.Config:
+    Pressures, Volumes, PhononConfig, DfptTemplate, materialize_press_vol, materialize_dir
+import Express.Phonon.Config: materialize
+
+function _materialize_tmpl(
+    templates::AbstractArray{DfptTemplate},
+    fixed::Union{Pressures,Volumes},
+)
+    results = map(templates) do template
+        arr = map(
+            (:scf, :dfpt, :q2r, :disp),
+            (PWInput, PhInput, Q2rInput, MatdynInput),
+        ) do field, T
+            str = read(getproperty(template, field), String)
+            parse(T, str)
         end
+        (; zip((:scf, :dfpt, :q2r, :disp), arr)...)
     end
-    templates = expandtmpl(config["templates"])
-
-    manager = LocalManager(config["np"], true)
-    bin = config["bin"]["qe"]
-
-    dirs = map(pressures) do pressure
-        abspath(joinpath(config["workdir"], "p" * string(ustrip(pressure))))
+    if length(results) != 1  # Length of `templates` = length of `pressures`
+        return results
+    else
+        return repeat(results, length(fixed.values))
     end
+end
+
+function materialize(config)
+    config = from_dict(PhononConfig{QuantumESPRESSOCliConfig}, config)
+
+    templates = _materialize_tmpl(config.templates, config.fixed)
 
     return (
         templates = templates,
-        pressures = pressures,
-        dirs = dirs,
-        bin = [
-            PWExec(bin = bin[1]),
-            PhExec(bin = bin[2]),
-            Q2rExec(bin = bin[3]),
-            MatdynExec(bin = bin[4]),
-        ],
-        manager = manager,
-        use_shell = haskey(config, "use_shell") ? config["use_shell"] : false,
-        script_template = haskey(config, "script_template") ? config["script_template"] :
-                          nothing,
-        shell_args = haskey(config, "shell_args") ? config["shell_args"] : Dict(),
+        fixed = materialize_press_vol(config.fixed),
+        workdir = config.workdir,
+        dirs = materialize_dir(config),
+        cli = config.cli,
     )
 end
 
