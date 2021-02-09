@@ -34,7 +34,7 @@ adjust(template::MatdynInput, x::Union{PhononDispersion,VDos}, a::Q2rInput, b::P
 adjust(template::MatdynInput, x::Union{PhononDispersion,VDos}, a::PhInput, b::Q2rInput) =
     adjust(template, x, b, a)
 
-include("config.jl")
+include("Config.jl")
 
 inputtype(x::Calculation) = inputtype(typeof(x))
 inputtype(::Type{Scf}) = PWInput

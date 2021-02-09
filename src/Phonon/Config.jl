@@ -1,3 +1,5 @@
+module Config
+
 function materialize(config)
     pressures = map(config["pressures"]["values"]) do pressure
         pressure * myuparse(config["pressures"]["unit"])
@@ -43,4 +45,6 @@ function materialize(config)
                           nothing,
         shell_args = haskey(config, "shell_args") ? config["shell_args"] : Dict(),
     )
+end
+
 end
