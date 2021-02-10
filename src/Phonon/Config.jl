@@ -41,7 +41,7 @@ function materialize(config)
     return (
         templates = templates,
         fixed = materialize_press_vol(config.fixed),
-        workdir = config.workdir,
+        workdir = config.outdirs.root,
         dirs = materialize_dir(config),
         cli = config.cli,
     )
