@@ -131,13 +131,23 @@ function (x::MakeCmd{<:Union{VDos,PhononDispersion}})(
     end
 end
 
+cli(::Type{<:Scf}) = :pw
+cli(::Type{<:Dfpt}) = :ph
+cli(::Type{<:RealSpaceForceConstants}) = :q2r
+cli(::Type{<:Union{PhononDispersion,VDos}}) = :matdyn
+
 function buildjob(x::MakeCmd{T}, cfgfile) where {T}
     config = loadconfig(cfgfile)
     infiles = map(dir -> joinpath(dir, shortname(T) * ".in"), config.dirs)
     outfiles = map(dir -> joinpath(dir, shortname(T) * ".out"), config.dirs)
     jobs = map(
         ExternalAtomicJob,
-        x(infiles; outputs = outfiles, mpi = config.cli.mpi, options = config.cli.pw),
+        x(
+            infiles;
+            outputs = outfiles,
+            mpi = config.cli.mpi,
+            options = getproperty(config.cli, cli(T)),
+        ),
     )
     return parallel(jobs...)
 end
