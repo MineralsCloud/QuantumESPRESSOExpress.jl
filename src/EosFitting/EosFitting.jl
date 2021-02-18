@@ -76,8 +76,18 @@ function (x::MakeCmd)(
         end
     end
     @set! mpi.np = distprocs(mpi.np, length(inputs))
-    map(inputs, outputs, errors) do input, output, error
-        x(input; output = output, error = error, mpi = mpi, options = options)
+    distkeys = []
+    for (key, value) in mpi.options
+        if value isa AbstractArray
+            push!(distkeys, key)
+        end
+    end
+    return map(enumerate(inputs)) do (i, input)
+        tempmpi = mpi
+        for key in distkeys
+            @set! tempmpi.options[key] = mpi.options[key][i]
+        end
+        x(input; output = outputs[i], error = errors[i], mpi = tempmpi, options = options)
     end
 end
 
