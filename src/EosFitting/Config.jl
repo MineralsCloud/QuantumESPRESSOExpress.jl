@@ -40,9 +40,9 @@ function materialize(config)
         templates = templates,
         fixed = fixed,
         trial_eos = materialize_eos(config.trial_eos),
-        workdir = config.outdirs.root,
+        workdir = config.dirs.root,
         dirs = materialize_dir(config),
-        num_inv = config.num_inv,
+        inv_opt = config.inv_opt,
         cli = config.cli,
     )
 end
