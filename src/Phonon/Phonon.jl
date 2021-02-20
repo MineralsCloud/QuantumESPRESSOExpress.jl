@@ -37,8 +37,8 @@ using SimpleWorkflow: ExternalAtomicJob, parallel
 using ...QuantumESPRESSOExpress: QE
 
 import Express.Phonon: shortname, buildjob
-import Express.Phonon.DefaultActions: MakeInput, parsecell, inputtype
-import Express.Shell: MakeCmd, distprocs
+import Express.Phonon.DefaultActions: MakeInput, MakeCmd, parsecell, inputtype
+import Express.Shell: distprocs
 
 include("MakeInput.jl")
 include("MakeCmd.jl")

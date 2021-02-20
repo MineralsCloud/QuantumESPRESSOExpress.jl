@@ -14,7 +14,7 @@ using ..QuantumESPRESSOExpress: QE
 
 using Express: loadconfig
 using Express.EosFitting: SelfConsistentField, StOptim, VcOptim, ScfOrOptim, iofiles
-import Express.EosFitting: shortname, buildjob
+import Express.EosFitting: shortname
 import Express.EosFitting.DefaultActions: parseoutput
 
 include("Config.jl")
@@ -36,8 +36,9 @@ using UnitfulAtomic
 
 using Express.EosFitting:
     SelfConsistentField, Optimization, StOptim, VcOptim, ScfOrOptim, iofiles, loadconfig
-import Express.EosFitting.DefaultActions: MakeInput, FitEos
-import Express.Shell: MakeCmd, distprocs
+import Express.EosFitting: buildjob
+import Express.EosFitting.DefaultActions: MakeInput, FitEos, MakeCmd
+import Express.Shell: distprocs
 
 include("MakeInput.jl")
 include("MakeCmd.jl")
