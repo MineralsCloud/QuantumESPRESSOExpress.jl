@@ -23,7 +23,7 @@ function (x::MakeInput{T})(cfgfile) where {T}
             fill(config.trial_eos, length(infiles)),
             config.fixed,
             fill("Y-m-d_H:M:S", length(infiles)),
-            fill(config.num_inv, length(infiles)),
+            fill(config.inv_opt, length(infiles)),
         )
     end
 end
@@ -75,9 +75,9 @@ function Customizer(
     eos::EquationOfStateOfSolids,
     pressure::Pressure,
     timefmt,
-    num_inv = NumericalInversionOptions(),
+    inv_opt = NumericalInversionOptions(),
 )
-    volume = inverse(eos)(pressure, num_inv)
+    volume = inverse(eos)(pressure, inv_opt)
     return Customizer(volume, pressure, timefmt)
 end
 Customizer(params::Parameters, pressure::Pressure, args...) =
