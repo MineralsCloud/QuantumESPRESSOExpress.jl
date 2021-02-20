@@ -8,8 +8,7 @@ using QuantumESPRESSO.Inputs.PWscf: PWInput
 using QuantumESPRESSO.Inputs.PHonon: PhInput, Q2rInput, MatdynInput
 using Unitful: ustrip
 
-using Express.Phonon.Config:
-    Pressures, Volumes, PhononConfig, DfptTemplate, materialize_press_vol, materialize_dir
+using Express.Phonon.Config: Pressures, Volumes, PhononConfig, DfptTemplate
 import Express.Phonon.Config: materialize
 
 function _materialize_tmpl(
@@ -40,9 +39,9 @@ function materialize(config)
 
     return (
         templates = templates,
-        fixed = materialize_press_vol(config.fixed),
+        fixed = materialize(config.fixed),
         workdir = config.dirs.root,
-        dirs = materialize_dir(config),
+        dirs = materialize(config.dirs, config.fixed),
         cli = config.cli,
     )
 end
