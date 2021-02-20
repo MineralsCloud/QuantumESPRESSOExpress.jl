@@ -21,7 +21,7 @@ function _materialize_tmpl(config, fixed)
     end
 end
 
-function materialize(config)
+function materialize(config::AbstractDict)
     config = from_dict(EosFittingConfig{QuantumESPRESSOCliConfig}, config)
 
     templates = _materialize_tmpl(config.templates, config.fixed)

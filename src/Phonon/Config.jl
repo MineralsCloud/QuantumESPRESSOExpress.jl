@@ -32,7 +32,7 @@ function _materialize_tmpl(
     end
 end
 
-function materialize(config)
+function materialize(config::AbstractDict)
     config = from_dict(PhononConfig{QuantumESPRESSOCliConfig}, config)
 
     templates = _materialize_tmpl(config.templates, config.fixed)
