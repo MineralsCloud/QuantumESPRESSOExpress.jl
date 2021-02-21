@@ -213,8 +213,8 @@ uuid = "e2ba6199-217a-4e67-a87a-7c52f15ade04"
 version = "0.1.3"
 
 [[Express]]
-deps = ["AbInitioSoftwareBase", "Compat", "Configurations", "Crystallography", "Distributed", "EquationsOfStateOfSolids", "Mustache", "PyQHA", "Serialization", "Setfield", "SimpleWorkflow", "Unitful", "UnitfulAtomic", "UrlDownload"]
-git-tree-sha1 = "2db6b7526fe5ce4d3973acfd9eedac98ae300a0b"
+deps = ["AbInitioSoftwareBase", "Compat", "Configurations", "Crystallography", "Dates", "Distributed", "EquationsOfStateOfSolids", "Logging", "Mustache", "PyQHA", "Serialization", "Setfield", "SimpleWorkflow", "Unitful", "UnitfulAtomic", "UrlDownload"]
+git-tree-sha1 = "cfc8998035aaa43a6cd47b4a39693cf7bc194b6d"
 repo-rev = "master"
 repo-url = "git@github.com:MineralsCloud/Express.jl.git"
 uuid = "b12df14e-adf7-11e9-0606-d5813a258349"
@@ -726,9 +726,9 @@ version = "0.9.6"
 
 [[StructTypes]]
 deps = ["Dates", "UUIDs"]
-git-tree-sha1 = "65a43f5218197bc7091b76bc273a5e323a1d7b0d"
+git-tree-sha1 = "5df8d5254973ce3e4532443aa3cd2a1134d227d5"
 uuid = "856f2bd8-1eba-4b0a-8007-ebc267875bd4"
-version = "1.2.3"
+version = "1.3.0"
 
 [[SuiteSparse]]
 deps = ["Libdl", "LinearAlgebra", "Serialization", "SparseArrays"]
