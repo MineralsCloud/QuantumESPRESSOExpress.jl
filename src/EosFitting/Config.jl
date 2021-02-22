@@ -40,7 +40,7 @@ function materialize(config::AbstractDict)
         workdir = config.dirs.root,
         dirs = materialize(config.dirs, config.fixed),
         inv_opt = config.inv_opt,
-        recover = abspath(expanduser(config.recover)),
+        recover = config.recover,
         cli = config.cli,
     )
 end
