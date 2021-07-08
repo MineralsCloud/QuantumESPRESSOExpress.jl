@@ -9,3 +9,4 @@
 [![Build Status](https://api.cirrus-ci.com/github/MineralsCloud/QuantumESPRESSOExpress.jl.svg)](https://cirrus-ci.com/github/MineralsCloud/QuantumESPRESSOExpress.jl)
 [![Coverage](https://codecov.io/gh/MineralsCloud/QuantumESPRESSOExpress.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/MineralsCloud/QuantumESPRESSOExpress.jl)
 [![Coverage](https://coveralls.io/repos/github/MineralsCloud/QuantumESPRESSOExpress.jl/badge.svg?branch=master)](https://coveralls.io/github/MineralsCloud/QuantumESPRESSOExpress.jl?branch=master)
+[![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/organization/repository)
