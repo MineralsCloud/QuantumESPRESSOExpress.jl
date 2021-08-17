@@ -1,4 +1,4 @@
-module EosFitting
+module EquationOfStateWorkflow
 
 using Crystallography: cellvolume
 using QuantumESPRESSOCli: PwxConfig, makecmd
