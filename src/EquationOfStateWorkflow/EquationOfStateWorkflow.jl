@@ -1,20 +1,18 @@
 module EquationOfStateWorkflow
 
 using Crystallography: cellvolume
-using QuantumESPRESSOCli: PwxConfig, makecmd
+using QuantumESPRESSO.Commands: PwxConfig, makecmd
 using QuantumESPRESSO.Inputs.PWscf: CellParametersCard
 using QuantumESPRESSO.Outputs.PWscf:
     Preamble, parse_electrons_energies, parsefinal, isjobdone, tryparsefinal
 using Setfield: @set!
 using Unitful: Pressure, Volume, @u_str
-import Unitful
 using UnitfulAtomic
 
 using ..QuantumESPRESSOExpress: QE
 
-using Express: loadconfig
-using Express.EosFitting: SelfConsistentField, StOptim, VcOptim, ScfOrOptim, iofiles
-import Express.EosFitting.DefaultActions: parseoutput
+using Express.EquationOfStateWorkflow: SelfConsistentField, StOptim, VcOptim, ScfOrOptim
+import Express.EquationOfStateWorkflow.DefaultActions: parseoutput
 
 include("Config.jl")
 
