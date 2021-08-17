@@ -14,7 +14,6 @@ using ..QuantumESPRESSOExpress: QE
 
 using Express: loadconfig
 using Express.EosFitting: SelfConsistentField, StOptim, VcOptim, ScfOrOptim, iofiles
-import Express.EosFitting: shortname
 import Express.EosFitting.DefaultActions: parseoutput
 
 include("Config.jl")
@@ -44,10 +43,6 @@ include("MakeInput.jl")
 include("MakeCmd.jl")
 
 end
-
-shortname(::Type{SelfConsistentField}) = "scf"
-shortname(::Type{StOptim}) = "relax"
-shortname(::Type{VcOptim}) = "vc-relax"
 
 function parseoutput(::SelfConsistentField)
     function (file)
