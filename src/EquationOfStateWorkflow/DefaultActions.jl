@@ -104,37 +104,5 @@ function (x::RunCmd)(
     )
     return run(cmd)
 end
-function (x::RunCmd)(
-    inputs::AbstractArray;
-    outputs,
-    errors = outputs,
-    mpi,
-    options = PwxConfig(),
-)
-    if !isempty(outputs)
-        if size(inputs) != size(outputs)
-            throw(DimensionMismatch("size of inputs and outputs are different!"))
-        end
-    end
-    if !isempty(errors)
-        if size(inputs) != size(errors)
-            throw(DimensionMismatch("size of inputs and outputs are different!"))
-        end
-    end
-    @set! mpi.np = distprocs(mpi.np, length(inputs))
-    distkeys = []
-    for (key, value) in mpi.options
-        if value isa AbstractArray
-            push!(distkeys, key)
-        end
-    end
-    return map(enumerate(inputs)) do (i, input)
-        tempmpi = mpi
-        for key in distkeys
-            @set! tempmpi.options[key] = mpi.options[key][i]
-        end
-        x(input; output = outputs[i], error = errors[i], mpi = tempmpi, options = options)
-    end
-end
 
 end
