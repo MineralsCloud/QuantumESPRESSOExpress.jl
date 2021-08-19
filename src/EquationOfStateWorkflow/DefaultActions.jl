@@ -79,32 +79,16 @@ function (x::OutdirSetter)(template::PWInput)
     return template
 end
 
-struct Customizer
-    volume::Volume
-    pressure::Union{Pressure,Nothing}
-    timefmt::String
+customizer(volume::Volume, pressure::Pressure, timefmt = "Y-m-d_H:M:S") =
+    OutdirSetter(timefmt) ∘ PressureSetter(pressure) ∘ VolumeSetter(volume)
+customizer(volume::Volume, timefmt = "Y-m-d_H:M:S") =
+    OutdirSetter(timefmt) ∘ VolumeSetter(volume)
+function customizer(eos::PressureEquation, pressure::Pressure, timefmt = "Y-m-d_H:M:S")
+    volume = (eos^(-1))(pressure)
+    return customizer(volume, pressure, timefmt)
 end
-Customizer(volume, pressure = nothing, timefmt = "Y-m-d_H:M:S") =
-    Customizer(volume, pressure, timefmt)
-function Customizer(
-    eos::EquationOfStateOfSolids,
-    pressure::Pressure,
-    timefmt,
-    inv_opt = NumericalInversionOptions(),
-)
-    volume = inverse(eos)(pressure, inv_opt)
-    return Customizer(volume, pressure, timefmt)
-end
-Customizer(params::Parameters, pressure::Pressure, args...) =
-    Customizer(PressureEquation(params), pressure, args...)
-function (x::Customizer)(template::PWInput)::PWInput
-    customize = if x.pressure === nothing
-        OutdirSetter(x.timefmt) ∘ VolumeSetter(x.volume)
-    else
-        OutdirSetter(x.timefmt) ∘ PressureSetter(x.pressure) ∘ VolumeSetter(x.volume)
-    end
-    return customize(template)
-end
+customizer(params::Parameters, pressure::Pressure, timefmt = "Y-m-d_H:M:S") =
+    customizer(PressureEquation(params), pressure, timefmt)
 
 function (::MakeCmd)(
     input;
