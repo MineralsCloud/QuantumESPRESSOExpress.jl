@@ -49,13 +49,13 @@ function (x::MakeInput{T})(cfgfile) where {T}
     end
 end
 
-struct CalculationSetter{T<:Union{SelfConsistentField,Optimization}} <: Setter
-    calc::T
+struct CalculationSetter <: Setter
+    calc::ScfOrOptim
 end
-function (::CalculationSetter{T})(template::PWInput) where {T}
-    @set! template.control.calculation = if T == SelfConsistentField  # Functions can be extended, not safe
+function (x::CalculationSetter)(template::PWInput)
+    @set! template.control.calculation = if x.calc isa SelfConsistentField  # Functions can be extended, not safe
         "scf"
-    elseif T == StOptim
+    elseif x.calc isa StOptim
         "relax"
     else
         "vc-relax"
