@@ -63,13 +63,7 @@ function (x::CalculationSetter)(template::PWInput)
     return template
 end
 
-struct Normalizer{T}
-    calc::T
-end
-function (x::Normalizer)(template::PWInput)::PWInput
-    normalize = VerbositySetter("high") ∘ CalculationSetter(x.calc)
-    return normalize(template)
-end
+normalizer(calc::ScfOrOptim) = VerbositySetter("high") ∘ CalculationSetter(calc)
 
 struct OutdirSetter <: Setter
     timefmt::String
