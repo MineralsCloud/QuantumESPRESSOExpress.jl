@@ -87,17 +87,6 @@ end
 customizer(params::Parameters, pressure::Pressure, timefmt = "Y-m-d_H:M:S") =
     customizer(PressureEquation(params), pressure, timefmt)
 
-function (::MakeCmd)(
-    input;
-    output = tempname(; cleanup = false),
-    error = "",
-    mpi = MpiexecOptions(),
-    options = PwxConfig(),
-)
-    mkpath(dirname(input))
-    @set! options.script_dest = mktemp(dirname(input); cleanup = false)[1]
-    return makecmd(input; output = output, error = error, mpi = mpi, options = options)
-end
 function (x::MakeCmd)(
     inputs::AbstractArray;
     outputs,
