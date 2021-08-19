@@ -8,7 +8,7 @@ using EquationsOfStateOfSolids: EquationOfStateOfSolids, PressureEquation, Param
 using Express.Config: loadconfig
 using Express.EquationOfStateWorkflow.Config: Volumes
 using Express.EquationOfStateWorkflow: SelfConsistentField, StOptim, VcOptim, ScfOrOptim
-using QuantumESPRESSO.Commands: PwxConfig, makecmd
+using QuantumESPRESSO.Commands: pw
 using QuantumESPRESSO.Inputs.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using Setfield: @set!
 using Unitful: Pressure, Volume, @u_str
@@ -85,24 +85,13 @@ end
 customizer(params::Parameters, pressure::Pressure, timefmt = "Y-m-d_H:M:S") =
     customizer(PressureEquation(params), pressure, timefmt)
 
-function (x::RunCmd)(
-    input;
-    output,
-    error = output,
-    use_script = false,
-    mpi,
-    main = PwxConfig(),
-)
-    cmd = makecmd(
-        input;
-        output = output,
-        error = error,
-        dir = main.chdir ? parentdir(input) : pwd(),  # See https://github.com/MineralsCloud/QuantumESPRESSOCommands.jl/pull/10
-        use_script = use_script,
-        mpi = mpi,
-        main = main,
-    )
-    return run(cmd)
+(x::RunCmd)(input; output, error = output, kwargs...) = pw(input, output, error; kwargs...)
+function (x::RunCmd)(cfgfile; kwargs...)
+    config = loadconfig(cfgfile)
+    @set! mpi.np = distprocs(mpi.np, length(config.files))
+    map(config.files) do input, output
+        x(input; output = output, kwargs...)
+    end
 end
 
 end
