@@ -1,22 +1,19 @@
 module DefaultActions
 
-using AbInitioSoftwareBase.Cli: MpiexecOptions
+using AbInitioSoftwareBase.Commands: MpiexecConfig
 using AbInitioSoftwareBase.Inputs: Setter
 using Dates: format, now
 using EquationsOfStateOfSolids: EquationOfStateOfSolids, PressureEquation, Parameters
-using EquationsOfStateOfSolids.Inverse: NumericalInversionOptions, inverse
-using QuantumESPRESSOCli: PwxConfig, makecmd
+using QuantumESPRESSO.Commands: PwxConfig, makecmd
 using QuantumESPRESSO.Inputs.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using Setfield: @set!
-using SimpleWorkflow: ExternalAtomicJob, parallel
+using SimpleWorkflows: ExternalAtomicJob, parallel
 using Unitful: Pressure, Volume, @u_str
-import Unitful
 using UnitfulAtomic
 
-using Express.EosFitting:
-    SelfConsistentField, Optimization, StOptim, VcOptim, ScfOrOptim, iofiles, loadconfig
-import Express.EosFitting: buildjob
-import Express.EosFitting.DefaultActions: MakeInput, FitEos, MakeCmd
+using Express.Config: loadconfig
+using Express.EquationOfStateWorkflow: SelfConsistentField, StOptim, VcOptim, ScfOrOptim
+import Express.EquationOfStateWorkflow.DefaultActions: MakeInput, FitEos, MakeCmd
 import Express.Shell: distprocs
 
 (::MakeInput{T})(template::PWInput, args...) where {T<:ScfOrOptim} =
