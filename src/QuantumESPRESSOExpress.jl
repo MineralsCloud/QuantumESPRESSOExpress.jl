@@ -11,7 +11,7 @@ const QE = QuantumESPRESSO
 
 currentsoftware() = QE()
 
-include("EosFitting/EosFitting.jl")
+include("EquationOfStateWorkflow/EquationOfStateWorkflow.jl")
 include("Phonon/Phonon.jl")
 
 end
