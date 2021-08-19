@@ -4,20 +4,20 @@ using AbInitioSoftwareBase.Commands: MpiexecConfig
 using AbInitioSoftwareBase.Inputs: Setter
 using Dates: format, now
 using EquationsOfStateOfSolids: EquationOfStateOfSolids, PressureEquation, Parameters
+using Express.Config: loadconfig
+using Express.EquationOfStateWorkflow.Config: Volumes
+using Express.EquationOfStateWorkflow: SelfConsistentField, StOptim, VcOptim, ScfOrOptim
 using QuantumESPRESSO.Commands: PwxConfig, makecmd
 using QuantumESPRESSO.Inputs.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using Setfield: @set!
-using SimpleWorkflows: ExternalAtomicJob, parallel
 using Unitful: Pressure, Volume, @u_str
 using UnitfulAtomic
 
-using Express.Config: loadconfig
-using Express.EquationOfStateWorkflow: SelfConsistentField, StOptim, VcOptim, ScfOrOptim
-import Express.EquationOfStateWorkflow.DefaultActions: MakeInput, FitEos, MakeCmd
+import Express.EquationOfStateWorkflow.DefaultActions: MakeInput, FitEos, RunCmd
 import Express.Shell: distprocs
 
 (::MakeInput{T})(template::PWInput, args...) where {T<:ScfOrOptim} =
-    (Customizer(args...) ∘ Normalizer(T()))(template)
+    (customizer(args...) ∘ normalizer(T()))(template)
 function (x::MakeInput{T})(cfgfile) where {T}
     config = loadconfig(cfgfile)
     infiles = first.(config.files)
