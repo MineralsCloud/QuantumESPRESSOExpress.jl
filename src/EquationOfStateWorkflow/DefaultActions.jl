@@ -1,61 +1,58 @@
 module DefaultActions
 
-using AbInitioSoftwareBase.Cli: MpiexecOptions
+using AbInitioSoftwareBase: parentdir
+using AbInitioSoftwareBase.Commands: MpiexecConfig
 using AbInitioSoftwareBase.Inputs: Setter
 using Dates: format, now
 using EquationsOfStateOfSolids: EquationOfStateOfSolids, PressureEquation, Parameters
-using EquationsOfStateOfSolids.Inverse: NumericalInversionOptions, inverse
-using QuantumESPRESSOCli: PwxConfig, makecmd
+using Express.Config: loadconfig
+using Express.EquationOfStateWorkflow.Config: Volumes
+using Express.EquationOfStateWorkflow: SelfConsistentField, StOptim, VcOptim, ScfOrOptim
+using QuantumESPRESSO.Commands: pw
 using QuantumESPRESSO.Inputs.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using Setfield: @set!
-using SimpleWorkflow: ExternalAtomicJob, parallel
 using Unitful: Pressure, Volume, @u_str
-import Unitful
 using UnitfulAtomic
 
-using Express.EosFitting:
-    SelfConsistentField, Optimization, StOptim, VcOptim, ScfOrOptim, iofiles, loadconfig
-import Express.EosFitting: buildjob
-import Express.EosFitting.DefaultActions: MakeInput, FitEos, MakeCmd
+import Express.EquationOfStateWorkflow.DefaultActions: MakeInput, FitEos, RunCmd
 import Express.Shell: distprocs
 
 (::MakeInput{T})(template::PWInput, args...) where {T<:ScfOrOptim} =
-    (Customizer(args...) ∘ Normalizer(T()))(template)
+    (customizer(args...) ∘ normalizer(T()))(template)
 function (x::MakeInput{T})(cfgfile) where {T}
     config = loadconfig(cfgfile)
-    infiles = first.(iofiles(T(), cfgfile))
+    infiles = first.(config.files)
     eos = PressureEquation(
         T <: SelfConsistentField ? config.trial_eos :
         FitEos{SelfConsistentField}()(cfgfile),
     )
-    if eltype(config.fixed) <: Volume
+    if config.fixed isa Volumes
         return broadcast(
             x,
             infiles,
-            config.templates,
-            fill(config.trial_eos, length(infiles)),
+            config.template,
             config.fixed,
+            fill("Y-m-d_H:M:S", length(infiles)),
         )
     else  # Pressure
         return broadcast(
             x,
             infiles,
-            config.templates,
-            fill(config.trial_eos, length(infiles)),
+            config.template,
+            fill(eos, length(infiles)),
             config.fixed,
             fill("Y-m-d_H:M:S", length(infiles)),
-            fill(config.inv_opt, length(infiles)),
         )
     end
 end
 
-struct CalculationSetter{T<:Union{SelfConsistentField,Optimization}} <: Setter
-    calc::T
+struct CalculationSetter <: Setter
+    calc::ScfOrOptim
 end
-function (::CalculationSetter{T})(template::PWInput) where {T}
-    @set! template.control.calculation = if T == SelfConsistentField  # Functions can be extended, not safe
+function (x::CalculationSetter)(template::PWInput)
+    @set! template.control.calculation = if x.calc isa SelfConsistentField  # Functions can be extended, not safe
         "scf"
-    elseif T == StOptim
+    elseif x.calc isa StOptim
         "relax"
     else
         "vc-relax"
@@ -63,13 +60,7 @@ function (::CalculationSetter{T})(template::PWInput) where {T}
     return template
 end
 
-struct Normalizer{T}
-    calc::T
-end
-function (x::Normalizer)(template::PWInput)::PWInput
-    normalize = VerbositySetter("high") ∘ CalculationSetter(x.calc)
-    return normalize(template)
-end
+normalizer(calc::ScfOrOptim) = VerbositySetter("high") ∘ CalculationSetter(calc)
 
 struct OutdirSetter <: Setter
     timefmt::String
@@ -85,86 +76,22 @@ function (x::OutdirSetter)(template::PWInput)
     return template
 end
 
-struct Customizer
-    volume::Volume
-    pressure::Union{Pressure,Nothing}
-    timefmt::String
+customizer(volume::Volume, timefmt = "Y-m-d_H:M:S") =
+    OutdirSetter(timefmt) ∘ VolumeSetter(volume)
+function customizer(eos::PressureEquation, pressure::Pressure, timefmt = "Y-m-d_H:M:S")
+    volume = (eos^(-1))(pressure)
+    return OutdirSetter(timefmt) ∘ PressureSetter(pressure) ∘ VolumeSetter(volume)
 end
-Customizer(volume, pressure = nothing, timefmt = "Y-m-d_H:M:S") =
-    Customizer(volume, pressure, timefmt)
-function Customizer(
-    eos::EquationOfStateOfSolids,
-    pressure::Pressure,
-    timefmt,
-    inv_opt = NumericalInversionOptions(),
-)
-    volume = inverse(eos)(pressure, inv_opt)
-    return Customizer(volume, pressure, timefmt)
-end
-Customizer(params::Parameters, pressure::Pressure, args...) =
-    Customizer(PressureEquation(params), pressure, args...)
-function (x::Customizer)(template::PWInput)::PWInput
-    customize = if x.pressure === nothing
-        OutdirSetter(x.timefmt) ∘ VolumeSetter(x.volume)
-    else
-        OutdirSetter(x.timefmt) ∘ PressureSetter(x.pressure) ∘ VolumeSetter(x.volume)
-    end
-    return customize(template)
-end
+customizer(params::Parameters, pressure::Pressure, timefmt = "Y-m-d_H:M:S") =
+    customizer(PressureEquation(params), pressure, timefmt)
 
-function (::MakeCmd)(
-    input;
-    output = tempname(; cleanup = false),
-    error = "",
-    mpi = MpiexecOptions(),
-    options = PwxConfig(),
-)
-    mkpath(dirname(input))
-    @set! options.script_dest = mktemp(dirname(input); cleanup = false)[1]
-    return makecmd(input; output = output, error = error, mpi = mpi, options = options)
-end
-function (x::MakeCmd)(
-    inputs::AbstractArray;
-    outputs,
-    errors = outputs,
-    mpi,
-    options = PwxConfig(),
-)
-    if !isempty(outputs)
-        if size(inputs) != size(outputs)
-            throw(DimensionMismatch("size of inputs and outputs are different!"))
-        end
-    end
-    if !isempty(errors)
-        if size(inputs) != size(errors)
-            throw(DimensionMismatch("size of inputs and outputs are different!"))
-        end
-    end
-    @set! mpi.np = distprocs(mpi.np, length(inputs))
-    distkeys = []
-    for (key, value) in mpi.options
-        if value isa AbstractArray
-            push!(distkeys, key)
-        end
-    end
-    return map(enumerate(inputs)) do (i, input)
-        tempmpi = mpi
-        for key in distkeys
-            @set! tempmpi.options[key] = mpi.options[key][i]
-        end
-        x(input; output = outputs[i], error = errors[i], mpi = tempmpi, options = options)
-    end
-end
-
-function buildjob(x::MakeCmd{T}, cfgfile) where {T}
+(x::RunCmd)(input; output, error = output, kwargs...) = pw(input, output, error; kwargs...)
+function (x::RunCmd)(cfgfile; kwargs...)
     config = loadconfig(cfgfile)
-    io = iofiles(T(), cfgfile)
-    infiles, outfiles = first.(io), last.(io)
-    jobs = map(
-        ExternalAtomicJob,
-        x(infiles; outputs = outfiles, mpi = config.cli.mpi, options = config.cli.pw),
-    )
-    return parallel(jobs...)
+    @set! mpi.np = distprocs(mpi.np, length(config.files))
+    map(config.files) do input, output
+        x(input; output = output, kwargs...)
+    end
 end
 
 end
