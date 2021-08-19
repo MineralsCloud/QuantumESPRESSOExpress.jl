@@ -23,7 +23,7 @@ import Express.Shell: distprocs
     (Customizer(args...) ∘ Normalizer(T()))(template)
 function (x::MakeInput{T})(cfgfile) where {T}
     config = loadconfig(cfgfile)
-    infiles = first.(iofiles(T(), cfgfile))
+    infiles = first.(config.files)
     eos = PressureEquation(
         T <: SelfConsistentField ? config.trial_eos :
         FitEos{SelfConsistentField}()(cfgfile),
@@ -32,19 +32,19 @@ function (x::MakeInput{T})(cfgfile) where {T}
         return broadcast(
             x,
             infiles,
-            config.templates,
-            fill(config.trial_eos, length(infiles)),
+            config.template,
+            fill(eos, length(infiles)),
             config.fixed,
+            fill("Y-m-d_H:M:S", length(infiles)),
         )
     else  # Pressure
         return broadcast(
             x,
             infiles,
-            config.templates,
-            fill(config.trial_eos, length(infiles)),
+            config.template,
+            fill(eos, length(infiles)),
             config.fixed,
             fill("Y-m-d_H:M:S", length(infiles)),
-            fill(config.inv_opt, length(infiles)),
         )
     end
 end
