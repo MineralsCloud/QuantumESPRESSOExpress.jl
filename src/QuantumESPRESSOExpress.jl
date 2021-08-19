@@ -2,7 +2,7 @@ module QuantumESPRESSOExpress
 
 using AbInitioSoftwareBase: AbInitioSoftware
 
-import Express: currentsoftware
+import Express: current_software
 
 export QE
 
