@@ -1,5 +1,6 @@
 module DefaultActions
 
+using AbInitioSoftwareBase: parentdir
 using AbInitioSoftwareBase.Commands: MpiexecConfig
 using AbInitioSoftwareBase.Inputs: Setter
 using Dates: format, now
@@ -84,7 +85,26 @@ end
 customizer(params::Parameters, pressure::Pressure, timefmt = "Y-m-d_H:M:S") =
     customizer(PressureEquation(params), pressure, timefmt)
 
-function (x::MakeCmd)(
+function (x::RunCmd)(
+    input;
+    output,
+    error = output,
+    use_script = false,
+    mpi,
+    main = PwxConfig(),
+)
+    cmd = makecmd(
+        input;
+        output = output,
+        error = error,
+        dir = main.chdir ? parentdir(input) : pwd(),  # See https://github.com/MineralsCloud/QuantumESPRESSOCommands.jl/pull/10
+        use_script = use_script,
+        mpi = mpi,
+        main = main,
+    )
+    return run(cmd)
+end
+function (x::RunCmd)(
     inputs::AbstractArray;
     outputs,
     errors = outputs,
