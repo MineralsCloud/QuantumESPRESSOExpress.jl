@@ -4,7 +4,8 @@ using AbInitioSoftwareBase: parentdir
 using AbInitioSoftwareBase.Commands: MpiexecConfig
 using AbInitioSoftwareBase.Inputs: Setter
 using Dates: format, now
-using EquationsOfStateOfSolids: EquationOfStateOfSolids, PressureEquation, Parameters
+using EquationsOfStateOfSolids:
+    EquationOfStateOfSolids, PressureEquation, Parameters, getparam
 using Express.Config: loadconfig
 using Express.EquationOfStateWorkflow.Config: Volumes
 using Express.EquationOfStateWorkflow: SelfConsistentField, StOptim, VcOptim, ScfOrOptim
@@ -79,8 +80,8 @@ end
 customizer(volume::Volume, timefmt = "Y-m-d_H:M:S") =
     OutdirSetter(timefmt) ∘ VolumeSetter(volume)
 function customizer(eos::PressureEquation, pressure::Pressure, timefmt = "Y-m-d_H:M:S")
-    volume = (eos^(-1))(pressure)
-    return OutdirSetter(timefmt) ∘ PressureSetter(pressure) ∘ VolumeSetter(volume)
+    volumes = (eos^(-1))(pressure, getparam(eos).v0)
+    return OutdirSetter(timefmt) ∘ PressureSetter(pressure) ∘ VolumeSetter(only(volumes))
 end
 customizer(params::Parameters, pressure::Pressure, timefmt = "Y-m-d_H:M:S") =
     customizer(PressureEquation(params), pressure, timefmt)
