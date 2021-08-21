@@ -4,7 +4,8 @@ using AbInitioSoftwareBase: parentdir
 using AbInitioSoftwareBase.Commands: MpiexecConfig
 using AbInitioSoftwareBase.Inputs: Setter
 using Dates: format, now
-using EquationsOfStateOfSolids: EquationOfStateOfSolids, PressureEquation, Parameters
+using EquationsOfStateOfSolids:
+    EquationOfStateOfSolids, PressureEquation, Parameters, getparam
 using Express.Config: loadconfig
 using Express.EquationOfStateWorkflow.Config: Volumes
 using Express.EquationOfStateWorkflow: SelfConsistentField, StOptim, VcOptim, ScfOrOptim
@@ -21,28 +22,19 @@ import Express.Shell: distprocs
     (customizer(args...) ∘ normalizer(T()))(template)
 function (x::MakeInput{T})(cfgfile) where {T}
     config = loadconfig(cfgfile)
-    infiles = first.(config.files)
+    inputs = first.(config.files)
     eos = PressureEquation(
         T <: SelfConsistentField ? config.trial_eos :
         FitEos{SelfConsistentField}()(cfgfile),
     )
     if config.fixed isa Volumes
-        return broadcast(
-            x,
-            infiles,
-            config.template,
-            config.fixed,
-            fill("Y-m-d_H:M:S", length(infiles)),
-        )
+        return map(inputs, config.fixed) do input, volume
+            x(input, config.template, volume, "Y-m-d_H:M:S")
+        end
     else  # Pressure
-        return broadcast(
-            x,
-            infiles,
-            config.template,
-            fill(eos, length(infiles)),
-            config.fixed,
-            fill("Y-m-d_H:M:S", length(infiles)),
-        )
+        return map(inputs, config.fixed) do input, pressure
+            x(input, config.template, eos, pressure, "Y-m-d_H:M:S")
+        end
     end
 end
 
@@ -79,8 +71,8 @@ end
 customizer(volume::Volume, timefmt = "Y-m-d_H:M:S") =
     OutdirSetter(timefmt) ∘ VolumeSetter(volume)
 function customizer(eos::PressureEquation, pressure::Pressure, timefmt = "Y-m-d_H:M:S")
-    volume = (eos^(-1))(pressure)
-    return OutdirSetter(timefmt) ∘ PressureSetter(pressure) ∘ VolumeSetter(volume)
+    volumes = (eos^(-1))(pressure, getparam(eos).v0)
+    return OutdirSetter(timefmt) ∘ PressureSetter(pressure) ∘ VolumeSetter(only(volumes))
 end
 customizer(params::Parameters, pressure::Pressure, timefmt = "Y-m-d_H:M:S") =
     customizer(PressureEquation(params), pressure, timefmt)
