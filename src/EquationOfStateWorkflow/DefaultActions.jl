@@ -77,13 +77,13 @@ end
 customizer(params::Parameters, pressure::Pressure, timefmt = "Y-m-d_H:M:S") =
     customizer(PressureEquation(params), pressure, timefmt)
 
-(x::RunCmd)(input; output = mktemp(parentdir(input))[1], error = output, kwargs...) =
+(x::RunCmd)(input, output = mktemp(parentdir(input))[1], error = output; kwargs...) =
     pw(input, output, error; kwargs...)
 function (x::RunCmd)(cfgfile; kwargs...)
     config = loadconfig(cfgfile)
-    @set! mpi.np = distprocs(mpi.np, length(config.files))
-    map(config.files) do input, output
-        x(input; output = output, kwargs...)
+    np = distprocs(config.cli.mpi.np, length(config.files))
+    map(config.files) do (input, output)
+        x(input, output; np = np)
     end
 end
 
