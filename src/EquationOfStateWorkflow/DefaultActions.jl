@@ -7,7 +7,6 @@ using Dates: format, now
 using EquationsOfStateOfSolids:
     EquationOfStateOfSolids, PressureEquation, Parameters, getparam
 using Express.Config: loadconfig
-using Express.EquationOfStateWorkflow.Config: Volumes
 using Express.EquationOfStateWorkflow: SelfConsistentField, StOptim, VcOptim, ScfOrOptim
 using QuantumESPRESSO.Commands: pw
 using QuantumESPRESSO.Inputs.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
@@ -20,23 +19,6 @@ import Express.Shell: distprocs
 
 (::MakeInput{T})(template::PWInput, args...) where {T<:ScfOrOptim} =
     (customizer(args...) ∘ normalizer(T()))(template)
-function (x::MakeInput{T})(cfgfile) where {T}
-    config = loadconfig(cfgfile)
-    inputs = first.(config.files)
-    eos = PressureEquation(
-        T <: SelfConsistentField ? config.trial_eos :
-        FitEos{SelfConsistentField}()(cfgfile),
-    )
-    if config.fixed isa Volumes
-        return map(inputs, config.fixed) do input, volume
-            x(input, config.template, volume, "Y-m-d_H:M:S")
-        end
-    else  # Pressure
-        return map(inputs, config.fixed) do input, pressure
-            x(input, config.template, eos, pressure, "Y-m-d_H:M:S")
-        end
-    end
-end
 
 struct CalculationSetter <: Setter
     calc::ScfOrOptim
