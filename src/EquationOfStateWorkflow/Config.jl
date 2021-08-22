@@ -6,9 +6,9 @@ using QuantumESPRESSO.Commands:
 using AbInitioSoftwareBase.Commands: CommandConfig, MpiexecConfig
 
 import Configurations: convert_to_option
-import Express.EquationOfStateWorkflow.Config: RuntimeConfig, materialize
+import Express.EquationOfStateWorkflow.Config: RuntimeConfig, ExpandConfig
 
-function materialize(template::AbstractString)
+function (::ExpandConfig)(template::AbstractString)
     str = read(expanduser(template), String)
     return parse(PWInput, str)
 end

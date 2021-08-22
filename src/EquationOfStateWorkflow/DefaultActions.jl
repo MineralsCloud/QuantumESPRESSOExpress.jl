@@ -6,7 +6,7 @@ using AbInitioSoftwareBase.Inputs: Setter
 using Dates: format, now
 using EquationsOfStateOfSolids:
     EquationOfStateOfSolids, PressureEquation, Parameters, getparam
-using Express.EquationOfStateWorkflow: SelfConsistentField, StOptim, VcOptim, ScfOrOptim
+using Express.EquationOfStateWorkflow: Scf, StOptim, VcOptim, ScfOrOptim
 using QuantumESPRESSO.Commands: pw
 using QuantumESPRESSO.Inputs.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using Setfield: @set!
@@ -22,7 +22,7 @@ struct CalculationSetter <: Setter
     calc::ScfOrOptim
 end
 function (x::CalculationSetter)(template::PWInput)
-    @set! template.control.calculation = if x.calc isa SelfConsistentField  # Functions can be extended, not safe
+    @set! template.control.calculation = if x.calc isa Scf  # Functions can be extended, not safe
         "scf"
     elseif x.calc isa StOptim
         "relax"
