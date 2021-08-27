@@ -1,6 +1,6 @@
 module Config
 
-using AbInitioSoftwareBase.Commands: CommandConfig
+using AbInitioSoftwareBase.Commands: CommandConfig, MpiexecConfig
 using Configurations: from_dict
 using Express: myuparse
 using Express.PhononWorkflow: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos
