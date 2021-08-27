@@ -1,5 +1,6 @@
 module DefaultActions
 
+using AbInitioSoftwareBase: parentdir
 using AbInitioSoftwareBase.Inputs: Setter
 using AbInitioSoftwareBase.Commands: MpiexecConfig
 using Dates: format, now
@@ -14,7 +15,7 @@ using QuantumESPRESSO.Inputs.PWscf:
     AtomicPositionsCardSetter
 using QuantumESPRESSO.Inputs.PHonon:
     PhInput, Q2rInput, MatdynInput, VerbositySetter, relayinfo
-using QuantumESPRESSO.Commands: PwxConfig, PhxConfig, Q2rxConfig, MatdynxConfig, makecmd
+using QuantumESPRESSO.Commands: pw, ph, q2r, matdyn
 using QuantumESPRESSO.Outputs.PWscf: tryparsefinal
 using Setfield: @set!
 
@@ -58,7 +59,7 @@ function (::CalculationSetter)(template::PWInput)
     return template
 end
 
-normalizer(calc::Scf) =VerbositySetter("high") ∘ CalculationSetter(Scf())
+normalizer(calc::Scf) = VerbositySetter("high") ∘ CalculationSetter(Scf())
 normalizer(calc::Dfpt) = 1
 struct Normalizer{T,S}
     calc::T
@@ -121,193 +122,21 @@ function (x::Customizer)(template::PWInput)::PWInput
     return customize(template)
 end
 
-function (::RunCmd{Scf})(
-    input;
-    output = tempname(; cleanup = false),
-    error = "",
-    mpi = MpiexecConfig(),
-    options = PwxConfig(),
-)
-    mkpath(dirname(input))
-    @set! options.script_dest = mktemp(dirname(input); cleanup = false)[1]
-    return makecmd(input; output = output, error = error, mpi = mpi, options = options)
-end
-function (x::RunCmd{Scf})(
-    inputs::AbstractArray;
-    outputs,
-    errors = outputs,
-    mpi,
-    options = PwxConfig(),
-)
-    if !isempty(outputs)
-        if size(inputs) != size(outputs)
-            throw(DimensionMismatch("size of inputs and outputs are different!"))
-        end
-    end
-    if !isempty(errors)
-        if size(inputs) != size(errors)
-            throw(DimensionMismatch("size of inputs and outputs are different!"))
-        end
-    end
-    @set! mpi.np = distprocs(mpi.np, length(inputs))
-    distkeys = []
-    for (key, value) in mpi.options
-        if value isa AbstractArray
-            push!(distkeys, key)
-        end
-    end
-    return map(enumerate(inputs)) do (i, input)
-        tempmpi = mpi
-        for key in distkeys
-            @set! tempmpi.options[key] = mpi.options[key][i]
-        end
-        x(input; output = outputs[i], error = errors[i], mpi = tempmpi, options = options)
-    end
-end
-function (::RunCmd{Dfpt})(
-    input;
-    output = tempname(; cleanup = false),
-    error = "",
-    mpi = MpiexecConfig(),
-    options = PhxConfig(),
-)
-    mkpath(dirname(input))
-    @set! options.script_dest = mktemp(dirname(input); cleanup = false)[1]
-    return makecmd(input; output = output, error = error, mpi = mpi, options = options)
-end
-function (x::RunCmd{Dfpt})(
-    inputs::AbstractArray;
-    outputs,
-    errors = outputs,
-    mpi,
-    options = PhxConfig(),
-)
-    if !isempty(outputs)
-        if size(inputs) != size(outputs)
-            throw(DimensionMismatch("size of inputs and outputs are different!"))
-        end
-    end
-    if !isempty(errors)
-        if size(inputs) != size(errors)
-            throw(DimensionMismatch("size of inputs and outputs are different!"))
-        end
-    end
-    @set! mpi.np = distprocs(mpi.np, length(inputs))
-    distkeys = []
-    for (key, value) in mpi.options
-        if value isa AbstractArray
-            push!(distkeys, key)
-        end
-    end
-    return map(enumerate(inputs)) do (i, input)
-        tempmpi = mpi
-        for key in distkeys
-            @set! tempmpi.options[key] = mpi.options[key][i]
-        end
-        x(input; output = outputs[i], error = errors[i], mpi = tempmpi, options = options)
-    end
-end
-function (::RunCmd{RealSpaceForceConstants})(
-    input;
-    output = tempname(; cleanup = false),
-    error = "",
-    mpi = MpiexecConfig(),
-    options = Q2rxConfig(),
-)
-    mkpath(dirname(input))
-    @set! options.script_dest = mktemp(dirname(input); cleanup = false)[1]
-    return makecmd(input; output = output, error = error, mpi = mpi, options = options)
-end
-function (x::RunCmd{RealSpaceForceConstants})(
-    inputs::AbstractArray;
-    outputs,
-    errors = outputs,
-    mpi,
-    options = Q2rxConfig(),
-)
-    if !isempty(outputs)
-        if size(inputs) != size(outputs)
-            throw(DimensionMismatch("size of inputs and outputs are different!"))
-        end
-    end
-    if !isempty(errors)
-        if size(inputs) != size(errors)
-            throw(DimensionMismatch("size of inputs and outputs are different!"))
-        end
-    end
-    @set! mpi.np = distprocs(mpi.np, length(inputs))
-    distkeys = []
-    for (key, value) in mpi.options
-        if value isa AbstractArray
-            push!(distkeys, key)
-        end
-    end
-    return map(enumerate(inputs)) do (i, input)
-        tempmpi = mpi
-        for key in distkeys
-            @set! tempmpi.options[key] = mpi.options[key][i]
-        end
-        x(input; output = outputs[i], error = errors[i], mpi = tempmpi, options = options)
-    end
-end
-function (::RunCmd{<:Union{VDos,PhononDispersion}})(
-    input;
-    output = tempname(; cleanup = false),
-    error = "",
-    mpi = MpiexecConfig(),
-    options = MatdynxConfig(),
-)
-    mkpath(dirname(input))
-    @set! options.script_dest = mktemp(dirname(input); cleanup = false)[1]
-    return makecmd(input; output = output, error = error, mpi = mpi, options = options)
-end
-function (x::RunCmd{<:Union{VDos,PhononDispersion}})(
-    inputs::AbstractArray;
-    outputs,
-    errors = outputs,
-    mpi,
-    options = MatdynxConfig(),
-)
-    if !isempty(outputs)
-        if size(inputs) != size(outputs)
-            throw(DimensionMismatch("size of inputs and outputs are different!"))
-        end
-    end
-    if !isempty(errors)
-        if size(inputs) != size(errors)
-            throw(DimensionMismatch("size of inputs and outputs are different!"))
-        end
-    end
-    @set! mpi.np = distprocs(mpi.np, length(inputs))
-    distkeys = []
-    for (key, value) in mpi.options
-        if value isa AbstractArray
-            push!(distkeys, key)
-        end
-    end
-    return map(enumerate(inputs)) do (i, input)
-        tempmpi = mpi
-        for key in distkeys
-            @set! tempmpi.options[key] = mpi.options[key][i]
-        end
-        x(input; output = outputs[i], error = errors[i], mpi = tempmpi, options = options)
-    end
-end
-
-function buildjob(x::RunCmd{T}, cfgfile) where {T}
-    config = loadconfig(cfgfile)
-    infiles = map(dir -> joinpath(dir, shortname(T) * ".in"), config.dirs)
-    outfiles = map(dir -> joinpath(dir, shortname(T) * ".out"), config.dirs)
-    jobs = map(
-        ExternalAtomicJob,
-        x(
-            infiles;
-            outputs = outfiles,
-            mpi = config.cli.mpi,
-            options = getproperty(config.cli, cli(T)),
-        ),
-    )
-    return parallel(jobs...)
-end
+(x::RunCmd{Scf})(input, output = mktemp(parentdir(input))[1], error = output; kwargs...) =
+    pw(input, output, error; kwargs...)
+(x::RunCmd{Dfpt})(input, output = mktemp(parentdir(input))[1], error = output; kwargs...) =
+    ph(input, output, error; kwargs...)
+(x::RunCmd{RealSpaceForceConstants})(
+    input,
+    output = mktemp(parentdir(input))[1],
+    error = output;
+    kwargs...,
+) = q2r(input, output, error; kwargs...)
+(x::RunCmd{<:Union{VDos,PhononDispersion}})(
+    input,
+    output = mktemp(parentdir(input))[1],
+    error = output;
+    kwargs...,
+) = matdyn(input, output, error; kwargs...)
 
 end
