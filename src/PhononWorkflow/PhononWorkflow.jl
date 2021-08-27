@@ -1,4 +1,4 @@
-module Phonon
+module PhononWorkflow
 
 include("Config.jl")
 include("DefaultActions.jl")
