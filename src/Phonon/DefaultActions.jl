@@ -1,12 +1,13 @@
 module DefaultActions
 
 using AbInitioSoftwareBase: parentdir
-using AbInitioSoftwareBase.Inputs: Setter
+using AbInitioSoftwareBase.Inputs: Setter, Input
 using AbInitioSoftwareBase.Commands: MpiexecConfig
 using Dates: format, now
 using Express: Calculation, Scf
 using Express.EquationOfStateWorkflow: VcOptim
 using Express.PhononWorkflow: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos
+# using QuantumESPRESSO.Inputs: QuantumESPRESSOInput
 using QuantumESPRESSO.Inputs.PWscf:
     PWInput,
     CellParametersCard,
@@ -30,26 +31,19 @@ inputtype(::Type{RealSpaceForceConstants}) = Q2rInput
 inputtype(::Type{<:Union{PhononDispersion,VDos}}) = MatdynInput
 
 parsecell(str) =
-    tryparsefinal(CellParametersCard, str), tryparsefinal(AtomicPositionsCard, str)
+    tryparsefinal(AtomicPositionsCard, str), tryparsefinal(CellParametersCard, str)
 
-(::MakeInput{T})(template::PWInput, args...) where {T<:Scf} =
-    (Customizer(args...) ∘ Normalizer(T(), template))(template)
-(::MakeInput{T})(template::PhInput, previnp::PWInput) where {T<:Dfpt} =
-    Normalizer(T(), previnp)(template)
-(::MakeInput{T})(template::Q2rInput, previnp::PhInput) where {T<:RealSpaceForceConstants} =
-    Normalizer(T(), previnp)(template)
-(::MakeInput{T})(template::Q2rInput, previnp::PhInput) where {T<:RealSpaceForceConstants} =
-    Normalizer(T(), previnp)(template)
+(::MakeInput{Scf})(template::PWInput, args...) =
+    (customizer(args...) ∘ normalizer(Scf(), template))(template)
+(::MakeInput{Dfpt})(template::PhInput, previnp::PWInput) =
+    normalizer(Dfpt(), previnp)(template)
+(::MakeInput{RealSpaceForceConstants})(template::Q2rInput, previnp::PhInput) =
+    normalizer(RealSpaceForceConstants(), previnp)(template)
 (::MakeInput{T})(
     template::MatdynInput,
     a::Q2rInput,
     b::PhInput,
-) where {T<:Union{PhononDispersion,VDos}} = Normalizer(T(), (a, b))(template)
-(x::MakeInput{T})(
-    template::MatdynInput,
-    a::Q2rInput,
-    b::PhInput,
-) where {T<:Union{PhononDispersion,VDos}} = x(template, b, a)
+) where {T<:Union{PhononDispersion,VDos}} = normalizer(T(), (a, b))(template)
 
 struct CalculationSetter <: Setter
     calc::Union{Scf,Dfpt}
@@ -59,41 +53,36 @@ function (::CalculationSetter)(template::PWInput)
     return template
 end
 
-normalizer(calc::Scf) = VerbositySetter("high") ∘ CalculationSetter(Scf())
-normalizer(calc::Dfpt) = 1
-struct Normalizer{T,S}
-    calc::T
-    args::S
+struct RelayArgumentsSetter <: Setter
+    input::Union{Input,Tuple}
 end
-function (x::Normalizer{Scf})(template::PWInput)::PWInput
-    normalize = VerbositySetter("high") ∘ CalculationSetter(Scf())
-    return normalize(template)
+function (x::RelayArgumentsSetter)(template)
+    relayinfo(x.input, template)
+    return template
 end
-function (x::Normalizer{Dfpt,PWInput})(template::PhInput)::PhInput
-    normalize = Base.Fix1(relayinfo, x.args) ∘ VerbositySetter("high")
-    return normalize(template)
+function (x::RelayArgumentsSetter)(template::MatdynInput)
+    relayinfo(x.input[1], template)
+    relayinfo(x.input[2], template)
+    return template
 end
-(x::Normalizer{RealSpaceForceConstants,PhInput})(template::Q2rInput)::Q2rInput =
-    relayinfo(x.args, template)
-function (
-    x::Normalizer{
-        PhononDispersion,
-        <:Union{Tuple{Q2rInput,PhInput},Tuple{PhInput,Q2rInput}},
-    }
-)(
-    template::MatdynInput,
-)::MatdynInput
-    @set! template.input.dos = false
-    normalize = Base.Fix1(relayinfo, x.args[2]) ∘ Base.Fix1(relayinfo, x.args[1])
-    return normalize(template)
+
+struct DosSetter <: Setter
+    dos::Bool
 end
-function (x::Normalizer{VDos,<:Union{Tuple{Q2rInput,PhInput},Tuple{PhInput,Q2rInput}}})(
-    template::MatdynInput,
-)::MatdynInput
-    @set! template.input.dos = true
-    normalize = Base.Fix1(relayinfo, x.args[2]) ∘ Base.Fix1(relayinfo, x.args[1])
-    return normalize(template)
+function (x::DosSetter)(template::MatdynInput)
+    @set! template.input.dos = x.dos
+    return template
 end
+
+normalizer(::Scf, args...) = VerbositySetter("high") ∘ CalculationSetter(Scf())
+normalizer(::Dfpt, input::PWInput) = RelayArgumentsSetter(input) ∘ VerbositySetter("high")
+normalizer(::RealSpaceForceConstants, input::PhInput) = RelayArgumentsSetter(input)
+normalizer(
+    ::PhononDispersion,
+    inputs::Union{Tuple{Q2rInput,PhInput},Tuple{PhInput,Q2rInput}},
+) = RelayArgumentsSetter(inputs) ∘ DosSetter(false)
+normalizer(::VDos, inputs::Union{Tuple{Q2rInput,PhInput},Tuple{PhInput,Q2rInput}}) =
+    RelayArgumentsSetter(inputs) ∘ DosSetter(true)
 
 struct OutdirSetter <: Setter
     timefmt::String
@@ -109,18 +98,11 @@ function (x::OutdirSetter)(template::PWInput)
     return template
 end
 
-struct Customizer
-    cp::CellParametersCard
-    ap::AtomicPositionsCard
-    timefmt::String
-end
-Customizer(a, b) = Customizer(a, b, "Y-m-d_H:M:S")
-function (x::Customizer)(template::PWInput)::PWInput
-    customize =
-        OutdirSetter(x.timefmt) ∘ CellParametersCardSetter(x.cp) ∘
-        AtomicPositionsCardSetter(x.ap)
-    return customize(template)
-end
+customizer(
+    ap::AtomicPositionsCard,
+    cp::CellParametersCard,
+    timefmt::AbstractString = "Y-m-d_H:M:S",
+) = OutdirSetter(timefmt) ∘ CellParametersCardSetter(cp) ∘ AtomicPositionsCardSetter(ap)
 
 (x::RunCmd{Scf})(input, output = mktemp(parentdir(input))[1], error = output; kwargs...) =
     pw(input, output, error; kwargs...)
