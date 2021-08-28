@@ -56,13 +56,10 @@ end
 struct RelayArgumentsSetter <: Setter
     input::Union{Input,Tuple}
 end
-function (x::RelayArgumentsSetter)(template)
-    relayinfo(x.input, template)
-    return template
-end
+(x::RelayArgumentsSetter)(template) = relayinfo(x.input, template)
 function (x::RelayArgumentsSetter)(template::MatdynInput)
-    relayinfo(x.input[1], template)
-    relayinfo(x.input[2], template)
+    template = relayinfo(x.input[1], template)
+    template = relayinfo(x.input[2], template)
     return template
 end
 
