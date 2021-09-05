@@ -1,25 +1,22 @@
 workflow: vdos
-np: 24
-bin:
-  qe:
-    - pw.x
-    - ph.x
-    - q2r.x
-    - matdyn.x
-templates:
-  - - examples/Ge/template.in
-  - - examples/Ge/ph.in
-  - - examples/Ge/q2r.in
-  - - examples/Ge/disp.in
-pressures:
-  unit: GPa
-  values:
-    - -5
-    - -2
-    - 0
-    - 5
-    - 10
-    - 15
-    - 17
-    - 20
-use_shell: true
+mpi:
+  np: 16
+template:
+  scf: template.in
+  dfpt: ph.in
+  q2r: q2r.in
+  disp: disp.in
+save:
+  status: status.jls
+fixed:
+  pressures:
+    unit: GPa
+    values:
+      - -5
+      - -2
+      - 0
+      - 5
+      - 10
+      - 15
+      - 17
+      - 20

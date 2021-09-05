@@ -2,7 +2,7 @@
 cli:
   mpi:
     np: 16
-template: examples/Ge/template.in
+template: template.in
 save:
   status: status.jls
 fixed:
