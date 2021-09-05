@@ -101,21 +101,19 @@ customizer(
     timefmt::AbstractString = "Y-m-d_H:M:S",
 ) = OutdirSetter(timefmt) ∘ CellParametersCardSetter(cp) ∘ AtomicPositionsCardSetter(ap)
 
-(x::RunCmd{Scf})(input, output = mktemp(parentdir(input))[1], error = output; kwargs...) =
-    pw(input, output, error; kwargs...)
-(x::RunCmd{Dfpt})(input, output = mktemp(parentdir(input))[1], error = output; kwargs...) =
-    ph(input, output, error; kwargs...)
+(x::RunCmd{Scf})(input, output = mktemp(parentdir(input))[1]; kwargs...) =
+    pw(input, output; kwargs...)
+(x::RunCmd{Dfpt})(input, output = mktemp(parentdir(input))[1]; kwargs...) =
+    ph(input, output; kwargs...)
 (x::RunCmd{RealSpaceForceConstants})(
     input,
     output = mktemp(parentdir(input))[1],
-    error = output;
     kwargs...,
-) = q2r(input, output, error; kwargs...)
+) = q2r(input, output; kwargs...)
 (x::RunCmd{<:Union{VDos,PhononDispersion}})(
     input,
     output = mktemp(parentdir(input))[1],
-    error = output;
     kwargs...,
-) = matdyn(input, output, error; kwargs...)
+) = matdyn(input, output; kwargs...)
 
 end
