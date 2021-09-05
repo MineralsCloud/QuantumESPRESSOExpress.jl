@@ -1,7 +1,7 @@
 &control
 calculation='scf'
 verbosity = 'high'
-pseudo_dir  = '/home/qe/pseudo'
+pseudo_dir  = './pseudo'
 prefix='Ge'
 outdir   = './tmp'
 tprnfor = .true.
