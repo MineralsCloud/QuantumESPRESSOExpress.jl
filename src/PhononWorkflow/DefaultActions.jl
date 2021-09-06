@@ -107,12 +107,12 @@ customizer(
     ph(input, output; kwargs...)
 (x::RunCmd{RealSpaceForceConstants})(
     input,
-    output = mktemp(parentdir(input))[1],
+    output = mktemp(parentdir(input))[1];
     kwargs...,
 ) = q2r(input, output; kwargs...)
 (x::RunCmd{<:Union{VDos,PhononDispersion}})(
     input,
-    output = mktemp(parentdir(input))[1],
+    output = mktemp(parentdir(input))[1];
     kwargs...,
 ) = matdyn(input, output; kwargs...)
 
