@@ -1,26 +1,23 @@
-workflow: eos
-np: 16
-bin:
-  qe:
-    - pw.x
-templates:
-  - examples/GaN/template.in
-pressures:
-  unit: GPa
-  values:
-    - -5
-    - 0
-    - 5
-    - 10
-    - 15
-    - 20
-    - 25
-    - 30
+recipe: eos
+cli:
+  mpi:
+    np: 16
+template: examples/GaN/template.in
+fixed:
+  pressures:
+    unit: GPa
+    values:
+      - -5
+      - 0
+      - 5
+      - 10
+      - 15
+      - 20
+      - 25
+      - 30
 trial_eos:
-  name: bm3
-  parameters:
+  type: bm3
+  values:
     v0: 317 bohr^3
     b0: 210 GPa
     b′0: 4
-    e0: -612.43149513 Ry
-use_shell: false

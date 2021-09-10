@@ -1,24 +1,21 @@
-workflow: phonon dispersion
-np: 16
-bin:
-  qe:
-    - pw.x
-    - ph.x
-    - q2r.x
-    - matdyn.x
-templates:
-  - - examples/GaN/template.in
-  - - examples/GaN/ph.in
-  - - examples/GaN/q2r.in
-  - - examples/GaN/disp.in
-pressures:
-  unit: GPa
-  values:
-    - -5
-    - 0
-    - 5
-    - 10
-    - 15
-    - 20
-    - 25
-    - 30
+recipe: phonon dispersion
+cli:
+  mpi:
+    np: 16
+template:
+  scf: template.in
+  dfpt: ph.in
+  q2r: q2r.in
+  disp: disp.in
+fixed:
+  pressures:
+    unit: GPa
+    values:
+      - -5
+      - 0
+      - 5
+      - 10
+      - 15
+      - 20
+      - 25
+      - 30

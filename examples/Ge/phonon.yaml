@@ -1,6 +1,8 @@
+recipe: 'vdos'
 workflow: vdos
-mpi:
-  np: 16
+cli:
+  mpi:
+    np: 16
 template:
   scf: template.in
   dfpt: ph.in
