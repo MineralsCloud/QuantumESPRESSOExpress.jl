@@ -1,5 +1,4 @@
 recipe: 'vdos'
-workflow: vdos
 cli:
   mpi:
     np: 16
