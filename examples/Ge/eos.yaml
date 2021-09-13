@@ -1,4 +1,4 @@
-recipe: 'eos'
+recipe: eos
 cli:
   mpi:
     np: 16
@@ -23,4 +23,3 @@ trial_eos:
     - 300.44 bohr^3
     - 74.88 GPa
     - 4.82
-    - -612.43149513 Ry
