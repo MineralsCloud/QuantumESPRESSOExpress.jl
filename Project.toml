@@ -1,34 +1,34 @@
 name = "QuantumESPRESSOExpress"
 uuid = "524a00d3-5d12-4323-9774-d2c11dc9d82e"
 authors = ["Qi Zhang <singularitti@outlook.com>"]
-version = "0.1.2-DEV"
+version = "0.2.0"
 
 [deps]
-AbInitioSoftwareBase = "df5135bc-470e-46c6-b451-292e27ca5b84"
-Configurations = "5218b696-f38b-4ac9-8b61-a12ec717816d"
-Crystallography = "3bff3928-7a76-11e9-2089-d112443085a5"
-Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
-EquationsOfStateOfSolids = "1eaa2786-f833-4167-8397-974edad0881e"
-Express = "b12df14e-adf7-11e9-0606-d5813a258349"
-QuantumESPRESSO = "95228164-aa68-11e9-35aa-d79ea5c4658d"
-Setfield = "efcf1570-3423-57d1-acb7-fd33fddbac46"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 UnitfulAtomic = "a7773ee8-282e-5fa2-be4e-bd808c38a91a"
-
-[compat]
-AbInitioSoftwareBase = "0.2, 0.3, 0.4, 0.5, 0.6"
-Configurations = "0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16"
-Crystallography = "0.2, 0.3"
-EquationsOfStateOfSolids = "0.1, 0.2"
-Express = "0.4"
-QuantumESPRESSO = "0.5"
-Setfield = "0.4, 0.5, 0.6, 0.7, 0.8"
-Unitful = "0.18, 1.0"
-UnitfulAtomic = "0.3, 1.0"
-julia = "1"
+QuantumESPRESSO = "95228164-aa68-11e9-35aa-d79ea5c4658d"
+Configurations = "5218b696-f38b-4ac9-8b61-a12ec717816d"
+Express = "b12df14e-adf7-11e9-0606-d5813a258349"
+AbInitioSoftwareBase = "df5135bc-470e-46c6-b451-292e27ca5b84"
+Crystallography = "3bff3928-7a76-11e9-2089-d112443085a5"
+EquationsOfStateOfSolids = "1eaa2786-f833-4167-8397-974edad0881e"
+Setfield = "efcf1570-3423-57d1-acb7-fd33fddbac46"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+Unitful = "0.18, 1.0"
+UnitfulAtomic = "0.3, 1.0"
+julia = "1"
+QuantumESPRESSO = "0.5"
+Configurations = "0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16"
+Express = "0.4"
+AbInitioSoftwareBase = "0.2, 0.3, 0.4, 0.5, 0.6"
+Crystallography = "0.2, 0.3"
+EquationsOfStateOfSolids = "0.1, 0.2"
+Setfield = "0.4, 0.5, 0.6, 0.7, 0.8"
 
 [targets]
 test = ["Test"]
