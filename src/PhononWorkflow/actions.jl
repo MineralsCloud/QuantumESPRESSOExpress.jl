@@ -1,5 +1,3 @@
-module DefaultActions
-
 using AbInitioSoftwareBase: parentdir
 using AbInitioSoftwareBase.Inputs: Setter, Input
 using AbInitioSoftwareBase.Commands: MpiexecConfig
@@ -20,8 +18,7 @@ using QuantumESPRESSO.Commands: pw, ph, q2r, matdyn
 using QuantumESPRESSO.Outputs.PWscf: tryparsefinal
 using Setfield: @set!
 
-import Express.PhononWorkflow.DefaultActions:
-    MakeInput, RunCmd, parsecell, inputtype, buildjob
+import Express.PhononWorkflow: MakeInput, RunCmd, parsecell, inputtype, buildjob
 import Express.Shell: distprocs
 
 inputtype(x::Calculation) = inputtype(typeof(x))
@@ -115,5 +112,3 @@ customizer(
     output = mktemp(parentdir(input))[1];
     kwargs...,
 ) = matdyn(input, output; kwargs...)
-
-end

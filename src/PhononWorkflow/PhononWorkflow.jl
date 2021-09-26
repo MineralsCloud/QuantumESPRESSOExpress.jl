@@ -1,6 +1,6 @@
 module PhononWorkflow
 
 include("Config.jl")
-include("DefaultActions.jl")
+include("actions.jl")
 
 end

@@ -8,10 +8,10 @@ using QuantumESPRESSO.Outputs.PWscf:
 using Unitful: @u_str
 using UnitfulAtomic
 
-import Express.EquationOfStateWorkflow.DefaultActions: parseoutput
+import Express.EquationOfStateWorkflow: parseoutput
 
 include("Config.jl")
-include("DefaultActions.jl")
+include("actions.jl")
 
 function parseoutput(::Scf)
     function (file)
