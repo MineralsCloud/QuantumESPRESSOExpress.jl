@@ -1,7 +1,7 @@
 name = "QuantumESPRESSOExpress"
 uuid = "524a00d3-5d12-4323-9774-d2c11dc9d82e"
 authors = ["Qi Zhang <singularitti@outlook.com>"]
-version = "0.2.1"
+version = "0.2.2-DEV"
 
 [deps]
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
