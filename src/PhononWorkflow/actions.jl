@@ -68,6 +68,12 @@ function (x::DosSetter)(template::MatdynInput)
     return template
 end
 
+struct RecoverySetter <: Setter end
+function (::RecoverySetter)(template::PhInput)
+    @set! template.inputph.recover = true
+    return template
+end
+
 normalizer(::Scf, args...) = VerbositySetter("high") ∘ CalculationSetter(Scf())
 normalizer(::Dfpt, input::PWInput) = RelayArgumentsSetter(input) ∘ VerbositySetter("high")
 normalizer(::RealSpaceForceConstants, input::PhInput) = RelayArgumentsSetter(input)
