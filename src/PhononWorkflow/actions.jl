@@ -75,7 +75,8 @@ function (::RecoverySetter)(template::PhInput)
 end
 
 normalizer(::Scf, args...) = VerbositySetter("high") ∘ CalculationSetter(Scf())
-normalizer(::Dfpt, input::PWInput) = RelayArgumentsSetter(input) ∘ VerbositySetter("high")
+normalizer(::Dfpt, input::PWInput) =
+    RelayArgumentsSetter(input) ∘ VerbositySetter("high") ∘ RecoverySetter()
 normalizer(::RealSpaceForceConstants, input::PhInput) = RelayArgumentsSetter(input)
 normalizer(
     ::PhononDispersion,
