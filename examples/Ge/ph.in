@@ -4,7 +4,6 @@ Phonon
     fildyn = 'dyn'
     outdir = './tmp'
     prefix = 'Ge'
-    recover = .true.
     ldisp = .true.
     tr2_ph = 1.0e-14
     nq1 = 2
