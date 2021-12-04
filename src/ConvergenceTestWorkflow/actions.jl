@@ -1,12 +1,11 @@
-using AbInitioSoftwareBase: parentdir
-using AbInitioSoftwareBase.Commands: MpiexecConfig
 using AbInitioSoftwareBase.Inputs: Setter
 using Dates: format, now
-using QuantumESPRESSO.Commands: pw
 using QuantumESPRESSO.Inputs.PWscf: PWInput, VerbositySetter
 using Setfield: @set!
+using Unitful: ustrip, @u_str
+using UnitfulAtomic
 
-import Express.EquationOfStateWorkflow: MakeInput, FitEos, RunCmd
+import Express.ConvergenceTestWorkflow: MakeInput
 
 (::MakeInput)(template::PWInput, args...) = (customizer(args...) ∘ normalizer())(template)
 
@@ -14,11 +13,11 @@ struct CutoffEnergySetter <: Setter
     wfc::Number
 end
 function (x::CutoffEnergySetter)(template::PWInput)
-    @set! template.system.ecutwfc = x.wfc
+    @set! template.system.ecutwfc = ustrip(u"Ry", x.wfc)
     return template
 end
 
-normalizer(calc::Scf) = VerbositySetter("high") ∘ CutoffEnergySetter(calc)
+normalizer() = VerbositySetter("high")
 
 struct OutdirSetter <: Setter
     timefmt::String
@@ -34,4 +33,4 @@ function (x::OutdirSetter)(template::PWInput)
     return template
 end
 
-customizer(timefmt = "Y-m-d_H:M:S") = OutdirSetter(timefmt)
+customizer(calc, timefmt = "Y-m-d_H:M:S") = OutdirSetter(timefmt) ∘ CutoffEnergySetter(calc)
