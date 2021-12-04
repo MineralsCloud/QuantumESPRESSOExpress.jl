@@ -5,6 +5,8 @@ using QuantumESPRESSO.Outputs.PWscf: parse_electrons_energies
 using Unitful: @u_str
 using UnitfulAtomic
 
+import Express.ConvergenceTestWorkflow: parseoutput
+
 include("Config.jl")
 include("actions.jl")
 
