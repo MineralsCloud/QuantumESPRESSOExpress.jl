@@ -3,7 +3,7 @@ using AbInitioSoftwareBase.Inputs: Setter
 using Crystallography: MonkhorstPackGrid
 using Dates: format, now
 using QuantumESPRESSO.Commands: pw
-using QuantumESPRESSO.Inputs.PWscf: MonkhorstPackGrid, KMeshCard, PWInput, VerbositySetter
+using QuantumESPRESSO.Inputs.PWscf: KMeshCard, PWInput, VerbositySetter
 using Setfield: @set!
 using Unitful: ustrip, @u_str
 using UnitfulAtomic
