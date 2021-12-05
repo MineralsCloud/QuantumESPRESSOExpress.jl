@@ -1,8 +1,9 @@
 using AbInitioSoftwareBase: parentdir
 using AbInitioSoftwareBase.Inputs: Setter
+using Crystallography: MonkhorstPackGrid
 using Dates: format, now
 using QuantumESPRESSO.Commands: pw
-using QuantumESPRESSO.Inputs.PWscf: PWInput, VerbositySetter
+using QuantumESPRESSO.Inputs.PWscf: MonkhorstPackGrid, KMeshCard, PWInput, VerbositySetter
 using Setfield: @set!
 using Unitful: ustrip, @u_str
 using UnitfulAtomic
@@ -36,6 +37,14 @@ function (x::OutdirSetter)(template::PWInput)
 end
 
 customizer(calc, timefmt = "Y-m-d_H:M:S") = OutdirSetter(timefmt) ∘ CutoffEnergySetter(calc)
+struct MonkhorstPackGridSetter <: Setter
+    mesh::Vector{Int}
+    shift::Vector{Int}
+end
+function (x::MonkhorstPackGridSetter)(template::PWInput)
+    @set! template.k_points = KMeshCard(MonkhorstPackGrid(x.mesh, x.shift))
+    return template
+end
 
 (x::RunCmd)(input, output = mktemp(parentdir(input))[1]; kwargs...) =
     pw(input, output; kwargs...)
