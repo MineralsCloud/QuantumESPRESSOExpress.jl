@@ -36,7 +36,6 @@ function (x::OutdirSetter)(template::PWInput)
     return template
 end
 
-customizer(calc, timefmt = "Y-m-d_H:M:S") = OutdirSetter(timefmt) ∘ CutoffEnergySetter(calc)
 struct MonkhorstPackGridSetter <: Setter
     mesh::Vector{Int}
     shift::Vector{Int}
@@ -45,6 +44,11 @@ function (x::MonkhorstPackGridSetter)(template::PWInput)
     @set! template.k_points = KMeshCard(MonkhorstPackGrid(x.mesh, x.shift))
     return template
 end
+
+customizer(mesh, shift, timefmt = "Y-m-d_H:M:S") =
+    OutdirSetter(timefmt) ∘ MonkhorstPackGridSetter(mesh, shift)
+customizer(energy::Number, timefmt::AbstractString = "Y-m-d_H:M:S") =
+    OutdirSetter(timefmt) ∘ CutoffEnergySetter(energy)
 
 (x::RunCmd)(input, output = mktemp(parentdir(input))[1]; kwargs...) =
     pw(input, output; kwargs...)
