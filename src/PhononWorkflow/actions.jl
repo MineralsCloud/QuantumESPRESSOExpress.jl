@@ -17,6 +17,7 @@ using QuantumESPRESSO.Inputs.PHonon:
 using QuantumESPRESSO.Commands: pw, ph, q2r, matdyn
 using QuantumESPRESSO.Outputs.PWscf: tryparsefinal
 using Setfield: @set!
+using UnifiedPseudopotentialFormat  # To work with `download_potential`
 
 import Express.PhononWorkflow:
     MakeInput, RunCmd, parsecell, inputtype, buildjob, getpseudodir, getpotentials
