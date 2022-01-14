@@ -18,7 +18,8 @@ using QuantumESPRESSO.Commands: pw, ph, q2r, matdyn
 using QuantumESPRESSO.Outputs.PWscf: tryparsefinal
 using Setfield: @set!
 
-import Express.PhononWorkflow: MakeInput, RunCmd, parsecell, inputtype, buildjob
+import Express.PhononWorkflow:
+    MakeInput, RunCmd, parsecell, inputtype, buildjob, getpseudodir, getpotentials
 import Express.Shell: distprocs
 
 inputtype(x::Calculation) = inputtype(typeof(x))
@@ -119,3 +120,11 @@ customizer(
     output = mktemp(parentdir(input))[1];
     kwargs...,
 ) = matdyn(input, output; kwargs...)
+
+getpseudodir(template::PWInput) = abspath(expanduser(template.control.pseudo_dir))
+
+function getpotentials(template::PWInput)
+    return map(template.atomic_species.data) do atomic_species
+        atomic_species.pseudopot
+    end
+end
