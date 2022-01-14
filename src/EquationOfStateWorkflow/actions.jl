@@ -9,6 +9,7 @@ using QuantumESPRESSO.Commands: pw
 using QuantumESPRESSO.Inputs.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using REPL.TerminalMenus: RadioMenu, request
 using Setfield: @set!
+using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: Pressure, Volume, @u_str
 using UnitfulAtomic
 
