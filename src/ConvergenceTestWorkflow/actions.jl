@@ -8,7 +8,7 @@ using Setfield: @set!
 using Unitful: ustrip, @u_str
 using UnitfulAtomic
 
-import Express.ConvergenceTestWorkflow: MakeInput, RunCmd
+import Express.ConvergenceTestWorkflow: MakeInput, RunCmd, getpseudodir, getpotentials
 
 (::MakeInput)(template::PWInput, args...) = (customizer(args...) ∘ normalizer())(template)
 
@@ -52,3 +52,11 @@ customizer(energy::Number, timefmt::AbstractString = "Y-m-d_H:M:S") =
 
 (x::RunCmd)(input, output = mktemp(parentdir(input))[1]; kwargs...) =
     pw(input, output; kwargs...)
+
+getpseudodir(template::PWInput) = abspath(expanduser(template.control.pseudo_dir))
+
+function getpotentials(template::PWInput)
+    return map(template.atomic_species.data) do atomic_species
+        atomic_species.pseudopot
+    end
+end
