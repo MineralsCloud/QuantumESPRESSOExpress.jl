@@ -13,7 +13,7 @@ using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: Pressure, Volume, @u_str
 using UnitfulAtomic
 
-import Express.EquationOfStateWorkflow: MakeInput, FitEos, RunCmd, getpseudodir, getpotentials
+import Express.EquationOfStateWorkflow: MakeInput, FitEos, RunCmd
 
 (::MakeInput{T})(template::PWInput, args...) where {T<:ScfOrOptim} =
     (customizer(args...) ∘ normalizer(T()))(template)
@@ -66,12 +66,4 @@ function _interactive_choose(volumes)
     menu = RadioMenu(options)
     choice = request("Choose the desired volume:", menu)
     choice == -1 ? throw(InterruptException()) : volumes[choice]
-end
-
-getpseudodir(template::PWInput) = abspath(expanduser(template.control.pseudo_dir))
-
-function getpotentials(template::PWInput)
-    return map(template.atomic_species.data) do atomic_species
-        atomic_species.pseudopot
-    end
 end
