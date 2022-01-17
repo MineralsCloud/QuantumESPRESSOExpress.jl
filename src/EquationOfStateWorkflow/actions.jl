@@ -61,6 +61,16 @@ customizer(params::Parameters, pressure::Pressure, timefmt = "Y-m-d_H:M:S") =
 (x::RunCmd)(input, output = mktemp(parentdir(input))[1]; kwargs...) =
     pw(input, output; kwargs...)
 
+function _choose(possible_volumes, pressure, eos)
+    v0 = getparam(eos).v0
+    filtered = if pressure >= zero(pressure)  # If pressure is greater than zero,
+        filter(<(v0), possible_volumes)  # the volume could only be smaller than `v0`.
+    else
+        filter(>(v0), possible_volumes)
+    end
+    return only(filtered)
+end
+
 function _interactive_choose(volumes)
     options = string.(volumes)
     menu = RadioMenu(options)
