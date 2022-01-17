@@ -51,8 +51,10 @@ end
 customizer(volume::Volume, timefmt = "Y-m-d_H:M:S") =
     OutdirSetter(timefmt) ∘ VolumeSetter(volume)
 function customizer(eos::PressureEquation, pressure::Pressure, timefmt = "Y-m-d_H:M:S")
-    volumes = vsolve(eos, pressure)
-    volume = length(volumes) > 1 ? _interactive_choose(volumes) : only(volumes)
+    possible_volumes = vsolve(eos, pressure)
+    volume =
+        length(possible_volumes) > 1 ? _choose(possible_volumes, pressure, eos) :
+        only(possible_volumes)
     return OutdirSetter(timefmt) ∘ PressureSetter(pressure) ∘ VolumeSetter(volume)
 end
 customizer(params::Parameters, pressure::Pressure, timefmt = "Y-m-d_H:M:S") =
@@ -60,6 +62,16 @@ customizer(params::Parameters, pressure::Pressure, timefmt = "Y-m-d_H:M:S") =
 
 (x::RunCmd)(input, output = mktemp(parentdir(input))[1]; kwargs...) =
     pw(input, output; kwargs...)
+
+function _choose(possible_volumes, pressure, eos)
+    v0 = getparam(eos).v0
+    filtered = if pressure >= zero(pressure)  # If pressure is greater than zero,
+        filter(<(v0), possible_volumes)  # the volume could only be smaller than `v0`.
+    else
+        filter(>(v0), possible_volumes)
+    end
+    return only(filtered)
+end
 
 function _interactive_choose(volumes)
     options = string.(volumes)
