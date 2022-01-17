@@ -51,8 +51,10 @@ end
 customizer(volume::Volume, timefmt = "Y-m-d_H:M:S") =
     OutdirSetter(timefmt) ∘ VolumeSetter(volume)
 function customizer(eos::PressureEquation, pressure::Pressure, timefmt = "Y-m-d_H:M:S")
-    volumes = vsolve(eos, pressure)
-    volume = length(volumes) > 1 ? _interactive_choose(volumes) : only(volumes)
+    possible_volumes = vsolve(eos, pressure)
+    volume =
+        length(possible_volumes) > 1 ? _choose(possible_volumes, pressure, eos) :
+        only(possible_volumes)
     return OutdirSetter(timefmt) ∘ PressureSetter(pressure) ∘ VolumeSetter(volume)
 end
 customizer(params::Parameters, pressure::Pressure, timefmt = "Y-m-d_H:M:S") =
