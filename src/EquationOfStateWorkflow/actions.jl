@@ -72,10 +72,3 @@ function _choose(possible_volumes, pressure, eos)
     end
     return only(filtered)
 end
-
-function _interactive_choose(volumes)
-    options = string.(volumes)
-    menu = RadioMenu(options)
-    choice = request("Choose the desired volume:", menu)
-    choice == -1 ? throw(InterruptException()) : volumes[choice]
-end
