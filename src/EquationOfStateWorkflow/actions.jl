@@ -66,16 +66,9 @@ customizer(params::Parameters, pressure::Pressure, timefmt = "Y-m-d_H:M:S") =
 function _choose(possible_volumes, pressure, eos)
     v0 = getparam(eos).v0
     filtered = if pressure >= zero(pressure)  # If pressure is greater than zero,
-        filter(<(v0), possible_volumes)  # the volume could only be smaller than `v0`.
+        filter(<=(v0), possible_volumes)  # the volume could only be smaller than `v0`.
     else
-        filter(>(v0), possible_volumes)
+        filter(v -> 1 < v / v0 <= 3, possible_volumes)
     end
     return only(filtered)
-end
-
-function _interactive_choose(volumes)
-    options = string.(volumes)
-    menu = RadioMenu(options)
-    choice = request("Choose the desired volume:", menu)
-    choice == -1 ? throw(InterruptException()) : volumes[choice]
 end
