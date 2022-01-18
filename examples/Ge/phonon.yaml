@@ -1,7 +1,7 @@
 recipe: vdos
 cli:
   mpi:
-    np: 16
+    np: 256
 template:
   scf: template.in
   dfpt: ph.in
