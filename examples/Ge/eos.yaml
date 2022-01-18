@@ -1,7 +1,7 @@
 recipe: eos
 cli:
   mpi:
-    np: 16
+    np: 256
 template: template.in
 save:
   status: status.jls
