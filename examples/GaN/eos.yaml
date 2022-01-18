@@ -20,7 +20,7 @@ fixed:
 trial_eos:
   type: bm3
   values:
-    v0: 317 bohr^3
-    b0: 210 GPa
-    b′0: 4
-    e0: -612.43149513 Ry
+    - 317 bohr^3
+    - 210 GPa
+    - 4
+    - -612.43149513 Ry
