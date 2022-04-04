@@ -1,8 +1,8 @@
 recipe: eos
 cli:
   mpi:
-    np: 256
-template: template.in
+    np: 16
+template: ../examples/Ge/template.in
 save:
   status: status.jls
 fixed:

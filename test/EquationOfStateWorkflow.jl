@@ -51,4 +51,33 @@ using UnitfulAtomic
     @test config.save_status == config.root * "/status.jls"
 end
 
+@testset "Load a configuration file: Ge" begin
+    dict = load("../examples/Ge/eos.yaml")
+    config = ExpandConfig{Scf}()(dict)
+    @test config.template == PWInput(
+        control = ControlNamelist(pseudo_dir = "./pseudo", prefix = "Ge", outdir = "./"),
+        system = SystemNamelist(
+            ibrav = 2,
+            celldm = [7.957636],
+            nat = 2,
+            ntyp = 1,
+            ecutwfc = 55,
+        ),
+        electrons = ElectronsNamelist(conv_thr = 1e-10),
+        atomic_species = AtomicSpeciesCard([
+            AtomicSpecies("Ge", 72.64, "Ge.pz-dn-kjpaw_psl.0.2.2.UPF"),
+        ]),
+        atomic_positions = AtomicPositionsCard(
+            [AtomicPosition("Ge", [0, 0, 0]), AtomicPosition("Ge", [0.75, 0.75, 0.75])],
+            "crystal",
+        ),
+        k_points = KMeshCard(MonkhorstPackGrid([6, 6, 6], [1, 1, 1])),
+    )
+    @test config.trial_eos == BirchMurnaghan3rd(300.44u"bohr^3", 74.88u"GPa", 4.82)
+    @test config.fixed == [-5, -2, 0, 5, 10, 15, 17, 20] * u"GPa"
+    @test config.save_raw == config.root * "/raw.json"
+    @test config.save_eos == config.root * "/eos.jls"
+    @test config.save_status == config.root * "/status.jls"
+end
+
 # end
