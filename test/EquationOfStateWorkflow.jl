@@ -11,8 +11,8 @@ using Test
 using Unitful: @u_str
 using UnitfulAtomic
 
-@testset "Load a configuration file" begin
-    dict = load("examples/GaN/eos.yaml")
+@testset "Load a configuration file: GaN" begin
+    dict = load("../examples/GaN/eos.yaml")
     config = ExpandConfig{Scf}()(dict)
     @test config.template == PWInput(
         control = ControlNamelist(
