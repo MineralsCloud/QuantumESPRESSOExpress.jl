@@ -2,7 +2,7 @@ recipe: eos
 cli:
   mpi:
     np: 16
-template: template.in
+template: ../examples/GaN/template.in
 save:
   status: status.jls
 fixed:

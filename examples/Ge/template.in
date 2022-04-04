@@ -2,7 +2,7 @@
 calculation='scf'
 pseudo_dir  = './pseudo'
 prefix='Ge'
-outdir   = './tmp'
+outdir   = './'
 /
 &system
 ibrav=2
