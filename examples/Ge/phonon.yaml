@@ -3,10 +3,10 @@ cli:
   mpi:
     np: 256
 template:
-  scf: template.in
-  dfpt: ph.in
-  q2r: q2r.in
-  disp: disp.in
+  scf: ../examples/Ge/template.in
+  dfpt: ../examples/Ge/ph.in
+  q2r: ../examples/Ge/q2r.in
+  disp: ../examples/Ge/disp.in
 save:
   status: status.jls
 fixed:
