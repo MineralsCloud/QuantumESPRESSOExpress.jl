@@ -46,8 +46,10 @@ using UnitfulAtomic
         ),
     )
     @test config.fixed == [-5, -2, 0, 5, 10, 15, 17, 20] * u"GPa"
-    @test config.save_raw == config.root * "/raw.json"
-    @test config.save_status == config.root * "/status.jls"
+    if !Sys.iswindows()
+        @test config.save_raw == config.root * "/raw.json"
+        @test config.save_status == config.root * "/status.jls"
+    end
 end
 
 end
