@@ -1,4 +1,4 @@
-# module EquationOfStateWorkflow
+module EquationOfStateWorkflow
 
 using AbInitioSoftwareBase: load
 using Crystallography: MonkhorstPackGrid
@@ -80,4 +80,4 @@ end
     @test config.save_status == config.root * "/status.jls"
 end
 
-# end
+end

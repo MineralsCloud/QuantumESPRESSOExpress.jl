@@ -7,7 +7,6 @@ using EquationsOfStateOfSolids:
 using Express.EquationOfStateWorkflow: StOptim, ScfOrOptim
 using QuantumESPRESSO.Commands: pw
 using QuantumESPRESSO.Inputs.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
-using REPL.TerminalMenus: RadioMenu, request
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: Pressure, Volume, @u_str
@@ -38,13 +37,19 @@ struct OutdirSetter <: Setter
     timefmt::String
 end
 function (x::OutdirSetter)(template::PWInput)
-    @set! template.control.outdir = abspath(
-        joinpath(
-            template.control.outdir,
-            join((template.control.prefix, format(now(), x.timefmt), rand(UInt)), '_'),
-        ),
-    )
-    mkpath(template.control.outdir)
+    # If an absolute path is given, then do nothing; else,
+    # set `outdir` to the current directory + `outdir` + a subdirectory.
+    @set! template.control.outdir = if !isabspath(template.control.outdir)
+        abspath(
+            joinpath(
+                template.control.outdir,
+                join((template.control.prefix, format(now(), x.timefmt), rand(UInt)), '_'),
+            ),
+        )
+    end
+    if !isdir(template.control.outdir)
+        mkpath(template.control.outdir)
+    end
     return template
 end
 
