@@ -21,7 +21,13 @@ function (x::CutoffEnergySetter)(template::PWInput)
     return template
 end
 
-normalizer() = VerbositySetter("high")
+struct PseudodirSetter <: Setter end
+function (x::PseudodirSetter)(template::PWInput)
+    @set! template.control.pseudo_dir = abspath(template.control.pseudo_dir)
+    return template
+end
+
+normalizer() = VerbositySetter("high") ∘ PseudodirSetter()
 
 struct OutdirSetter <: Setter
     timefmt::String
