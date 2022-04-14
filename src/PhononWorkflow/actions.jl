@@ -75,7 +75,14 @@ function (::RecoverySetter)(template::PhInput)
     return template
 end
 
-normalizer(::Scf, args...) = VerbositySetter("high") ∘ CalculationSetter(Scf())
+struct PseudodirSetter <: Setter end
+function (x::PseudodirSetter)(template::PWInput)
+    @set! template.control.pseudo_dir = abspath(template.control.pseudo_dir)
+    return template
+end
+
+normalizer(::Scf, args...) =
+    VerbositySetter("high") ∘ CalculationSetter(Scf()) ∘ PseudodirSetter()
 normalizer(::Dfpt, input::PWInput) =
     RelayArgumentsSetter(input) ∘ VerbositySetter("high") ∘ RecoverySetter()
 normalizer(::RealSpaceForceConstants, input::PhInput) = RelayArgumentsSetter(input)
