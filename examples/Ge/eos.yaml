@@ -2,13 +2,13 @@ recipe: eos
 cli:
   mpi:
     np: 16
-template: ../examples/Ge/template.in
+template: template.in
 save:
-  status: status.jld2
+  wf: wf.jld2
 fixed:
   pressures:
     unit: GPa
-    values:
+    numbers:
       - -5
       - -2
       - 0
@@ -19,7 +19,7 @@ fixed:
       - 20
 trial_eos:
   type: bm3
-  values:
+  params:
     - 300.44 bohr^3
     - 74.88 GPa
     - 4.82
