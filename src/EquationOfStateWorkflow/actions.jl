@@ -1,9 +1,7 @@
 using AbInitioSoftwareBase: parentdir
-using AbInitioSoftwareBase.Commands: MpiexecConfig
 using AbInitioSoftwareBase.Inputs: Setter
 using Dates: format, now
-using EquationsOfStateOfSolids:
-    EquationOfStateOfSolids, PressureEquation, Parameters, getparam, vsolve
+using EquationsOfStateOfSolids: PressureEquation, Parameters, getparam, vsolve
 using ExpressBase: Scf, FixedCellOptimization, VariableCellOptimization
 using QuantumESPRESSO.Commands: pw
 using QuantumESPRESSO.Inputs.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter

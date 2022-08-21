@@ -1,7 +1,6 @@
 module EquationOfStateWorkflow
 
 using Crystallography: cellvolume
-using ExpressBase: Scf, VariableCellOptimization
 using QuantumESPRESSO.Inputs.PWscf: CellParametersCard
 using QuantumESPRESSO.Outputs.PWscf:
     Preamble, parse_electrons_energies, parsefinal, isjobdone, tryparsefinal
