@@ -1,7 +1,7 @@
 module EquationOfStateWorkflow
 
 using Crystallography: cellvolume
-using Express.EquationOfStateWorkflow: Scf, VcOptim
+using ExpressBase: Scf, VariableCellOptimization
 using QuantumESPRESSO.Inputs.PWscf: CellParametersCard
 using QuantumESPRESSO.Outputs.PWscf:
     Preamble, parse_electrons_energies, parsefinal, isjobdone, tryparsefinal
@@ -28,7 +28,7 @@ function parseoutput(::Scf)
         end
     end
 end
-function parseoutput(::VcOptim)
+function parseoutput(::VariableCellOptimization)
     function (file)
         str = read(file, String)
         if !isjobdone(str)

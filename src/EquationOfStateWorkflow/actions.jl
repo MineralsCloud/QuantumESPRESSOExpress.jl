@@ -4,7 +4,7 @@ using AbInitioSoftwareBase.Inputs: Setter
 using Dates: format, now
 using EquationsOfStateOfSolids:
     EquationOfStateOfSolids, PressureEquation, Parameters, getparam, vsolve
-using Express.EquationOfStateWorkflow: StOptim, ScfOrOptim
+using ExpressBase: Scf, FixedCellOptimization, VariableCellOptimization
 using QuantumESPRESSO.Commands: pw
 using QuantumESPRESSO.Inputs.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using Setfield: @set!
@@ -12,18 +12,19 @@ using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: Pressure, Volume, @u_str
 using UnitfulAtomic
 
-import Express.EquationOfStateWorkflow: MakeInput, FitEos, RunCmd
+import Express: RunCmd
+import Express.EquationOfStateWorkflow: MakeInput, FitEos
 
-(::MakeInput{T})(template::PWInput, args...) where {T<:ScfOrOptim} =
+(::MakeInput{T})(template::PWInput, args...) where {T} =
     (customizer(args...) ∘ normalizer(T()))(template)
 
 struct CalculationSetter <: Setter
-    calc::ScfOrOptim
+    calc::Union{Scf,FixedCellOptimization,VariableCellOptimization}
 end
 function (x::CalculationSetter)(template::PWInput)
     @set! template.control.calculation = if x.calc isa Scf  # Functions can be extended, not safe
         "scf"
-    elseif x.calc isa StOptim
+    elseif x.calc isa FixedCellOptimization
         "relax"
     else
         "vc-relax"
@@ -37,8 +38,7 @@ function (x::PseudodirSetter)(template::PWInput)
     return template
 end
 
-normalizer(calc::ScfOrOptim) =
-    VerbositySetter("high") ∘ CalculationSetter(calc) ∘ PseudodirSetter()
+normalizer(calc) = VerbositySetter("high") ∘ CalculationSetter(calc) ∘ PseudodirSetter()
 
 struct OutdirSetter <: Setter
     timefmt::String
