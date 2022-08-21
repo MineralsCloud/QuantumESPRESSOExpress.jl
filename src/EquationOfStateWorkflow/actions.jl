@@ -12,7 +12,8 @@ using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: Pressure, Volume, @u_str
 using UnitfulAtomic
 
-import Express.EquationOfStateWorkflow: MakeInput, FitEos, RunCmd
+import Express: RunCmd
+import Express.EquationOfStateWorkflow: MakeInput, FitEos
 
 (::MakeInput{T})(template::PWInput, args...) where {T} =
     (customizer(args...) ∘ normalizer(T()))(template)
