@@ -2,7 +2,7 @@ module QuantumESPRESSOExpress
 
 using AbInitioSoftwareBase: AbInitioSoftware
 
-import Express: current_software
+# import Express: current_software
 
 export QE
 
@@ -11,8 +11,8 @@ const QE = QuantumESPRESSO
 
 currentsoftware() = QE()
 
-include("ConvergenceTestWorkflow/ConvergenceTestWorkflow.jl")
+# include("ConvergenceTestWorkflow/ConvergenceTestWorkflow.jl")
 include("EquationOfStateWorkflow/EquationOfStateWorkflow.jl")
-include("PhononWorkflow/PhononWorkflow.jl")
+# include("PhononWorkflow/PhononWorkflow.jl")
 
 end
