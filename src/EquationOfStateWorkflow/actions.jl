@@ -60,15 +60,15 @@ end
 
 customizer(volume::Volume, timefmt = "Y-m-d_H:M:S") =
     OutdirSetter(timefmt) ∘ VolumeSetter(volume)
-function customizer(eos::PressureEquation, pressure::Pressure, timefmt = "Y-m-d_H:M:S")
+function customizer(pressure::Pressure, eos::PressureEquation, timefmt = "Y-m-d_H:M:S")
     possible_volumes = vsolve(eos, pressure)
     volume =
         length(possible_volumes) > 1 ? _choose(possible_volumes, pressure, eos) :
         only(possible_volumes)
     return OutdirSetter(timefmt) ∘ PressureSetter(pressure) ∘ VolumeSetter(volume)
 end
-customizer(params::Parameters, pressure::Pressure, timefmt = "Y-m-d_H:M:S") =
-    customizer(PressureEquation(params), pressure, timefmt)
+customizer(pressure::Pressure, params::Parameters, timefmt = "Y-m-d_H:M:S") =
+    customizer(pressure, PressureEquation(params), timefmt)
 
 (x::RunCmd)(input, output = mktemp(parentdir(input))[1]; kwargs...) =
     pw(input, output; kwargs...)
