@@ -12,10 +12,10 @@ function (::ExpandConfig)(template::AbstractString)
     return parse(PWInput, str)
 end
 
-convert_to_option(::Type{RuntimeConfig}, ::Type{CommandConfig}, dict) =
-    QuantumESPRESSOConfig(;
-        mpi = get(dict, "mpi", MpiexecConfig()),
-        pw = get(dict, "pw", PwxConfig()),
+function convert_to_option(::Type{RuntimeConfig}, ::Type{CommandConfig}, dict)
+    return QuantumESPRESSOConfig(;
+        mpi=get(dict, "mpi", MpiexecConfig()), pw=get(dict, "pw", PwxConfig())
     )
+end
 
 end

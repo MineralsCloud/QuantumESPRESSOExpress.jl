@@ -13,8 +13,9 @@ using UnitfulAtomic
 import Express: RunCmd
 import Express.EquationOfStateWorkflow: MakeInput, FitEos
 
-(::MakeInput{T})(template::PWInput, args...) where {T} =
-    (customizer(args...) ∘ normalizer(T()))(template)
+function (::MakeInput{T})(template::PWInput, args...) where {T}
+    return (customizer(args...) ∘ normalizer(T()))(template)
+end
 
 struct CalculationSetter <: Setter
     calc::Union{Scf,FixedCellOptimization,VariableCellOptimization}
@@ -58,20 +59,25 @@ function (x::OutdirSetter)(template::PWInput)
     return template
 end
 
-customizer(volume::Volume, timefmt = "Y-m-d_H:M:S") =
-    OutdirSetter(timefmt) ∘ VolumeSetter(volume)
-function customizer(pressure::Pressure, eos::PressureEquation, timefmt = "Y-m-d_H:M:S")
+function customizer(volume::Volume, timefmt="Y-m-d_H:M:S")
+    return OutdirSetter(timefmt) ∘ VolumeSetter(volume)
+end
+function customizer(pressure::Pressure, eos::PressureEquation, timefmt="Y-m-d_H:M:S")
     possible_volumes = vsolve(eos, pressure)
-    volume =
-        length(possible_volumes) > 1 ? _choose(possible_volumes, pressure, eos) :
+    volume = if length(possible_volumes) > 1
+        _choose(possible_volumes, pressure, eos)
+    else
         only(possible_volumes)
+    end
     return OutdirSetter(timefmt) ∘ PressureSetter(pressure) ∘ VolumeSetter(volume)
 end
-customizer(pressure::Pressure, params::Parameters, timefmt = "Y-m-d_H:M:S") =
-    customizer(pressure, PressureEquation(params), timefmt)
+function customizer(pressure::Pressure, params::Parameters, timefmt="Y-m-d_H:M:S")
+    return customizer(pressure, PressureEquation(params), timefmt)
+end
 
-(x::RunCmd)(input, output = mktemp(parentdir(input))[1]; kwargs...) =
-    pw(input, output; kwargs...)
+function (x::RunCmd)(input, output=mktemp(parentdir(input))[1]; kwargs...)
+    return pw(input, output; kwargs...)
+end
 
 function _choose(possible_volumes, pressure, eos)
     v0 = getparam(eos).v0

@@ -33,20 +33,24 @@ inputtype(::Type{Dfpt}) = PhInput
 inputtype(::Type{RealSpaceForceConstants}) = Q2rInput
 inputtype(::Type{<:Union{PhononDispersion,VDos}}) = MatdynInput
 
-parsecell(str) =
-    tryparsefinal(AtomicPositionsCard, str), tryparsefinal(CellParametersCard, str)
+function parsecell(str)
+    return tryparsefinal(AtomicPositionsCard, str), tryparsefinal(CellParametersCard, str)
+end
 
-(::MakeInput{Scf})(template::PWInput, args...) =
-    (customizer(args...) ∘ normalizer(Scf(), template))(template)
-(::MakeInput{Dfpt})(template::PhInput, previnp::PWInput) =
-    normalizer(Dfpt(), previnp)(template)
-(::MakeInput{RealSpaceForceConstants})(template::Q2rInput, previnp::PhInput) =
-    normalizer(RealSpaceForceConstants(), previnp)(template)
-(::MakeInput{T})(
-    template::MatdynInput,
-    a::Q2rInput,
-    b::PhInput,
-) where {T<:Union{PhononDispersion,VDos}} = normalizer(T(), (a, b))(template)
+function (::MakeInput{Scf})(template::PWInput, args...)
+    return (customizer(args...) ∘ normalizer(Scf(), template))(template)
+end
+function (::MakeInput{Dfpt})(template::PhInput, previnp::PWInput)
+    return normalizer(Dfpt(), previnp)(template)
+end
+function (::MakeInput{RealSpaceForceConstants})(template::Q2rInput, previnp::PhInput)
+    return normalizer(RealSpaceForceConstants(), previnp)(template)
+end
+function (::MakeInput{T})(
+    template::MatdynInput, a::Q2rInput, b::PhInput
+) where {T<:Union{PhononDispersion,VDos}}
+    return normalizer(T(), (a, b))(template)
+end
 
 struct CalculationSetter <: Setter
     calc::Union{Scf,Dfpt}
@@ -86,17 +90,21 @@ function (x::PseudodirSetter)(template::PWInput)
     return template
 end
 
-normalizer(::Scf, args...) =
-    VerbositySetter("high") ∘ CalculationSetter(Scf()) ∘ PseudodirSetter()
-normalizer(::Dfpt, input::PWInput) =
-    RelayArgumentsSetter(input) ∘ VerbositySetter("high") ∘ RecoverySetter()
+function normalizer(::Scf, args...)
+    return VerbositySetter("high") ∘ CalculationSetter(Scf()) ∘ PseudodirSetter()
+end
+function normalizer(::Dfpt, input::PWInput)
+    return RelayArgumentsSetter(input) ∘ VerbositySetter("high") ∘ RecoverySetter()
+end
 normalizer(::RealSpaceForceConstants, input::PhInput) = RelayArgumentsSetter(input)
-normalizer(
-    ::PhononDispersion,
-    inputs::Union{Tuple{Q2rInput,PhInput},Tuple{PhInput,Q2rInput}},
-) = RelayArgumentsSetter(inputs) ∘ DosSetter(false)
-normalizer(::VDos, inputs::Union{Tuple{Q2rInput,PhInput},Tuple{PhInput,Q2rInput}}) =
-    RelayArgumentsSetter(inputs) ∘ DosSetter(true)
+function normalizer(
+    ::PhononDispersion, inputs::Union{Tuple{Q2rInput,PhInput},Tuple{PhInput,Q2rInput}}
+)
+    return RelayArgumentsSetter(inputs) ∘ DosSetter(false)
+end
+function normalizer(::VDos, inputs::Union{Tuple{Q2rInput,PhInput},Tuple{PhInput,Q2rInput}})
+    return RelayArgumentsSetter(inputs) ∘ DosSetter(true)
+end
 
 struct OutdirSetter <: Setter
     timefmt::String
@@ -118,23 +126,26 @@ function (x::OutdirSetter)(template::PWInput)
     return template
 end
 
-customizer(
-    ap::AtomicPositionsCard,
-    cp::CellParametersCard,
-    timefmt::AbstractString = "Y-m-d_H:M:S",
-) = OutdirSetter(timefmt) ∘ CellParametersCardSetter(cp) ∘ AtomicPositionsCardSetter(ap)
+function customizer(
+    ap::AtomicPositionsCard, cp::CellParametersCard, timefmt::AbstractString="Y-m-d_H:M:S"
+)
+    return OutdirSetter(timefmt) ∘ CellParametersCardSetter(cp) ∘
+           AtomicPositionsCardSetter(ap)
+end
 
-(x::RunCmd{Scf})(input, output = mktemp(parentdir(input))[1]; kwargs...) =
-    pw(input, output; kwargs...)
-(x::RunCmd{Dfpt})(input, output = mktemp(parentdir(input))[1]; kwargs...) =
-    ph(input, output; kwargs...)
-(x::RunCmd{RealSpaceForceConstants})(
-    input,
-    output = mktemp(parentdir(input))[1];
-    kwargs...,
-) = q2r(input, output; kwargs...)
-(x::RunCmd{<:Union{VDos,PhononDispersion}})(
-    input,
-    output = mktemp(parentdir(input))[1];
-    kwargs...,
-) = matdyn(input, output; kwargs...)
+function (x::RunCmd{Scf})(input, output=mktemp(parentdir(input))[1]; kwargs...)
+    return pw(input, output; kwargs...)
+end
+function (x::RunCmd{Dfpt})(input, output=mktemp(parentdir(input))[1]; kwargs...)
+    return ph(input, output; kwargs...)
+end
+function (x::RunCmd{RealSpaceForceConstants})(
+    input, output=mktemp(parentdir(input))[1]; kwargs...
+)
+    return q2r(input, output; kwargs...)
+end
+function (x::RunCmd{<:Union{VDos,PhononDispersion}})(
+    input, output=mktemp(parentdir(input))[1]; kwargs...
+)
+    return matdyn(input, output; kwargs...)
+end

@@ -15,8 +15,7 @@ import Express.PhononWorkflow.Config: ExpandConfig
 
 function (::ExpandConfig)(template::Template)
     inputs = map(
-        (:scf, :dfpt, :q2r, :disp),
-        (PWInput, PhInput, Q2rInput, MatdynInput),
+        (:scf, :dfpt, :q2r, :disp), (PWInput, PhInput, Q2rInput, MatdynInput)
     ) do field, T
         str = read(getproperty(template, field), String)
         parse(T, str)
@@ -24,13 +23,14 @@ function (::ExpandConfig)(template::Template)
     return (; zip((:scf, :dfpt, :q2r, :disp), inputs)...)
 end
 
-convert_to_option(::Type{RuntimeConfig}, ::Type{CommandConfig}, dict) =
-    QuantumESPRESSOConfig(;
-        mpi = get(dict, "mpi", MpiexecConfig()),
-        pw = get(dict, "pw", PwxConfig()),
-        ph = get(dict, "ph", PhxConfig()),
-        q2r = get(dict, "q2r", Q2rxConfig()),
-        matdyn = get(dict, "matdyn", MatdynxConfig()),
+function convert_to_option(::Type{RuntimeConfig}, ::Type{CommandConfig}, dict)
+    return QuantumESPRESSOConfig(;
+        mpi=get(dict, "mpi", MpiexecConfig()),
+        pw=get(dict, "pw", PwxConfig()),
+        ph=get(dict, "ph", PhxConfig()),
+        q2r=get(dict, "q2r", Q2rxConfig()),
+        matdyn=get(dict, "matdyn", MatdynxConfig()),
     )
+end
 
 end

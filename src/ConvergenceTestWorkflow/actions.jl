@@ -58,10 +58,13 @@ function (x::MonkhorstPackGridSetter)(template::PWInput)
     return template
 end
 
-customizer(mesh, shift, timefmt = "Y-m-d_H:M:S") =
-    OutdirSetter(timefmt) ∘ MonkhorstPackGridSetter(mesh, shift)
-customizer(energy::Number, timefmt::AbstractString = "Y-m-d_H:M:S") =
-    OutdirSetter(timefmt) ∘ CutoffEnergySetter(energy)
+function customizer(mesh, shift, timefmt="Y-m-d_H:M:S")
+    return OutdirSetter(timefmt) ∘ MonkhorstPackGridSetter(mesh, shift)
+end
+function customizer(energy::Number, timefmt::AbstractString="Y-m-d_H:M:S")
+    return OutdirSetter(timefmt) ∘ CutoffEnergySetter(energy)
+end
 
-(x::RunCmd)(input, output = mktemp(parentdir(input))[1]; kwargs...) =
-    pw(input, output; kwargs...)
+function (x::RunCmd)(input, output=mktemp(parentdir(input))[1]; kwargs...)
+    return pw(input, output; kwargs...)
+end

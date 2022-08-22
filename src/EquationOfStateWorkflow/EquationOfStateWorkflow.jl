@@ -23,7 +23,7 @@ function parseoutput(::Scf)
         if preamble !== nothing && !isempty(e)
             return preamble.omega * u"bohr^3" => e.ε[end] * u"Ry"  # volume, energy
         else
-            return
+            return nothing
         end
     end
 end
@@ -38,7 +38,7 @@ function parseoutput(::VariableCellOptimization)
             return cellvolume(parsefinal(CellParametersCard, str)) * u"bohr^3" =>
                 parse_electrons_energies(str, :converged).ε[end] * u"Ry"  # volume, energy
         else
-            return
+            return nothing
         end
     end
 end
