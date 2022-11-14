@@ -110,16 +110,13 @@ struct OutdirSetter <: Setter
     timefmt::String
 end
 function (x::OutdirSetter)(template::PWInput)
-    # If an absolute path is given, then do nothing; else,
-    # set `outdir` to the current directory + `outdir` + a subdirectory.
-    @set! template.control.outdir = if !isabspath(template.control.outdir)
-        abspath(
-            joinpath(
-                template.control.outdir,
-                join((template.control.prefix, format(now(), x.timefmt), rand(UInt)), '_'),
-            ),
-        )
-    end
+    # Set `outdir` to `outdir` + a subdirectory.
+    @set! template.control.outdir = abspath(
+        joinpath(
+            template.control.outdir,
+            join((template.control.prefix, format(now(), x.timefmt), rand(UInt)), '_'),
+        ),
+    )
     if !isdir(template.control.outdir)
         mkpath(template.control.outdir)
     end
