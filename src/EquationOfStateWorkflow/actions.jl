@@ -2,7 +2,7 @@ using AbInitioSoftwareBase: parentdir
 using AbInitioSoftwareBase.Inputs: Setter
 using Dates: format, now
 using EquationsOfStateOfSolids: PressureEquation, Parameters, getparam, vsolve
-using ExpressBase: Scf, FixedCellOptimization, VariableCellOptimization
+using Express.EquationOfStateWorkflow: Scf, FixedCellOptimization, VariableCellOptimization
 using QuantumESPRESSO.Commands: pw
 using QuantumESPRESSO.Inputs.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using Setfield: @set!
@@ -24,8 +24,10 @@ function (x::CalculationSetter)(template::PWInput)
         "scf"
     elseif x.calc isa FixedCellOptimization
         "relax"
-    else
+    elseif x.calc isa VariableCellOptimization
         "vc-relax"
+    else
+        throw(ArgumentError("this should never happen!"))
     end
     return template
 end
