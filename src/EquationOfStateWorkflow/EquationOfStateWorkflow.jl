@@ -14,7 +14,6 @@ include("actions.jl")
 
 function parseoutput(::Scf)
     function (file)
-        @show file
         str = read(file, String)
         preamble = tryparse(Preamble, str)
         e = try
@@ -30,7 +29,6 @@ function parseoutput(::Scf)
 end
 function parseoutput(::VariableCellOptimization)
     function (file)
-        @show file
         str = read(file, String)
         if !isjobdone(str)
             @warn "Job is not finished!"
