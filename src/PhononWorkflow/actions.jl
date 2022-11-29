@@ -2,14 +2,8 @@ using AbInitioSoftwareBase: parentdir
 using AbInitioSoftwareBase.Inputs: Setter, Input
 using AbInitioSoftwareBase.Commands: MpiexecConfig
 using Dates: format, now
-using ExpressBase:
-    Calculation,
-    Scf,
-    VariableCellOptimization,
-    Dfpt,
-    RealSpaceForceConstants,
-    PhononDispersion,
-    VDos
+using Express: Calculation, Scf
+using Express.PhononWorkflow: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos
 # using QuantumESPRESSO.Inputs: QuantumESPRESSOInput
 using QuantumESPRESSO.Inputs.PWscf:
     PWInput,
@@ -25,7 +19,6 @@ using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 
 import Express.PhononWorkflow: MakeInput, RunCmd, parsecell, inputtype, buildjob
-import Express: distribute_procs
 
 inputtype(x::Calculation) = inputtype(typeof(x))
 inputtype(::Type{Scf}) = PWInput
