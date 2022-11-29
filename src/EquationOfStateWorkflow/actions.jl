@@ -16,8 +16,8 @@ function (::MakeInput{T})(template::PWInput, args...) where {T}
     return (customizer(args...) ∘ normalizer(T()))(template)
 end
 
-struct CalculationSetter <: Setter
-    calc::Union{Scf,FixedCellOptimization,VariableCellOptimization}
+struct CalculationSetter{T} <: Setter
+    calc::T
 end
 function (x::CalculationSetter)(template::PWInput)
     @set! template.control.calculation = if x.calc isa Scf  # Functions can be extended, not safe
