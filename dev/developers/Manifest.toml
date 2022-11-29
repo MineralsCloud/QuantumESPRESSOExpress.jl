@@ -640,7 +640,7 @@ version = "0.6.3"
 
 [[deps.QuantumESPRESSOExpress]]
 deps = ["AbInitioSoftwareBase", "Configurations", "Crystallography", "Dates", "EquationsOfStateOfSolids", "Express", "ExpressBase", "QuantumESPRESSO", "Setfield", "UnifiedPseudopotentialFormat", "Unitful", "UnitfulAtomic"]
-git-tree-sha1 = "77a7891f531b66669ab945df557843a0e82374c7"
+git-tree-sha1 = "b9c2d7eb3a3c60fd467f6fa95d3631df4dc98589"
 repo-rev = "main"
 repo-url = "https://github.com/MineralsCloud/QuantumESPRESSOExpress.jl"
 uuid = "524a00d3-5d12-4323-9774-d2c11dc9d82e"
