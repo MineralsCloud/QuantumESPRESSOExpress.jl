@@ -101,11 +101,6 @@ deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
 version = "0.5.2+0"
 
-[[deps.CompositionsBase]]
-git-tree-sha1 = "455419f7e328a1a2493cabc6428d79e951349769"
-uuid = "a33af91c-f02d-484b-be07-31d278c5ca2b"
-version = "0.1.1"
-
 [[deps.Conda]]
 deps = ["Downloads", "JSON", "VersionParsing"]
 git-tree-sha1 = "6e47d11ea2776bc5627421d59cdcc1296c058071"
@@ -239,22 +234,11 @@ git-tree-sha1 = "101ee1ca55db9b5bf4265613eac836af151b3f8f"
 uuid = "1eaa2786-f833-4167-8397-974edad0881e"
 version = "0.4.2"
 
-[[deps.ExprTools]]
-git-tree-sha1 = "56559bbef6ca5ea0c0818fa5c90320398a6fbf8d"
-uuid = "e2ba6199-217a-4e67-a87a-7c52f15ade04"
-version = "0.1.8"
-
 [[deps.Express]]
 deps = ["AbInitioSoftwareBase", "Configurations", "Dates", "EquationsOfStateOfSolids", "Formatting", "JLD2", "Logging", "Pseudopotentials", "PyQHA", "SimpleWorkflows", "Unitful"]
-git-tree-sha1 = "cd57ff2ea5b6ee7f506f4f7d03dd7e0ffc2b0afc"
+git-tree-sha1 = "9de17017aea44ff46f43199f391bc9f99bc9c94d"
 uuid = "b12df14e-adf7-11e9-0606-d5813a258349"
-version = "0.9.0"
-
-[[deps.ExpressBase]]
-deps = ["CompositionsBase", "JSON", "TOML", "ValSplit", "YAML"]
-git-tree-sha1 = "dbbd940537bd2516645686dd29142b7f435297f3"
-uuid = "6bf22d12-b2e3-4e51-8f6d-9d050a32c5d5"
-version = "0.3.0"
+version = "0.9.2"
 
 [[deps.ExproniconLite]]
 git-tree-sha1 = "2321c9c5a07c2658484dacf8e68e3cd8e2470d5d"
@@ -386,9 +370,9 @@ version = "0.21.3"
 
 [[deps.JuliaFormatter]]
 deps = ["CSTParser", "CommonMark", "DataStructures", "Glob", "Pkg", "Tokenize"]
-git-tree-sha1 = "a91af8a988efedba0e80deec6b8ce70a0054e94f"
+git-tree-sha1 = "76ee67858b65133b2460b0eebf52e49950bb90a3"
 uuid = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
-version = "1.0.15"
+version = "1.0.16"
 
 [[deps.LLVMOpenMP_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -639,12 +623,12 @@ uuid = "f713baf6-9299-4878-8719-8ad597e49a7b"
 version = "0.6.3"
 
 [[deps.QuantumESPRESSOExpress]]
-deps = ["AbInitioSoftwareBase", "Configurations", "Crystallography", "Dates", "EquationsOfStateOfSolids", "Express", "ExpressBase", "QuantumESPRESSO", "Setfield", "UnifiedPseudopotentialFormat", "Unitful", "UnitfulAtomic"]
-git-tree-sha1 = "b9c2d7eb3a3c60fd467f6fa95d3631df4dc98589"
+deps = ["AbInitioSoftwareBase", "Configurations", "Crystallography", "Dates", "EquationsOfStateOfSolids", "Express", "QuantumESPRESSO", "Setfield", "UnifiedPseudopotentialFormat", "Unitful", "UnitfulAtomic"]
+git-tree-sha1 = "7f3f9c2ddcc7a3c0266cd0c3680075c01f599178"
 repo-rev = "main"
 repo-url = "https://github.com/MineralsCloud/QuantumESPRESSOExpress.jl"
 uuid = "524a00d3-5d12-4323-9774-d2c11dc9d82e"
-version = "0.5.8"
+version = "0.5.9"
 
 [[deps.QuantumESPRESSOFormatter]]
 deps = ["AbInitioSoftwareBase", "Compat", "Crystallography", "Formatting", "IterTools", "PyFortran90Namelists", "QuantumESPRESSOBase", "QuantumESPRESSOParser"]
@@ -743,9 +727,9 @@ version = "0.9.4"
 
 [[deps.SimpleWorkflows]]
 deps = ["DataFrames", "Dates", "Graphs", "JLD2", "TryCatch"]
-git-tree-sha1 = "17feb180aa81480e637cd6f55385f78cd6f92f8f"
+git-tree-sha1 = "e34059cb81dfb12ac738d253c6fcde8e5c3ec15b"
 uuid = "6a97d125-85da-4b66-b300-4bba10360563"
-version = "0.16.1"
+version = "0.16.2"
 
 [[deps.SnoopPrecompile]]
 git-tree-sha1 = "f604441450a3c0569830946e5b33b78c928e1a85"
@@ -913,12 +897,6 @@ deps = ["Unitful"]
 git-tree-sha1 = "903be579194534af1c4b4778d1ace676ca042238"
 uuid = "a7773ee8-282e-5fa2-be4e-bd808c38a91a"
 version = "1.0.0"
-
-[[deps.ValSplit]]
-deps = ["ExprTools", "Tricks"]
-git-tree-sha1 = "0d087f8ddc8eced370cc968eeb3b01db32cb2c01"
-uuid = "0625e100-946b-11ec-09cd-6328dd093154"
-version = "0.1.0"
 
 [[deps.VersionParsing]]
 git-tree-sha1 = "58d6e80b4ee071f5efd07fda82cb9fbe17200868"
