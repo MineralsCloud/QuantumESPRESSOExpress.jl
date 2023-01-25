@@ -1,16 +1,14 @@
 module Config
 
-using AbInitioSoftwareBase.Commands: CommandConfig, MpiexecConfig
-using Configurations: from_dict
-using Express: myuparse
-using Express.PhononWorkflow: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos
+using AbInitioSoftwareBase.Commands: MpiexecConfig, CommandConfig
+using Configurations: OptionField
 using QuantumESPRESSO.Commands:
     QuantumESPRESSOConfig, PwxConfig, PhxConfig, Q2rxConfig, MatdynxConfig
 using QuantumESPRESSO.Inputs.PWscf: PWInput
 using QuantumESPRESSO.Inputs.PHonon: PhInput, Q2rInput, MatdynInput
 using Express.PhononWorkflow.Config: RuntimeConfig, Template
 
-import Configurations: convert_to_option
+import Configurations: from_dict
 import Express.PhononWorkflow.Config: ExpandConfig
 
 function (::ExpandConfig)(template::Template)
@@ -23,7 +21,14 @@ function (::ExpandConfig)(template::Template)
     return (; zip((:scf, :dfpt, :q2r, :disp), inputs)...)
 end
 
-function convert_to_option(::Type{RuntimeConfig}, ::Type{CommandConfig}, dict)
+function from_dict(
+    ::Type{RuntimeConfig}, ::OptionField{:cli}, ::Type{<:CommandConfig}, dict
+)
+    return from_dict(RuntimeConfig, OptionField{:cli}(), QuantumESPRESSOConfig, dict)
+end
+function from_dict(
+    ::Type{RuntimeConfig}, ::OptionField{:cli}, ::Type{QuantumESPRESSOConfig}, dict
+)
     return QuantumESPRESSOConfig(;
         mpi=get(dict, "mpi", MpiexecConfig()),
         pw=get(dict, "pw", PwxConfig()),
