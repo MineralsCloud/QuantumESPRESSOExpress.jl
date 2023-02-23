@@ -2,17 +2,19 @@ module DB
 
 using ExpressDB: Indexer
 using ExpressDB: listfiles, readby
-using QuantumESPRESSO.Outputs.PWscf: parse_energy_decomposition
+using QuantumESPRESSO.Outputs.PWscf: parse_electrons_energies, parse_smearing_energy
 
 export EosEnergyIndexer, index
 
-struct EosEnergyIndexer <: Indexer end
+struct EosEnergyIndexer{T} <: Indexer
+    parser::T
+end
 
-function index(::EosEnergyIndexer, root_dir=pwd())
+function index(indexer::EosEnergyIndexer, root_dir=pwd())
     files = listfiles(
         "*/VariableCellOptimization.in" => "*/VariableCellOptimization.out", root_dir
     )
-    return readby(files, identity => parse_energy_decomposition)
+    return readby(files, identity => indexer.parser)
 end
 
 end
