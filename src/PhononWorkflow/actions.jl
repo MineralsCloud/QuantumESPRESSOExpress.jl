@@ -77,14 +77,14 @@ function (::RecoverySetter)(template::PhInput)
     return template
 end
 
-struct PseudodirSetter <: Setter end
-function (x::PseudodirSetter)(template::PWInput)
+struct PseudoDirSetter <: Setter end
+function (x::PseudoDirSetter)(template::PWInput)
     @set! template.control.pseudo_dir = abspath(template.control.pseudo_dir)
     return template
 end
 
 function normalizer(::Scf, args...)
-    return VerbositySetter("high") ∘ CalculationSetter(Scf()) ∘ PseudodirSetter()
+    return VerbositySetter("high") ∘ CalculationSetter(Scf()) ∘ PseudoDirSetter()
 end
 function normalizer(::Dfpt, input::PWInput)
     return RelayArgumentsSetter(input) ∘ VerbositySetter("high") ∘ RecoverySetter()

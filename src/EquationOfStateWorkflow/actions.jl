@@ -32,13 +32,13 @@ function (x::CalculationSetter)(template::PWInput)
     return template
 end
 
-struct PseudodirSetter <: Setter end
-function (x::PseudodirSetter)(template::PWInput)
+struct PseudoDirSetter <: Setter end
+function (x::PseudoDirSetter)(template::PWInput)
     @set! template.control.pseudo_dir = abspath(template.control.pseudo_dir)
     return template
 end
 
-normalizer(calc) = VerbositySetter("high") ∘ CalculationSetter(calc) ∘ PseudodirSetter()
+normalizer(calc) = VerbositySetter("high") ∘ CalculationSetter(calc) ∘ PseudoDirSetter()
 
 struct OutdirSetter <: Setter
     timefmt::String
