@@ -4,17 +4,16 @@ using AbInitioSoftwareBase.Commands: MpiexecConfig
 using Dates: format, now
 using Express: Calculation, Scf
 using Express.PhononWorkflow: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos
-# using QuantumESPRESSO.Inputs: QuantumESPRESSOInput
-using QuantumESPRESSO.Inputs.PWscf:
+# using QuantumESPRESSO: QuantumESPRESSOInput
+using QuantumESPRESSO.PWscf:
     PWInput,
     CellParametersCard,
     AtomicPositionsCard,
     CellParametersCardSetter,
-    AtomicPositionsCardSetter
-using QuantumESPRESSO.Inputs.PHonon:
-    PhInput, Q2rInput, MatdynInput, VerbositySetter, relayinfo
+    AtomicPositionsCardSetter,
+    tryparsefinal
+using QuantumESPRESSO.PHonon: PhInput, Q2rInput, MatdynInput, VerbositySetter, relayinfo
 using QuantumESPRESSO.Commands: pw, ph, q2r, matdyn
-using QuantumESPRESSO.Outputs.PWscf: tryparsefinal
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 

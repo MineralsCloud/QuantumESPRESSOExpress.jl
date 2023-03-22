@@ -3,7 +3,7 @@ using AbInitioSoftwareBase.Inputs: Setter
 using Crystallography: MonkhorstPackGrid
 using Dates: format, now
 using QuantumESPRESSO.Commands: pw
-using QuantumESPRESSO.Inputs.PWscf: KMeshCard, PWInput, VerbositySetter
+using QuantumESPRESSO.PWscf: KMeshCard, PWInput, VerbositySetter
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: ustrip, @u_str

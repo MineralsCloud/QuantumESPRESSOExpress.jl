@@ -1,7 +1,7 @@
 module ConvergenceTestWorkflow
 
 using Express: Scf
-using QuantumESPRESSO.Outputs.PWscf: parse_electrons_energies
+using QuantumESPRESSO.PWscf: parse_electrons_energies
 using Unitful: @u_str
 using UnitfulAtomic
 

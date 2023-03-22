@@ -4,7 +4,7 @@ using AbInitioSoftwareBase: load
 using Express.PhononWorkflow: Scf, Dfpt
 using Express.PhononWorkflow.Config: ExpandConfig
 using QuantumESPRESSOExpress.PhononWorkflow
-using QuantumESPRESSO.Inputs.PHonon:
+using QuantumESPRESSO.PHonon:
     PhNamelist, Q2rNamelist, MatdynNamelist, PhInput, Q2rInput, MatdynInput
 using Test
 using Unitful: @u_str
