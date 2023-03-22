@@ -1,9 +1,13 @@
 module EquationOfStateWorkflow
 
 using Crystallography: cellvolume
-using QuantumESPRESSO.Inputs.PWscf: CellParametersCard
-using QuantumESPRESSO.Outputs.PWscf:
-    Preamble, parse_electrons_energies, parsefinal, isjobdone, tryparsefinal
+using QuantumESPRESSO.PWscf:
+    CellParametersCard,
+    Preamble,
+    parse_electrons_energies,
+    parsefinal,
+    isjobdone,
+    tryparsefinal
 using Unitful: @u_str
 using UnitfulAtomic
 

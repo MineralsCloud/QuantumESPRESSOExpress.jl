@@ -2,7 +2,7 @@ module DB
 
 using ExpressDB: Indexer
 using ExpressDB: listfiles, readby
-using QuantumESPRESSO.Outputs.PWscf: parse_electrons_energies, parse_smearing_energy
+using QuantumESPRESSO.PWscf: parse_electrons_energies, parse_smearing_energy
 
 export EosEnergyIndexer, index
 

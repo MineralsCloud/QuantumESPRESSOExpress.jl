@@ -4,8 +4,8 @@ using AbInitioSoftwareBase.Commands: MpiexecConfig, CommandConfig
 using Configurations: OptionField
 using QuantumESPRESSO.Commands:
     QuantumESPRESSOConfig, PwxConfig, PhxConfig, Q2rxConfig, MatdynxConfig
-using QuantumESPRESSO.Inputs.PWscf: PWInput
-using QuantumESPRESSO.Inputs.PHonon: PhInput, Q2rInput, MatdynInput
+using QuantumESPRESSO.PWscf: PWInput
+using QuantumESPRESSO.PHonon: PhInput, Q2rInput, MatdynInput
 using Express.PhononWorkflow.Config: RuntimeConfig, Template
 
 import Configurations: from_dict

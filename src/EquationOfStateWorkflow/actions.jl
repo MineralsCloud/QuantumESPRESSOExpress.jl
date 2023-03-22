@@ -4,7 +4,7 @@ using Dates: format, now
 using EquationsOfStateOfSolids: PressureEquation, Parameters, getparam, vsolve
 using Express.EquationOfStateWorkflow: Scf, FixedCellOptimization, VariableCellOptimization
 using QuantumESPRESSO.Commands: pw
-using QuantumESPRESSO.Inputs.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
+using QuantumESPRESSO.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: Pressure, Volume, @u_str

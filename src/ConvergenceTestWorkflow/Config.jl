@@ -1,6 +1,6 @@
 module Config
 
-using QuantumESPRESSO.Inputs.PWscf: PWInput
+using QuantumESPRESSO.PWscf: PWInput
 using QuantumESPRESSO.Commands: QuantumESPRESSOConfig, PwxConfig
 using AbInitioSoftwareBase.Commands: CommandConfig, MpiexecConfig
 

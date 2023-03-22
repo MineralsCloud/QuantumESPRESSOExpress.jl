@@ -6,7 +6,7 @@ using EquationsOfStateOfSolids: BirchMurnaghan3rd
 using Express.EquationOfStateWorkflow: Scf
 using Express.EquationOfStateWorkflow.Config: ExpandConfig
 using QuantumESPRESSOExpress.EquationOfStateWorkflow
-using QuantumESPRESSO.Inputs.PWscf
+using QuantumESPRESSO.PWscf
 using Test
 using Unitful: @u_str
 using UnitfulAtomic
