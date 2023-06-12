@@ -2,7 +2,7 @@ using AbInitioSoftwareBase: parentdir
 using AbInitioSoftwareBase.Inputs: Setter
 using Dates: format, now
 using EquationsOfStateOfSolids: PressureEquation, Parameters, getparam, vsolve
-using Express.EquationOfStateWorkflow: Scf, FixedCellOptimization, VariableCellOptimization
+using ExpressBase: Scf, FixedCellOptimization, VariableCellOptimization
 using QuantumESPRESSO.Commands: pw
 using QuantumESPRESSO.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using Setfield: @set!
@@ -10,7 +10,8 @@ using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: Pressure, Volume, @u_str
 using UnitfulAtomic
 
-import Express.EquationOfStateWorkflow: MakeInput, FitEos, RunCmd
+import Express: RunCmd
+import Express.EquationOfStateWorkflow: MakeInput, FitEquationOfState
 
 function (::MakeInput{T})(template::PWInput, args...) where {T}
     return (customizer(args...) ∘ normalizer(T()))(template)
