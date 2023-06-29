@@ -1,5 +1,4 @@
-using AbInitioSoftwareBase: parentdir
-using AbInitioSoftwareBase.Inputs: Setter, Input
+using AbInitioSoftwareBase: Input, Setter, parentdir
 using AbInitioSoftwareBase.Commands: MpiexecConfig
 using Dates: format, now
 using Express: Calculation, Scf

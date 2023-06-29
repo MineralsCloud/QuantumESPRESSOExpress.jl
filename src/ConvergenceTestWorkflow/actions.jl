@@ -1,5 +1,4 @@
-using AbInitioSoftwareBase: parentdir
-using AbInitioSoftwareBase.Inputs: Setter
+using AbInitioSoftwareBase: Setter, parentdir
 using Crystallography: MonkhorstPackGrid
 using Dates: format, now
 using QuantumESPRESSO.Commands: pw
