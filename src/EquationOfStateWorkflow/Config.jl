@@ -1,8 +1,8 @@
 module Config
 
 using Configurations: OptionField, @option
+using ExpressBase: CommandConfig
 using QuantumESPRESSO.PWscf: PWInput
-using AbInitioSoftwareBase.Commands: CommandConfig, MpiexecConfig
 
 import Configurations: from_dict
 import Express.EquationOfStateWorkflow.Config: RuntimeConfig, ExpandConfig

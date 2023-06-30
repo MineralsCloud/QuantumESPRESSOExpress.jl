@@ -2,7 +2,6 @@ module Config
 
 using QuantumESPRESSO.PWscf: PWInput
 using QuantumESPRESSO.Commands: QuantumESPRESSOConfig, PwxConfig
-using AbInitioSoftwareBase.Commands: CommandConfig, MpiexecConfig
 
 import Configurations: convert_to_option
 import Express.ConvergenceTestWorkflow.Config: RuntimeConfig, ExpandConfig
