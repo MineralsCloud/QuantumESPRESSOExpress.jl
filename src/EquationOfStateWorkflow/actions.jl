@@ -1,7 +1,7 @@
-using AbInitioSoftwareBase: Setter, parentdir
+using AbInitioSoftwareBase: Setter
 using Dates: format, now
 using EquationsOfStateOfSolids: PressureEquation, Parameters, getparam, vsolve
-using ExpressBase: Scf, FixedCellOptimization, VariableCellOptimization
+using ExpressBase: Scf, FixedCellOptimization, VariableCellOptimization, parentdir
 using QuantumESPRESSO.Commands: pw
 using QuantumESPRESSO.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using Setfield: @set!
