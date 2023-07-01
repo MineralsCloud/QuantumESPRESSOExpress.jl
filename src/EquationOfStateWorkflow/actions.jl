@@ -1,8 +1,8 @@
 using AbInitioSoftwareBase: Setter
 using Dates: format, now
 using EquationsOfStateOfSolids: PressureEquation, Parameters, getparam, vsolve
-using ExpressBase: Scf, FixedCellOptimization, VariableCellOptimization, parentdir
-using QuantumESPRESSO.Commands: pw
+using ExpressBase: Scf, FixedCellOptimization, VariableCellOptimization
+using ExpressBase.Files: parentdir
 using QuantumESPRESSO.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
