@@ -12,6 +12,18 @@ function (::ExpandConfig)(template::AbstractString)
     return parse(PWInput, str)
 end
 
+@option struct MpiexecOptions <: CommandConfig
+    path::String = "mpiexec"
+    f::String = ""
+    hosts::Vector{String} = String[]
+    wdir::String = ""
+    configfile::String = ""
+    env::Union{Dict,Vector} = Dict(ENV)
+    np::UInt = 1
+end
+
+const MpiexecConfig = MpiexecOptions
+
 """
     ParallelizationFlags(; nimage=0, npool=0, ntg=0, nyfft=0, nband=0, ndiag=0)
 
