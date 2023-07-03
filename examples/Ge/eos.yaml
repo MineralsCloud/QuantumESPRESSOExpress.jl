@@ -4,7 +4,8 @@ cli:
     np: 16
 template: template.in
 save:
-  wf: wf.jld2
+  wf: wf.jls
+  eos: eos.jls
 fixed:
   pressures:
     unit: GPa

@@ -4,7 +4,7 @@ cli:
     np: 16
 template: ../examples/GaN/template.in
 save:
-  status: status.jld2
+  status: status.jls
 fixed:
   pressures:
     unit: GPa

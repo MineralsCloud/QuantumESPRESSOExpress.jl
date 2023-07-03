@@ -8,7 +8,7 @@ template:
   q2r: ../examples/Ge/q2r.in
   disp: ../examples/Ge/disp.in
 save:
-  status: status.jld2
+  status: status.jls
 fixed:
   pressures:
     unit: GPa
