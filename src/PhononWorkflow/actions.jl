@@ -2,7 +2,7 @@ using AbInitioSoftwareBase: Input, Setter, parentdir
 using AbInitioSoftwareBase.Commands: MpiexecConfig
 using Dates: format, now
 using Express: Calculation, SCF
-using Express.PhononWorkflow: DFPT, RealSpaceForceConstants, PhononDispersion, VDos
+using Express.PhononWorkflow: DFPT, RealSpaceForceConstants, PhononDispersion, VDOS
 # using QuantumESPRESSO: QuantumESPRESSOInput
 using QuantumESPRESSO.PWscf:
     PWInput,
@@ -22,7 +22,7 @@ inputtype(x::Calculation) = inputtype(typeof(x))
 inputtype(::Type{SCF}) = PWInput
 inputtype(::Type{DFPT}) = PhInput
 inputtype(::Type{RealSpaceForceConstants}) = Q2rInput
-inputtype(::Type{<:Union{PhononDispersion,VDos}}) = MatdynInput
+inputtype(::Type{<:Union{PhononDispersion,VDOS}}) = MatdynInput
 
 function parsecell(str)
     return tryparsefinal(AtomicPositionsCard, str), tryparsefinal(CellParametersCard, str)
@@ -39,7 +39,7 @@ function (::MakeInput{RealSpaceForceConstants})(template::Q2rInput, previnp::PhI
 end
 function (::MakeInput{T})(
     template::MatdynInput, a::Q2rInput, b::PhInput
-) where {T<:Union{PhononDispersion,VDos}}
+) where {T<:Union{PhononDispersion,VDOS}}
     return normalizer(T(), (a, b))(template)
 end
 
@@ -93,7 +93,7 @@ function normalizer(
 )
     return RelayArgumentsSetter(inputs) ∘ DosSetter(false)
 end
-function normalizer(::VDos, inputs::Union{Tuple{Q2rInput,PhInput},Tuple{PhInput,Q2rInput}})
+function normalizer(::VDOS, inputs::Union{Tuple{Q2rInput,PhInput},Tuple{PhInput,Q2rInput}})
     return RelayArgumentsSetter(inputs) ∘ DosSetter(true)
 end
 
@@ -132,7 +132,7 @@ function (x::RunCmd{RealSpaceForceConstants})(
 )
     return q2r(input, output; kwargs...)
 end
-function (x::RunCmd{<:Union{VDos,PhononDispersion}})(
+function (x::RunCmd{<:Union{VDOS,PhononDispersion}})(
     input, output=mktemp(parentdir(input))[1]; kwargs...
 )
     return matdyn(input, output; kwargs...)
