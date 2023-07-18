@@ -1,7 +1,7 @@
 using AbInitioSoftwareBase: Input, Setter, parentdir
 using AbInitioSoftwareBase.Commands: MpiexecConfig
 using Dates: format, now
-using Express: Calculation, Scf
+using Express: Calculation, SCF
 using Express.PhononWorkflow: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos
 # using QuantumESPRESSO: QuantumESPRESSOInput
 using QuantumESPRESSO.PWscf:
@@ -19,7 +19,7 @@ using UnifiedPseudopotentialFormat  # To work with `download_potential`
 import Express.PhononWorkflow: MakeInput, RunCmd, parsecell, inputtype, buildjob
 
 inputtype(x::Calculation) = inputtype(typeof(x))
-inputtype(::Type{Scf}) = PWInput
+inputtype(::Type{SCF}) = PWInput
 inputtype(::Type{Dfpt}) = PhInput
 inputtype(::Type{RealSpaceForceConstants}) = Q2rInput
 inputtype(::Type{<:Union{PhononDispersion,VDos}}) = MatdynInput
@@ -28,8 +28,8 @@ function parsecell(str)
     return tryparsefinal(AtomicPositionsCard, str), tryparsefinal(CellParametersCard, str)
 end
 
-function (::MakeInput{Scf})(template::PWInput, args...)
-    return (customizer(args...) ∘ normalizer(Scf(), template))(template)
+function (::MakeInput{SCF})(template::PWInput, args...)
+    return (customizer(args...) ∘ normalizer(SCF(), template))(template)
 end
 function (::MakeInput{Dfpt})(template::PhInput, previnp::PWInput)
     return normalizer(Dfpt(), previnp)(template)
@@ -44,7 +44,7 @@ function (::MakeInput{T})(
 end
 
 struct CalculationSetter <: Setter
-    calc::Union{Scf,Dfpt}
+    calc::Union{SCF,Dfpt}
 end
 function (::CalculationSetter)(template::PWInput)
     @set! template.control.calculation = "scf"
@@ -81,8 +81,8 @@ function (x::PseudoDirSetter)(template::PWInput)
     return template
 end
 
-function normalizer(::Scf, args...)
-    return VerbositySetter("high") ∘ CalculationSetter(Scf()) ∘ PseudoDirSetter()
+function normalizer(::SCF, args...)
+    return VerbositySetter("high") ∘ CalculationSetter(SCF()) ∘ PseudoDirSetter()
 end
 function normalizer(::Dfpt, input::PWInput)
     return RelayArgumentsSetter(input) ∘ VerbositySetter("high") ∘ RecoverySetter()
@@ -121,7 +121,7 @@ function customizer(
            AtomicPositionsCardSetter(ap)
 end
 
-function (x::RunCmd{Scf})(input, output=mktemp(parentdir(input))[1]; kwargs...)
+function (x::RunCmd{SCF})(input, output=mktemp(parentdir(input))[1]; kwargs...)
     return pw(input, output; kwargs...)
 end
 function (x::RunCmd{Dfpt})(input, output=mktemp(parentdir(input))[1]; kwargs...)

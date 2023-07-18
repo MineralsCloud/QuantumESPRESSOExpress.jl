@@ -1,7 +1,7 @@
 using AbInitioSoftwareBase: Setter
 using Dates: format, now
 using EquationsOfStateOfSolids: PressureEquation, Parameters, getparam, vsolve
-using ExpressBase: Scf, FixedCellOptimization, VariableCellOptimization
+using ExpressBase: SCF, FixedCellOptimization, VariableCellOptimization
 using ExpressBase.Files: parentdir
 using QuantumESPRESSO.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using Setfield: @set!
@@ -20,7 +20,7 @@ struct CalculationSetter{T} <: Setter
     calc::T
 end
 function (x::CalculationSetter)(template::PWInput)
-    @set! template.control.calculation = if x.calc isa Scf  # Functions can be extended, not safe
+    @set! template.control.calculation = if x.calc isa SCF  # Functions can be extended, not safe
         "scf"
     elseif x.calc isa FixedCellOptimization
         "relax"

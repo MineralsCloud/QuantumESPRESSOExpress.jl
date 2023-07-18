@@ -21,7 +21,7 @@ struct DataExtractionFailed <: Exception
     msg::String
 end
 
-function (::ExtractData{Scf})(file)
+function (::ExtractData{SCF})(file)
     str = read(file, String)
     preamble = tryparse(Preamble, str)
     e = try

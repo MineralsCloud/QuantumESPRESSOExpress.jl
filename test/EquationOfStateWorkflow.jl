@@ -3,7 +3,7 @@ module EquationOfStateWorkflow
 using AbInitioSoftwareBase: load
 using Crystallography: MonkhorstPackGrid
 using EquationsOfStateOfSolids: BirchMurnaghan3rd
-using Express.EquationOfStateWorkflow: Scf
+using Express.EquationOfStateWorkflow: SCF
 using Express.EquationOfStateWorkflow.Config: ExpandConfig
 using QuantumESPRESSOExpress.EquationOfStateWorkflow
 using QuantumESPRESSO.PWscf
@@ -13,7 +13,7 @@ using UnitfulAtomic
 
 @testset "Load a configuration file: GaN" begin
     dict = load("../examples/GaN/eos.yaml")
-    config = ExpandConfig{Scf}()(dict)
+    config = ExpandConfig{SCF}()(dict)
     @test config.template == PWInput(
         control = ControlNamelist(
             pseudo_dir = "/home/qe/pseudo",
@@ -55,7 +55,7 @@ end
 
 @testset "Load a configuration file: Ge" begin
     dict = load("../examples/Ge/eos.yaml")
-    config = ExpandConfig{Scf}()(dict)
+    config = ExpandConfig{SCF}()(dict)
     @test config.template == PWInput(
         control = ControlNamelist(pseudo_dir = "./pseudo", prefix = "Ge", outdir = "./"),
         system = SystemNamelist(

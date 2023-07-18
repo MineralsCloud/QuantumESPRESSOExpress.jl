@@ -1,7 +1,7 @@
 module PhononWorkflow
 
 using AbInitioSoftwareBase: load
-using Express.PhononWorkflow: Scf, Dfpt
+using Express.PhononWorkflow: SCF, Dfpt
 using Express.PhononWorkflow.Config: ExpandConfig
 using QuantumESPRESSOExpress.PhononWorkflow
 using QuantumESPRESSO.PHonon:
@@ -12,7 +12,7 @@ using UnitfulAtomic
 
 @testset "Load a configuration file: Ge" begin
     dict = load("../examples/Ge/phonon.yaml")
-    config = ExpandConfig{Scf}()(dict)
+    config = ExpandConfig{SCF}()(dict)
     @test config.template.dfpt == PhInput(
         "Phonon",
         PhNamelist(;
