@@ -8,9 +8,9 @@ using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: ustrip, @u_str
 using UnitfulAtomic
 
-import Express.ConvergenceTestWorkflow: MakeInput, RunCmd
+import Express.ConvergenceTestWorkflow: CreateInput, RunCmd
 
-(::MakeInput)(template::PWInput, args...) = (customizer(args...) ∘ normalizer())(template)
+(::CreateInput)(template::PWInput, args...) = (customizer(args...) ∘ normalizer())(template)
 
 struct CutoffEnergySetter <: Setter
     wfc::Number

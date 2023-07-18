@@ -16,7 +16,7 @@ using QuantumESPRESSO.Commands: pw, ph, q2r, matdyn
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 
-import Express.PhononWorkflow: MakeInput, RunCmd, parsecell, inputtype, buildjob
+import Express.PhononWorkflow: CreateInput, RunCmd, parsecell, inputtype, buildjob
 
 inputtype(x::Calculation) = inputtype(typeof(x))
 inputtype(::Type{SCF}) = PWInput
@@ -28,16 +28,16 @@ function parsecell(str)
     return tryparsefinal(AtomicPositionsCard, str), tryparsefinal(CellParametersCard, str)
 end
 
-function (::MakeInput{SCF})(template::PWInput, args...)
+function (::CreateInput{SCF})(template::PWInput, args...)
     return (customizer(args...) ∘ normalizer(SCF(), template))(template)
 end
-function (::MakeInput{DFPT})(template::PhInput, previnp::PWInput)
+function (::CreateInput{DFPT})(template::PhInput, previnp::PWInput)
     return normalizer(DFPT(), previnp)(template)
 end
-function (::MakeInput{RealSpaceForceConstants})(template::Q2rInput, previnp::PhInput)
+function (::CreateInput{RealSpaceForceConstants})(template::Q2rInput, previnp::PhInput)
     return normalizer(RealSpaceForceConstants(), previnp)(template)
 end
-function (::MakeInput{T})(
+function (::CreateInput{T})(
     template::MatdynInput, a::Q2rInput, b::PhInput
 ) where {T<:Union{PhononDispersion,VDOS}}
     return normalizer(T(), (a, b))(template)
