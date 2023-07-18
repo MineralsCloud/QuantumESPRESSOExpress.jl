@@ -5,7 +5,7 @@ using ExpressBase: CommandConfig
 using QuantumESPRESSO.PWscf: PWInput
 
 import Configurations: from_dict
-import Express.EquationOfStateWorkflow.Config: RuntimeConfig, ExpandConfig
+import Express.EquationOfStateWorkflow.Config: StaticConfig, ExpandConfig
 
 function (::ExpandConfig)(template::AbstractString)
     str = read(expanduser(template), String)
@@ -138,7 +138,7 @@ end
     dynmat::DynmatxConfig = DynmatxConfig()
 end
 
-function from_dict(::Type{RuntimeConfig}, ::OptionField{:cli}, ::Type{CommandConfig}, dict)
+function from_dict(::Type{<:StaticConfig}, ::OptionField{:cli}, ::Type{CommandConfig}, dict)
     return QuantumESPRESSOConfig(;
         mpi=get(dict, "mpi", MpiexecConfig()), pw=get(dict, "pw", PwxConfig())
     )

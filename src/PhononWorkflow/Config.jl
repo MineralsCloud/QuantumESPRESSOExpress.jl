@@ -2,7 +2,7 @@ module Config
 
 using AbInitioSoftwareBase.Commands: MpiexecConfig, CommandConfig
 using Configurations: OptionField
-using Express.PhononWorkflow.Config: RuntimeConfig, Template
+using Express.PhononWorkflow.Config: StaticConfig, Template
 using ExpressBase: CommandConfig
 using QuantumESPRESSO.Commands:
     QuantumESPRESSOConfig, PwxConfig, PhxConfig, Q2rxConfig, MatdynxConfig
@@ -23,12 +23,12 @@ function (::ExpandConfig)(template::Template)
 end
 
 function from_dict(
-    ::Type{RuntimeConfig}, ::OptionField{:cli}, ::Type{<:CommandConfig}, dict
+    ::Type{<:StaticConfig}, ::OptionField{:cli}, ::Type{<:CommandConfig}, dict
 )
-    return from_dict(RuntimeConfig, OptionField{:cli}(), QuantumESPRESSOConfig, dict)
+    return from_dict(StaticConfig, OptionField{:cli}(), QuantumESPRESSOConfig, dict)
 end
 function from_dict(
-    ::Type{RuntimeConfig}, ::OptionField{:cli}, ::Type{QuantumESPRESSOConfig}, dict
+    ::Type{<:StaticConfig}, ::OptionField{:cli}, ::Type{QuantumESPRESSOConfig}, dict
 )
     return QuantumESPRESSOConfig(;
         mpi=get(dict, "mpi", MpiexecConfig()),
