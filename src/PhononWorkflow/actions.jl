@@ -2,7 +2,7 @@ using AbInitioSoftwareBase: Input, Setter, parentdir
 using AbInitioSoftwareBase.Commands: MpiexecConfig
 using Dates: format, now
 using Express: Calculation, SCF
-using Express.PhononWorkflow: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos
+using Express.PhononWorkflow: DFPT, RealSpaceForceConstants, PhononDispersion, VDos
 # using QuantumESPRESSO: QuantumESPRESSOInput
 using QuantumESPRESSO.PWscf:
     PWInput,
@@ -20,7 +20,7 @@ import Express.PhononWorkflow: MakeInput, RunCmd, parsecell, inputtype, buildjob
 
 inputtype(x::Calculation) = inputtype(typeof(x))
 inputtype(::Type{SCF}) = PWInput
-inputtype(::Type{Dfpt}) = PhInput
+inputtype(::Type{DFPT}) = PhInput
 inputtype(::Type{RealSpaceForceConstants}) = Q2rInput
 inputtype(::Type{<:Union{PhononDispersion,VDos}}) = MatdynInput
 
@@ -31,8 +31,8 @@ end
 function (::MakeInput{SCF})(template::PWInput, args...)
     return (customizer(args...) ∘ normalizer(SCF(), template))(template)
 end
-function (::MakeInput{Dfpt})(template::PhInput, previnp::PWInput)
-    return normalizer(Dfpt(), previnp)(template)
+function (::MakeInput{DFPT})(template::PhInput, previnp::PWInput)
+    return normalizer(DFPT(), previnp)(template)
 end
 function (::MakeInput{RealSpaceForceConstants})(template::Q2rInput, previnp::PhInput)
     return normalizer(RealSpaceForceConstants(), previnp)(template)
@@ -44,7 +44,7 @@ function (::MakeInput{T})(
 end
 
 struct CalculationSetter <: Setter
-    calc::Union{SCF,Dfpt}
+    calc::Union{SCF,DFPT}
 end
 function (::CalculationSetter)(template::PWInput)
     @set! template.control.calculation = "scf"
@@ -84,7 +84,7 @@ end
 function normalizer(::SCF, args...)
     return VerbositySetter("high") ∘ CalculationSetter(SCF()) ∘ PseudoDirSetter()
 end
-function normalizer(::Dfpt, input::PWInput)
+function normalizer(::DFPT, input::PWInput)
     return RelayArgumentsSetter(input) ∘ VerbositySetter("high") ∘ RecoverySetter()
 end
 normalizer(::RealSpaceForceConstants, input::PhInput) = RelayArgumentsSetter(input)
@@ -124,7 +124,7 @@ end
 function (x::RunCmd{SCF})(input, output=mktemp(parentdir(input))[1]; kwargs...)
     return pw(input, output; kwargs...)
 end
-function (x::RunCmd{Dfpt})(input, output=mktemp(parentdir(input))[1]; kwargs...)
+function (x::RunCmd{DFPT})(input, output=mktemp(parentdir(input))[1]; kwargs...)
     return ph(input, output; kwargs...)
 end
 function (x::RunCmd{RealSpaceForceConstants})(

@@ -1,7 +1,7 @@
 module PhononWorkflow
 
 using AbInitioSoftwareBase: load
-using Express.PhononWorkflow: SCF, Dfpt
+using Express.PhononWorkflow: SCF, DFPT
 using Express.PhononWorkflow.Config: ExpandConfig
 using QuantumESPRESSOExpress.PhononWorkflow
 using QuantumESPRESSO.PHonon:
