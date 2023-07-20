@@ -57,8 +57,7 @@ function (x::OutdirSetter)(template::PWInput)
     return template
 end
 
-customizer(volume::Volume, timefmt="Y-m-d_H:M:S") =
-    OutdirSetter(timefmt) ∘ VolumeSetter(volume)
+customizer(volume::Volume) = OutdirSetter("Y-m-d_H:M:S") ∘ VolumeSetter(volume)
 
 function (x::RunCmd)(input, output=mktemp(parentdir(input))[1]; kwargs...)
     return pw(input, output; kwargs...)
