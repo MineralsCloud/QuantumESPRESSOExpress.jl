@@ -1,9 +1,9 @@
 module Config
 
-using AbInitioSoftwareBase.Commands: MpiexecConfig, CommandConfig
+using AbInitioSoftwareBase.Commands: MpiexecConfig
 using Configurations: OptionField
 using Express.PhononWorkflow.Config: StaticConfig, Template
-using ExpressBase: CommandConfig
+using ExpressBase.Config: SoftwareConfig
 using QuantumESPRESSO.Commands:
     QuantumESPRESSOConfig, PwxConfig, PhxConfig, Q2rxConfig, MatdynxConfig
 using QuantumESPRESSO.PWscf: PWInput
@@ -23,7 +23,7 @@ function (::ExpandConfig)(template::Template)
 end
 
 function from_dict(
-    ::Type{<:StaticConfig}, ::OptionField{:cli}, ::Type{<:CommandConfig}, dict
+    ::Type{<:StaticConfig}, ::OptionField{:cli}, ::Type{<:SoftwareConfig}, dict
 )
     return from_dict(StaticConfig, OptionField{:cli}(), QuantumESPRESSOConfig, dict)
 end

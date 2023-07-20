@@ -11,7 +11,7 @@ function (::ExpandConfig)(template::AbstractString)
     return parse(PWInput, str)
 end
 
-function convert_to_option(::Type{<:StaticConfig}, ::Type{CommandConfig}, dict)
+function convert_to_option(::Type{<:StaticConfig}, ::Type{SoftwareConfig}, dict)
     return QuantumESPRESSOConfig(;
         mpi=get(dict, "mpi", MpiexecConfig()), pw=get(dict, "pw", PwxConfig())
     )

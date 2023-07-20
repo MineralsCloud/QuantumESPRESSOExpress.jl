@@ -1,7 +1,7 @@
 module Config
 
 using Configurations: OptionField, @option
-using ExpressBase: CommandConfig
+using ExpressBase.Config: SoftwareConfig
 using QuantumESPRESSO.PWscf: PWInput
 
 import Configurations: from_dict
@@ -12,7 +12,7 @@ function (::ExpandConfig)(template::AbstractString)
     return parse(PWInput, str)
 end
 
-@option struct MpiexecOptions <: CommandConfig
+@option struct MpiexecOptions <: SoftwareConfig
     path::String = "mpiexec"
     f::String = ""
     hosts::Vector{String} = String[]
@@ -50,7 +50,7 @@ Create configurations for `pw.x`.
 - `options::ParallelizationFlags=ParallelizationFlags()`: the parallelization
   flags of `pw.x`.
 """
-@option mutable struct PwxConfig <: CommandConfig
+@option mutable struct PwxConfig <: SoftwareConfig
     path::String = "pw.x"
     chdir::Bool = true
     options::ParallelizationFlags = ParallelizationFlags()
@@ -68,7 +68,7 @@ Create configurations for `ph.x`.
 - `options::ParallelizationFlags=ParallelizationFlags()`: the parallelization
   flags of `ph.x`.
 """
-@option mutable struct PhxConfig <: CommandConfig
+@option mutable struct PhxConfig <: SoftwareConfig
     path::String = "ph.x"
     chdir::Bool = true
     options::ParallelizationFlags = ParallelizationFlags()
@@ -86,7 +86,7 @@ Create configurations for `q2r.x`.
 - `options::ParallelizationFlags=ParallelizationFlags()`: the parallelization
   flags of `q2r.x`.
 """
-@option mutable struct Q2rxConfig <: CommandConfig
+@option mutable struct Q2rxConfig <: SoftwareConfig
     path::String = "q2r.x"
     chdir::Bool = true
     options::ParallelizationFlags = ParallelizationFlags()
@@ -104,7 +104,7 @@ Create configurations for `matdyn.x`.
 - `options::ParallelizationFlags=ParallelizationFlags()`: the parallelization
   flags of `matdyn.x`.
 """
-@option mutable struct MatdynxConfig <: CommandConfig
+@option mutable struct MatdynxConfig <: SoftwareConfig
     path::String = "matdyn.x"
     chdir::Bool = true
     options::ParallelizationFlags = ParallelizationFlags()
@@ -122,14 +122,14 @@ Create configurations for `dynmat.x`.
 - `options::ParallelizationFlags=ParallelizationFlags()`: the parallelization
   flags of `dynmat.x`.
 """
-@option mutable struct DynmatxConfig <: CommandConfig
+@option mutable struct DynmatxConfig <: SoftwareConfig
     path::String = "dynmat.x"
     chdir::Bool = true
     options::ParallelizationFlags = ParallelizationFlags()
     env::Union{Dict,Vector} = Dict(ENV)
 end
 
-@option mutable struct QuantumESPRESSOConfig <: CommandConfig
+@option mutable struct QuantumESPRESSOConfig <: SoftwareConfig
     mpi::MpiexecConfig = MpiexecConfig()
     pw::PwxConfig = PwxConfig()
     ph::PhxConfig = PhxConfig()
@@ -138,7 +138,9 @@ end
     dynmat::DynmatxConfig = DynmatxConfig()
 end
 
-function from_dict(::Type{<:StaticConfig}, ::OptionField{:cli}, ::Type{CommandConfig}, dict)
+function from_dict(
+    ::Type{<:StaticConfig}, ::OptionField{:cli}, ::Type{SoftwareConfig}, dict
+)
     return QuantumESPRESSOConfig(;
         mpi=get(dict, "mpi", MpiexecConfig()), pw=get(dict, "pw", PwxConfig())
     )
