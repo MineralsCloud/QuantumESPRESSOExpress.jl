@@ -1,7 +1,7 @@
 using AbInitioSoftwareBase: Setter
 using Dates: format, now
 using EquationsOfStateOfSolids: PressureEquation, Parameters, getparam, vsolve
-using ExpressBase: SCF, FixedCellOptimization, VariableCellOptimization
+using ExpressBase: SelfConsistentField, FixedCellOptimization, VariableCellOptimization
 using ExpressBase.Files: parentdir
 using QuantumESPRESSO.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using Setfield: @set!
@@ -17,14 +17,14 @@ function (::CreateInput{T})(template::PWInput, args...) where {T}
 end
 
 struct CalculationSetter{T} <: Setter
-    calc::T
+    calculation::T
 end
 function (x::CalculationSetter)(template::PWInput)
-    @set! template.control.calculation = if x.calc isa SCF  # Functions can be extended, not safe
+    @set! template.control.calculation = if x.calculation isa SelfConsistentField  # Functions can be extended, not safe
         "scf"
-    elseif x.calc isa FixedCellOptimization
+    elseif x.calculation isa FixedCellOptimization
         "relax"
-    elseif x.calc isa VariableCellOptimization
+    elseif x.calculation isa VariableCellOptimization
         "vc-relax"
     else
         throw(ArgumentError("this should never happen!"))
@@ -38,7 +38,8 @@ function (x::PseudoDirSetter)(template::PWInput)
     return template
 end
 
-normalizer(calc) = VerbositySetter("high") ∘ CalculationSetter(calc) ∘ PseudoDirSetter()
+normalizer(calculation) =
+    VerbositySetter("high") ∘ CalculationSetter(calculation) ∘ PseudoDirSetter()
 
 struct OutdirSetter <: Setter
     timefmt::String

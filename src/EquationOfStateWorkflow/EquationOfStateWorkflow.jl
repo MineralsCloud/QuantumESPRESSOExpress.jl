@@ -21,7 +21,7 @@ struct DataExtractionFailed <: Exception
     msg::String
 end
 
-function (::ExtractData{SCF})(file)
+function (::ExtractData{SelfConsistentField})(file)
     str = read(file, String)
     preamble = tryparse(Preamble, str)
     e = try
