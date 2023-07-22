@@ -12,9 +12,8 @@ using UnitfulAtomic
 import Express.EquationOfStateWorkflow: CreateInput, FitEquationOfState
 import ExpressBase: RunCmd
 
-function (::CreateInput{T})(template::PWInput, args...) where {T}
-    return (customizer(args...) ∘ normalizer(T()))(template)
-end
+(::CreateInput{T})(template::PWInput, volume) where {T} =
+    (customizer(volume) ∘ normalizer(T()))(template)
 
 struct CalculationSetter{T} <: Setter
     calculation::T
