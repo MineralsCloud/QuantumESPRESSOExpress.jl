@@ -1,6 +1,6 @@
 module EquationOfStateWorkflow
 
-using Crystallography: cellvolume
+using CrystallographyBase: cellvolume
 using QuantumESPRESSO.PWscf:
     CellParametersCard,
     Preamble,

@@ -1,7 +1,7 @@
 module EquationOfStateWorkflow
 
 using AbInitioSoftwareBase: load
-using Crystallography: MonkhorstPackGrid
+using CrystallographyBase: MonkhorstPackGrid
 using EquationsOfStateOfSolids: BirchMurnaghan3rd
 using Express.EquationOfStateWorkflow: SCF
 using Express.EquationOfStateWorkflow.Config: ExpandConfig
