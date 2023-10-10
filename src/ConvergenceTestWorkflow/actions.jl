@@ -1,9 +1,8 @@
 using AbInitioSoftwareBase: Setter
 using CrystallographyBase: MonkhorstPackGrid
 using Dates: format, now
-using QuantumESPRESSO.Commands: pw
-using QuantumESPRESSO.PWscf: KMeshCard, PWInput, VerbositySetter
 using ExpressBase.Files: parentdir
+using QuantumESPRESSO.PWscf: PWInput, KMeshCard, PWInput, VerbositySetter
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: ustrip, @u_str

@@ -1,11 +1,11 @@
 module Config
 
+using Configurations: OptionField, @option
 using ExpressBase.Config: SoftwareConfig
 using QuantumESPRESSO.PWscf: PWInput
-using QuantumESPRESSO.Commands: QuantumESPRESSOConfig, PwxConfig
 
-import Configurations: convert_to_option
-import Express.ConvergenceTestWorkflow.Config: StaticConfig, ExpandConfig
+import Configurations: from_dict
+import Express.ConvergenceTestWorkflow.Config: StaticConfig, _update!
 
 function (::ExpandConfig)(template::AbstractString)
     str = read(expanduser(template), String)
