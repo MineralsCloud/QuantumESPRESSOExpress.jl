@@ -1,6 +1,6 @@
 module ConvergenceTestWorkflow
 
-using Express: SCF
+using ExpressBase: SelfConsistentField
 using QuantumESPRESSO.PWscf: parse_electrons_energies
 using Unitful: @u_str
 using UnitfulAtomic

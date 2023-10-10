@@ -1,5 +1,6 @@
 module Config
 
+using ExpressBase.Config: SoftwareConfig
 using QuantumESPRESSO.PWscf: PWInput
 using QuantumESPRESSO.Commands: QuantumESPRESSOConfig, PwxConfig
 
