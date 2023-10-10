@@ -7,9 +7,10 @@ using QuantumESPRESSO.PWscf: PWInput
 import Configurations: from_dict
 import Express.ConvergenceTestWorkflow.Config: StaticConfig, _update!
 
-function (::ExpandConfig)(template::AbstractString)
+function _update!(conf, template::AbstractString)
     str = read(expanduser(template), String)
-    return parse(PWInput, str)
+    conf.template = parse(PWInput, str)
+    return conf
 end
 
 function convert_to_option(::Type{<:StaticConfig}, ::Type{SoftwareConfig}, dict)
