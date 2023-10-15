@@ -12,13 +12,22 @@ using UnitfulAtomic
 import Express.ConvergenceTestWorkflow: CreateInput, ExtractData
 import ExpressBase: RunCmd
 
+struct DataExtractionFailed <: Exception
+    msg::String
+end
+
 function (::ExtractData)(file)
     str = read(file, String)
+    preamble = tryparse(Preamble, str)
     e = try
         parse_electrons_energies(str, :converged)
     catch
     end
-    return e.ε[end] * u"Ry"
+    if preamble !== nothing && !isempty(e)
+        return preamble.ecutwfc * u"Ry" => e.ε[end] * u"Ry"  # volume, energy
+    else
+        throw(DataExtractionFailed("no data found in file $file."))
+    end
 end
 
 (::CreateInput)(template::PWInput, args...) = (customizer(args...) ∘ normalizer())(template)
