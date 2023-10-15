@@ -1,8 +1,12 @@
-using AbInitioSoftwareBase: Input, Setter, parentdir
-using AbInitioSoftwareBase.Commands: MpiexecConfig
+using AbInitioSoftwareBase: Input, Setter
 using Dates: format, now
-using Express: Calculation, SCF
-using Express.PhononWorkflow: DFPT, RealSpaceForceConstants, PhononDispersion, VDOS
+using ExpressBase:
+    Calculation,
+    SelfConsistentField,
+    DensityFunctionalPerturbationTheory,
+    RealSpaceForceConstants,
+    PhononDispersion,
+    VDOS
 # using QuantumESPRESSO: QuantumESPRESSOInput
 using QuantumESPRESSO.PWscf:
     PWInput,
@@ -19,8 +23,8 @@ using UnifiedPseudopotentialFormat  # To work with `download_potential`
 import Express.PhononWorkflow: CreateInput, RunCmd, parsecell, inputtype, buildjob
 
 inputtype(x::Calculation) = inputtype(typeof(x))
-inputtype(::Type{SCF}) = PWInput
-inputtype(::Type{DFPT}) = PhInput
+inputtype(::Type{SelfConsistentField}) = PWInput
+inputtype(::Type{DensityFunctionalPerturbationTheory}) = PhInput
 inputtype(::Type{RealSpaceForceConstants}) = Q2rInput
 inputtype(::Type{<:Union{PhononDispersion,VDOS}}) = MatdynInput
 
@@ -28,11 +32,13 @@ function parsecell(str)
     return tryparsefinal(AtomicPositionsCard, str), tryparsefinal(CellParametersCard, str)
 end
 
-function (::CreateInput{SCF})(template::PWInput, args...)
-    return (customizer(args...) ∘ normalizer(SCF(), template))(template)
+function (::CreateInput{SelfConsistentField})(template::PWInput, args...)
+    return (customizer(args...) ∘ normalizer(SelfConsistentField(), template))(template)
 end
-function (::CreateInput{DFPT})(template::PhInput, previnp::PWInput)
-    return normalizer(DFPT(), previnp)(template)
+function (::CreateInput{DensityFunctionalPerturbationTheory})(
+    template::PhInput, previnp::PWInput
+)
+    return normalizer(DensityFunctionalPerturbationTheory(), previnp)(template)
 end
 function (::CreateInput{RealSpaceForceConstants})(template::Q2rInput, previnp::PhInput)
     return normalizer(RealSpaceForceConstants(), previnp)(template)
@@ -44,7 +50,7 @@ function (::CreateInput{T})(
 end
 
 struct CalculationSetter <: Setter
-    calc::Union{SCF,DFPT}
+    calc::Union{SelfConsistentField,DensityFunctionalPerturbationTheory}
 end
 function (::CalculationSetter)(template::PWInput)
     @set! template.control.calculation = "scf"
@@ -81,10 +87,11 @@ function (x::PseudoDirSetter)(template::PWInput)
     return template
 end
 
-function normalizer(::SCF, args...)
-    return VerbositySetter("high") ∘ CalculationSetter(SCF()) ∘ PseudoDirSetter()
+function normalizer(::SelfConsistentField, args...)
+    return VerbositySetter("high") ∘ CalculationSetter(SelfConsistentField()) ∘
+           PseudoDirSetter()
 end
-function normalizer(::DFPT, input::PWInput)
+function normalizer(::DensityFunctionalPerturbationTheory, input::PWInput)
     return RelayArgumentsSetter(input) ∘ VerbositySetter("high") ∘ RecoverySetter()
 end
 normalizer(::RealSpaceForceConstants, input::PhInput) = RelayArgumentsSetter(input)
@@ -121,10 +128,14 @@ function customizer(
            AtomicPositionsCardSetter(ap)
 end
 
-function (x::RunCmd{SCF})(input, output=mktemp(parentdir(input))[1]; kwargs...)
+function (x::RunCmd{SelfConsistentField})(
+    input, output=mktemp(parentdir(input))[1]; kwargs...
+)
     return pw(input, output; kwargs...)
 end
-function (x::RunCmd{DFPT})(input, output=mktemp(parentdir(input))[1]; kwargs...)
+function (x::RunCmd{DensityFunctionalPerturbationTheory})(
+    input, output=mktemp(parentdir(input))[1]; kwargs...
+)
     return ph(input, output; kwargs...)
 end
 function (x::RunCmd{RealSpaceForceConstants})(
