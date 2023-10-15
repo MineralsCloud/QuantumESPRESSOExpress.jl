@@ -6,7 +6,7 @@ using ExpressBase:
     DensityFunctionalPerturbationTheory,
     RealSpaceForceConstants,
     PhononDispersion,
-    VDOS
+    PhononDensityOfStates
 using QuantumESPRESSO.PWscf:
     PWInput,
     CellParametersCard,
@@ -15,7 +15,6 @@ using QuantumESPRESSO.PWscf:
     AtomicPositionsCardSetter,
     tryparsefinal
 using QuantumESPRESSO.PHonon: PhInput, Q2rInput, MatdynInput, VerbositySetter, relayinfo
-using QuantumESPRESSO.Commands: pw, ph, q2r, matdyn
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 
@@ -38,7 +37,7 @@ function (::CreateInput{RealSpaceForceConstants})(template::Q2rInput, previnp::P
 end
 function (::CreateInput{T})(
     template::MatdynInput, a::Q2rInput, b::PhInput
-) where {T<:Union{PhononDispersion,VDOS}}
+) where {T<:Union{PhononDispersion,PhononDensityOfStates}}
     return normalizer(T(), (a, b))(template)
 end
 (action::CreateInput)(template::MatdynInput, a::PhInput, b::Q2rInput) =
@@ -95,7 +94,9 @@ function normalizer(
 )
     return RelayArgumentsSetter(inputs) ∘ DosSetter(false)
 end
-function normalizer(::VDOS, inputs::Union{Tuple{Q2rInput,PhInput},Tuple{PhInput,Q2rInput}})
+function normalizer(
+    ::PhononDensityOfStates, inputs::Union{Tuple{Q2rInput,PhInput},Tuple{PhInput,Q2rInput}}
+)
     return RelayArgumentsSetter(inputs) ∘ DosSetter(true)
 end
 
