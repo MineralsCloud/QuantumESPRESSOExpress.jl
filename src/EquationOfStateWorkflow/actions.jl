@@ -2,7 +2,6 @@ using AbInitioSoftwareBase: Setter
 using Dates: format, now
 using EquationsOfStateOfSolids: PressureEquation, Parameters, getparam, vsolve
 using ExpressBase: SelfConsistentField, FixedCellOptimization, VariableCellOptimization
-using ExpressBase.Files: parentdir
 using QuantumESPRESSO.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
@@ -10,7 +9,6 @@ using Unitful: Pressure, Volume, @u_str
 using UnitfulAtomic
 
 import Express.EquationOfStateWorkflow: CreateInput, FitEquationOfState
-import ExpressBase: RunCmd
 
 (::CreateInput{T})(template::PWInput, volume) where {T} =
     (customizer(volume) ∘ normalizer(T()))(template)
@@ -58,7 +56,3 @@ function (x::OutdirSetter)(template::PWInput)
 end
 
 customizer(volume::Volume) = OutdirSetter("Y-m-d_H:M:S") ∘ VolumeSetter(volume)
-
-function (x::RunCmd)(input, output=mktemp(parentdir(input))[1]; kwargs...)
-    return pw(input, output; kwargs...)
-end

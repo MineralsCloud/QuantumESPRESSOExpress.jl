@@ -1,7 +1,6 @@
 using AbInitioSoftwareBase: Setter
 using CrystallographyBase: MonkhorstPackGrid
 using Dates: format, now
-using ExpressBase.Files: parentdir
 using QuantumESPRESSO.PWscf:
     PWInput, KMeshCard, PWInput, VerbositySetter, Preamble, parse_electrons_energies
 using Setfield: @set!
@@ -10,7 +9,6 @@ using Unitful: ustrip, @u_str
 using UnitfulAtomic
 
 import Express.ConvergenceTestWorkflow: CreateInput, ExtractData
-import ExpressBase: RunCmd
 
 struct DataExtractionFailed <: Exception
     msg::String
@@ -76,7 +74,3 @@ end
 
 customizer(mesh, shift) = OutdirSetter("Y-m-d_H:M:S") ∘ MonkhorstPackGridSetter(mesh, shift)
 customizer(energy::Number) = OutdirSetter("Y-m-d_H:M:S") ∘ CutoffEnergySetter(energy)
-
-function (x::RunCmd)(input, output=mktemp(parentdir(input))[1]; kwargs...)
-    return pw(input, output; kwargs...)
-end
