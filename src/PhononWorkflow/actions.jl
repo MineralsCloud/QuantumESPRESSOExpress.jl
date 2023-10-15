@@ -121,12 +121,9 @@ function (x::OutdirSetter)(template::PWInput)
     return template
 end
 
-function customizer(
-    ap::AtomicPositionsCard, cp::CellParametersCard, timefmt::AbstractString="Y-m-d_H:M:S"
-)
-    return OutdirSetter(timefmt) ∘ CellParametersCardSetter(cp) ∘
-           AtomicPositionsCardSetter(ap)
-end
+customizer(ap::AtomicPositionsCard, cp::CellParametersCard) =
+    OutdirSetter("Y-m-d_H:M:S") ∘ CellParametersCardSetter(cp) ∘
+    AtomicPositionsCardSetter(ap)
 
 function (x::RunCmd{SelfConsistentField})(
     input, output=mktemp(parentdir(input))[1]; kwargs...
