@@ -41,6 +41,8 @@ function (::CreateInput{T})(
 ) where {T<:Union{PhononDispersion,VDOS}}
     return normalizer(T(), (a, b))(template)
 end
+(action::CreateInput)(template::MatdynInput, a::PhInput, b::Q2rInput) =
+    action(template, b, a)
 
 struct CalculationSetter <: Setter
     calc::Union{SelfConsistentField,DensityFunctionalPerturbationTheory}
