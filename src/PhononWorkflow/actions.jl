@@ -20,13 +20,7 @@ using QuantumESPRESSO.Commands: pw, ph, q2r, matdyn
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 
-import Express.PhononWorkflow: CreateInput, RunCmd, parsecell, inputtype, buildjob
-
-inputtype(x::Calculation) = inputtype(typeof(x))
-inputtype(::Type{SelfConsistentField}) = PWInput
-inputtype(::Type{DensityFunctionalPerturbationTheory}) = PhInput
-inputtype(::Type{RealSpaceForceConstants}) = Q2rInput
-inputtype(::Type{<:Union{PhononDispersion,VDOS}}) = MatdynInput
+import Express.PhononWorkflow: CreateInput, RunCmd, parsecell
 
 function parsecell(str)
     return tryparsefinal(AtomicPositionsCard, str), tryparsefinal(CellParametersCard, str)
