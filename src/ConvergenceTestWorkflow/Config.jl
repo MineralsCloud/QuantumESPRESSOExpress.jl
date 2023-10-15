@@ -1,6 +1,6 @@
 module Config
 
-using Configurations: OptionField, @option
+using Configurations: OptionField
 using ExpressBase.Config: SoftwareConfig
 using QuantumESPRESSO.PWscf: PWInput
 

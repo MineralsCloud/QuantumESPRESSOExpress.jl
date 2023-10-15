@@ -1,3 +1,6 @@
+using Configurations: @option
+using ExpressBase.Config: SoftwareConfig
+
 @option struct MpiexecOptions <: SoftwareConfig
     path::String = "mpiexec"
     f::String = ""
