@@ -7,7 +7,6 @@ using ExpressBase:
     RealSpaceForceConstants,
     PhononDispersion,
     VDOS
-# using QuantumESPRESSO: QuantumESPRESSOInput
 using QuantumESPRESSO.PWscf:
     PWInput,
     CellParametersCard,
