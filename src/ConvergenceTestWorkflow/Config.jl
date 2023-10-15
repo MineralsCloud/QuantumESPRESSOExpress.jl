@@ -4,7 +4,7 @@ using Configurations: OptionField
 using ExpressBase.Config: SoftwareConfig
 using QuantumESPRESSO.PWscf: PWInput
 
-using ..QuantumESPRESSOExpress: QuantumESPRESSOConfig, MpiexecConfig, PwxConfig
+using ...QuantumESPRESSOExpress: QuantumESPRESSOConfig, MpiexecConfig, PwxConfig
 
 import Configurations: from_dict
 import Express.ConvergenceTestWorkflow.Config: StaticConfig, _update!
