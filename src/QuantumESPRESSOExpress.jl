@@ -15,7 +15,7 @@ currentsoftware() = QE()
 
 include("ConvergenceTestWorkflow/ConvergenceTestWorkflow.jl")
 include("EquationOfStateWorkflow/EquationOfStateWorkflow.jl")
-# include("PhononWorkflow/PhononWorkflow.jl")
+include("PhononWorkflow/PhononWorkflow.jl")
 
 function (x::RunCmd)(input, output=mktemp(parentdir(input))[1]; kwargs...)
     return pw(input, output; kwargs...)
