@@ -2,14 +2,24 @@ using AbInitioSoftwareBase: Setter
 using CrystallographyBase: MonkhorstPackGrid
 using Dates: format, now
 using ExpressBase.Files: parentdir
-using QuantumESPRESSO.PWscf: PWInput, KMeshCard, PWInput, VerbositySetter
+using QuantumESPRESSO.PWscf:
+    PWInput, KMeshCard, PWInput, VerbositySetter, parse_electrons_energies
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: ustrip, @u_str
 using UnitfulAtomic
 
-import Express.ConvergenceTestWorkflow: CreateInput
+import Express.ConvergenceTestWorkflow: CreateInput, ExtractData
 import ExpressBase: RunCmd
+
+function (::ExtractData)(file)
+    str = read(file, String)
+    e = try
+        parse_electrons_energies(str, :converged)
+    catch
+    end
+    return e.ε[end] * u"Ry"
+end
 
 (::CreateInput)(template::PWInput, args...) = (customizer(args...) ∘ normalizer())(template)
 
