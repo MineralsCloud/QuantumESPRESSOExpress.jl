@@ -119,24 +119,3 @@ end
 customizer(ap::AtomicPositionsCard, cp::CellParametersCard) =
     OutdirSetter("Y-m-d_H:M:S") ∘ CellParametersCardSetter(cp) ∘
     AtomicPositionsCardSetter(ap)
-
-function (x::RunCmd{SelfConsistentField})(
-    input, output=mktemp(parentdir(input))[1]; kwargs...
-)
-    return pw(input, output; kwargs...)
-end
-function (x::RunCmd{DensityFunctionalPerturbationTheory})(
-    input, output=mktemp(parentdir(input))[1]; kwargs...
-)
-    return ph(input, output; kwargs...)
-end
-function (x::RunCmd{RealSpaceForceConstants})(
-    input, output=mktemp(parentdir(input))[1]; kwargs...
-)
-    return q2r(input, output; kwargs...)
-end
-function (x::RunCmd{<:Union{VDOS,PhononDispersion}})(
-    input, output=mktemp(parentdir(input))[1]; kwargs...
-)
-    return matdyn(input, output; kwargs...)
-end
