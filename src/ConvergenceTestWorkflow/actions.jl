@@ -3,7 +3,7 @@ using CrystallographyBase: MonkhorstPackGrid
 using Dates: format, now
 using ExpressBase.Files: parentdir
 using QuantumESPRESSO.PWscf:
-    PWInput, KMeshCard, PWInput, VerbositySetter, parse_electrons_energies
+    PWInput, KMeshCard, PWInput, VerbositySetter, Preamble, parse_electrons_energies
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: ustrip, @u_str
