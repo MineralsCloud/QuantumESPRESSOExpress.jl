@@ -1,6 +1,8 @@
 module EquationOfStateWorkflow
 
-using CrystallographyBase: cellvolume
+using AtomsIO: FlexibleSystem, save_system
+using CrystallographyBase: Cell, cellvolume
+using Express: Calculation
 using QuantumESPRESSO.PWscf:
     CellParametersCard,
     Preamble,
@@ -11,7 +13,7 @@ using QuantumESPRESSO.PWscf:
 using Unitful: @u_str
 using UnitfulAtomic
 
-import Express.EquationOfStateWorkflow: ExtractData
+import Express.EquationOfStateWorkflow: ExtractData, ExtractCell, SaveCell
 
 include("Config.jl")
 include("actions.jl")
@@ -46,6 +48,17 @@ function (::ExtractData{VariableCellOptimization})(file)
     else
         throw(DataExtractionFailed("no data found in file $file."))
     end
+end
+
+function (::ExtractCell)(file)
+    str = read(file, String)
+    card = parsefinal(CellParametersCard, str)
+    return Cell(card)
+end
+
+function (action::SaveCell)(cell)
+    system = FlexibleSystem(cell)
+    return save_system(system, string(Calculation(action)) * ".cif")
 end
 
 end
