@@ -58,15 +58,15 @@ function (::ExtractCell)(file)
     return Cell(cell_parameters, atomic_positions)
 end
 
-function (action::SaveCell)(cell)
+function (action::SaveCell)(path, cell)
     lattice = Lattice(cell)
     lattice *= 1u"bohr"
     box = collect(basisvectors(lattice))
     atomicpositions = map(eachatom(cell)) do (atom, position)
-        Atom(atom, lattice(position))
+        Atom(Symbol(atom), lattice(position))
     end
     system = periodic_system(atomicpositions, box; fractional=true)
-    return save_system(string(Calculation(action)) * ".cif", system)
+    return save_system(path, system)
 end
 
 end
