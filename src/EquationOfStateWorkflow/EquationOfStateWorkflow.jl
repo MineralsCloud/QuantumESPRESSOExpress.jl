@@ -58,7 +58,7 @@ end
 
 function (action::SaveCell)(cell)
     system = FlexibleSystem(cell)
-    return save_system(system, string(Calculation(action)) * ".cif")
+    return save_system(string(Calculation(action)) * ".cif", system)
 end
 
 end
