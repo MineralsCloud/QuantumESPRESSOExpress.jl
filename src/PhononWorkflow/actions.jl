@@ -1,9 +1,12 @@
-using AbInitioSoftwareBase: Input, Setter, parentdir
-using AbInitioSoftwareBase.Commands: MpiexecConfig
+using AbInitioSoftwareBase: Input, Setter
 using Dates: format, now
-using Express: Calculation, Scf
-using Express.PhononWorkflow: Dfpt, RealSpaceForceConstants, PhononDispersion, VDos
-# using QuantumESPRESSO: QuantumESPRESSOInput
+using ExpressBase:
+    Calculation,
+    SelfConsistentField,
+    DensityFunctionalPerturbationTheory,
+    RealSpaceForceConstants,
+    PhononDispersion,
+    PhononDensityOfStates
 using QuantumESPRESSO.PWscf:
     PWInput,
     CellParametersCard,
@@ -12,39 +15,36 @@ using QuantumESPRESSO.PWscf:
     AtomicPositionsCardSetter,
     tryparsefinal
 using QuantumESPRESSO.PHonon: PhInput, Q2rInput, MatdynInput, VerbositySetter, relayinfo
-using QuantumESPRESSO.Commands: pw, ph, q2r, matdyn
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 
-import Express.PhononWorkflow: MakeInput, RunCmd, parsecell, inputtype, buildjob
-
-inputtype(x::Calculation) = inputtype(typeof(x))
-inputtype(::Type{Scf}) = PWInput
-inputtype(::Type{Dfpt}) = PhInput
-inputtype(::Type{RealSpaceForceConstants}) = Q2rInput
-inputtype(::Type{<:Union{PhononDispersion,VDos}}) = MatdynInput
+import Express.PhononWorkflow: CreateInput, RunCmd, parsecell
 
 function parsecell(str)
     return tryparsefinal(AtomicPositionsCard, str), tryparsefinal(CellParametersCard, str)
 end
 
-function (::MakeInput{Scf})(template::PWInput, args...)
-    return (customizer(args...) ∘ normalizer(Scf(), template))(template)
+function (::CreateInput{SelfConsistentField})(template::PWInput, args...)
+    return (customizer(args...) ∘ normalizer(SelfConsistentField(), template))(template)
 end
-function (::MakeInput{Dfpt})(template::PhInput, previnp::PWInput)
-    return normalizer(Dfpt(), previnp)(template)
+function (::CreateInput{DensityFunctionalPerturbationTheory})(
+    template::PhInput, previnp::PWInput
+)
+    return normalizer(DensityFunctionalPerturbationTheory(), previnp)(template)
 end
-function (::MakeInput{RealSpaceForceConstants})(template::Q2rInput, previnp::PhInput)
+function (::CreateInput{RealSpaceForceConstants})(template::Q2rInput, previnp::PhInput)
     return normalizer(RealSpaceForceConstants(), previnp)(template)
 end
-function (::MakeInput{T})(
+function (::CreateInput{T})(
     template::MatdynInput, a::Q2rInput, b::PhInput
-) where {T<:Union{PhononDispersion,VDos}}
+) where {T<:Union{PhononDispersion,PhononDensityOfStates}}
     return normalizer(T(), (a, b))(template)
 end
+(action::CreateInput)(template::MatdynInput, a::PhInput, b::Q2rInput) =
+    action(template, b, a)
 
 struct CalculationSetter <: Setter
-    calc::Union{Scf,Dfpt}
+    calc::Union{SelfConsistentField,DensityFunctionalPerturbationTheory}
 end
 function (::CalculationSetter)(template::PWInput)
     @set! template.control.calculation = "scf"
@@ -81,10 +81,11 @@ function (x::PseudoDirSetter)(template::PWInput)
     return template
 end
 
-function normalizer(::Scf, args...)
-    return VerbositySetter("high") ∘ CalculationSetter(Scf()) ∘ PseudoDirSetter()
+function normalizer(::SelfConsistentField, args...)
+    return VerbositySetter("high") ∘ CalculationSetter(SelfConsistentField()) ∘
+           PseudoDirSetter()
 end
-function normalizer(::Dfpt, input::PWInput)
+function normalizer(::DensityFunctionalPerturbationTheory, input::PWInput)
     return RelayArgumentsSetter(input) ∘ VerbositySetter("high") ∘ RecoverySetter()
 end
 normalizer(::RealSpaceForceConstants, input::PhInput) = RelayArgumentsSetter(input)
@@ -93,7 +94,9 @@ function normalizer(
 )
     return RelayArgumentsSetter(inputs) ∘ DosSetter(false)
 end
-function normalizer(::VDos, inputs::Union{Tuple{Q2rInput,PhInput},Tuple{PhInput,Q2rInput}})
+function normalizer(
+    ::PhononDensityOfStates, inputs::Union{Tuple{Q2rInput,PhInput},Tuple{PhInput,Q2rInput}}
+)
     return RelayArgumentsSetter(inputs) ∘ DosSetter(true)
 end
 
@@ -114,26 +117,6 @@ function (x::OutdirSetter)(template::PWInput)
     return template
 end
 
-function customizer(
-    ap::AtomicPositionsCard, cp::CellParametersCard, timefmt::AbstractString="Y-m-d_H:M:S"
-)
-    return OutdirSetter(timefmt) ∘ CellParametersCardSetter(cp) ∘
-           AtomicPositionsCardSetter(ap)
-end
-
-function (x::RunCmd{Scf})(input, output=mktemp(parentdir(input))[1]; kwargs...)
-    return pw(input, output; kwargs...)
-end
-function (x::RunCmd{Dfpt})(input, output=mktemp(parentdir(input))[1]; kwargs...)
-    return ph(input, output; kwargs...)
-end
-function (x::RunCmd{RealSpaceForceConstants})(
-    input, output=mktemp(parentdir(input))[1]; kwargs...
-)
-    return q2r(input, output; kwargs...)
-end
-function (x::RunCmd{<:Union{VDos,PhononDispersion}})(
-    input, output=mktemp(parentdir(input))[1]; kwargs...
-)
-    return matdyn(input, output; kwargs...)
-end
+customizer(ap::AtomicPositionsCard, cp::CellParametersCard) =
+    OutdirSetter("Y-m-d_H:M:S") ∘ CellParametersCardSetter(cp) ∘
+    AtomicPositionsCardSetter(ap)

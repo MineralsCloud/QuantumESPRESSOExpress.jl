@@ -1,8 +1,11 @@
 module EquationOfStateWorkflow
 
-using Crystallography: cellvolume
+using AtomsIO: Atom, periodic_system, save_system
+using CrystallographyBase: Lattice, Cell, basisvectors, cellvolume, eachatom
+using ExpressBase: Calculation
 using QuantumESPRESSO.PWscf:
     CellParametersCard,
+    AtomicPositionsCard,
     Preamble,
     parse_electrons_energies,
     parsefinal,
@@ -11,7 +14,7 @@ using QuantumESPRESSO.PWscf:
 using Unitful: @u_str
 using UnitfulAtomic
 
-import Express.EquationOfStateWorkflow: ExtractData
+import Express.EquationOfStateWorkflow: ExtractData, ExtractCell, SaveCell
 
 include("Config.jl")
 include("actions.jl")
@@ -21,7 +24,7 @@ struct DataExtractionFailed <: Exception
     msg::String
 end
 
-function (::ExtractData{Scf})(file)
+function (::ExtractData{SelfConsistentField})(file)
     str = read(file, String)
     preamble = tryparse(Preamble, str)
     e = try
@@ -46,6 +49,24 @@ function (::ExtractData{VariableCellOptimization})(file)
     else
         throw(DataExtractionFailed("no data found in file $file."))
     end
+end
+
+function (::ExtractCell)(file)
+    str = read(file, String)
+    cell_parameters = parsefinal(CellParametersCard, str)
+    atomic_positions = parsefinal(AtomicPositionsCard, str)
+    return Cell(cell_parameters, atomic_positions)
+end
+
+function (action::SaveCell)(cell)
+    lattice = Lattice(cell)
+    lattice *= 1u"bohr"
+    box = collect(basisvectors(lattice))
+    atomicpositions = map(eachatom(cell)) do (atom, position)
+        Atom(atom, lattice(position))
+    end
+    system = periodic_system(atomicpositions, box; fractional=true)
+    return save_system(string(Calculation(action)) * ".cif", system)
 end
 
 end

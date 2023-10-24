@@ -1,17 +1,23 @@
 module Config
 
+using Configurations: OptionField
+using ExpressBase.Config: SoftwareConfig
 using QuantumESPRESSO.PWscf: PWInput
-using QuantumESPRESSO.Commands: QuantumESPRESSOConfig, PwxConfig
 
-import Configurations: convert_to_option
-import Express.ConvergenceTestWorkflow.Config: RuntimeConfig, ExpandConfig
+using ...QuantumESPRESSOExpress: QuantumESPRESSOConfig, MpiexecConfig, PwxConfig
 
-function (::ExpandConfig)(template::AbstractString)
+import Configurations: from_dict
+import Express.ConvergenceTestWorkflow.Config: StaticConfig, _update!
+
+function _update!(conf, template::AbstractString)
     str = read(expanduser(template), String)
-    return parse(PWInput, str)
+    conf.template = parse(PWInput, str)
+    return conf
 end
 
-function convert_to_option(::Type{RuntimeConfig}, ::Type{CommandConfig}, dict)
+function from_dict(
+    ::Type{<:StaticConfig}, ::OptionField{:cli}, ::Type{SoftwareConfig}, dict
+)
     return QuantumESPRESSOConfig(;
         mpi=get(dict, "mpi", MpiexecConfig()), pw=get(dict, "pw", PwxConfig())
     )

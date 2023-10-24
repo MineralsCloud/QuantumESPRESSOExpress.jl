@@ -1,16 +1,34 @@
-using AbInitioSoftwareBase: Setter, parentdir
-using Crystallography: MonkhorstPackGrid
+using AbInitioSoftwareBase: Setter
+using CrystallographyBase: MonkhorstPackGrid
 using Dates: format, now
-using QuantumESPRESSO.Commands: pw
-using QuantumESPRESSO.PWscf: KMeshCard, PWInput, VerbositySetter
+using QuantumESPRESSO.PWscf:
+    PWInput, KMeshCard, PWInput, VerbositySetter, Preamble, parse_electrons_energies
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: ustrip, @u_str
 using UnitfulAtomic
 
-import Express.ConvergenceTestWorkflow: MakeInput, RunCmd
+import Express.ConvergenceTestWorkflow: CreateInput, ExtractData
 
-(::MakeInput)(template::PWInput, args...) = (customizer(args...) ∘ normalizer())(template)
+struct DataExtractionFailed <: Exception
+    msg::String
+end
+
+function (::ExtractData)(file)
+    str = read(file, String)
+    preamble = tryparse(Preamble, str)
+    e = try
+        parse_electrons_energies(str, :converged)
+    catch
+    end
+    if preamble !== nothing && !isempty(e)
+        return preamble.ecutwfc * u"Ry" => e.ε[end] * u"Ry"  # volume, energy
+    else
+        throw(DataExtractionFailed("no data found in file $file."))
+    end
+end
+
+(::CreateInput)(template::PWInput, args...) = (customizer(args...) ∘ normalizer())(template)
 
 struct CutoffEnergySetter <: Setter
     wfc::Number
@@ -54,13 +72,5 @@ function (x::MonkhorstPackGridSetter)(template::PWInput)
     return template
 end
 
-function customizer(mesh, shift, timefmt="Y-m-d_H:M:S")
-    return OutdirSetter(timefmt) ∘ MonkhorstPackGridSetter(mesh, shift)
-end
-function customizer(energy::Number, timefmt::AbstractString="Y-m-d_H:M:S")
-    return OutdirSetter(timefmt) ∘ CutoffEnergySetter(energy)
-end
-
-function (x::RunCmd)(input, output=mktemp(parentdir(input))[1]; kwargs...)
-    return pw(input, output; kwargs...)
-end
+customizer(mesh, shift) = OutdirSetter("Y-m-d_H:M:S") ∘ MonkhorstPackGridSetter(mesh, shift)
+customizer(energy::Number) = OutdirSetter("Y-m-d_H:M:S") ∘ CutoffEnergySetter(energy)

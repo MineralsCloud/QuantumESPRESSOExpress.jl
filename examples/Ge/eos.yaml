@@ -3,10 +3,9 @@ cli:
   mpi:
     np: 16
 template: template.in
-save:
-  wf: wf.jls
-  eos: eos.jls
-fixed:
+data:
+  eos_params: eos.json
+at:
   pressures:
     unit: GPa
     numbers:

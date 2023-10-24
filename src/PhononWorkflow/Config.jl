@@ -1,34 +1,44 @@
 module Config
 
-using AbInitioSoftwareBase.Commands: MpiexecConfig, CommandConfig
 using Configurations: OptionField
-using Express.PhononWorkflow.Config: RuntimeConfig, Template
-using ExpressBase: CommandConfig
-using QuantumESPRESSO.Commands:
-    QuantumESPRESSOConfig, PwxConfig, PhxConfig, Q2rxConfig, MatdynxConfig
+using Express.PhononWorkflow.Config: StaticConfig
+using ExpressBase:
+    SelfConsistentField,
+    DensityFunctionalPerturbationTheory,
+    RealSpaceForceConstants,
+    PhononDispersion,
+    PhononDensityOfStates
+using ExpressBase.Config: SoftwareConfig
 using QuantumESPRESSO.PWscf: PWInput
 using QuantumESPRESSO.PHonon: PhInput, Q2rInput, MatdynInput
 
+using ...QuantumESPRESSOExpress:
+    MpiexecConfig, QuantumESPRESSOConfig, PwxConfig, PhxConfig, Q2rxConfig, MatdynxConfig
+
 import Configurations: from_dict
-import Express.PhononWorkflow.Config: ExpandConfig
+import Express.PhononWorkflow.Config: StaticConfig, _update!
 
-function (::ExpandConfig)(template::Template)
-    inputs = map(
-        (:scf, :dfpt, :q2r, :disp), (PWInput, PhInput, Q2rInput, MatdynInput)
-    ) do field, T
-        str = read(getproperty(template, field), String)
-        parse(T, str)
+function _update!(conf, templates::Vector{String})
+    stage, T = if conf.calculation isa SelfConsistentField
+        1, PWInput
+    elseif conf.calculation isa DensityFunctionalPerturbationTheory
+        2, PhInput
+    elseif conf.calculation isa RealSpaceForceConstants
+        3, Q2rInput
+    elseif conf.calculation isa PhononDispersion
+        4, MatdynInput
+    elseif conf.calculation isa PhononDensityOfStates
+        4, MatdynInput
+    else
+        4, DynmatInput
     end
-    return (; zip((:scf, :dfpt, :q2r, :disp), inputs)...)
+    str = read(templates[stage], String)
+    conf.template = parse(T, str)
+    return conf
 end
 
 function from_dict(
-    ::Type{RuntimeConfig}, ::OptionField{:cli}, ::Type{<:CommandConfig}, dict
-)
-    return from_dict(RuntimeConfig, OptionField{:cli}(), QuantumESPRESSOConfig, dict)
-end
-function from_dict(
-    ::Type{RuntimeConfig}, ::OptionField{:cli}, ::Type{QuantumESPRESSOConfig}, dict
+    ::Type{<:StaticConfig}, ::OptionField{:cli}, ::Type{SoftwareConfig}, dict
 )
     return QuantumESPRESSOConfig(;
         mpi=get(dict, "mpi", MpiexecConfig()),

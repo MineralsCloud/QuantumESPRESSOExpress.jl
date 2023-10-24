@@ -1,30 +1,27 @@
 using AbInitioSoftwareBase: Setter
 using Dates: format, now
 using EquationsOfStateOfSolids: PressureEquation, Parameters, getparam, vsolve
-using ExpressBase: Scf, FixedCellOptimization, VariableCellOptimization
-using ExpressBase.Files: parentdir
+using ExpressBase: SelfConsistentField, FixedCellOptimization, VariableCellOptimization
 using QuantumESPRESSO.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: Pressure, Volume, @u_str
 using UnitfulAtomic
 
-import Express: RunCmd
-import Express.EquationOfStateWorkflow: MakeInput, FitEquationOfState
+import Express.EquationOfStateWorkflow: CreateInput, FitEquationOfState
 
-function (::MakeInput{T})(template::PWInput, args...) where {T}
-    return (customizer(args...) ∘ normalizer(T()))(template)
-end
+(::CreateInput{T})(template::PWInput, volume) where {T} =
+    (customizer(volume) ∘ normalizer(T()))(template)
 
 struct CalculationSetter{T} <: Setter
-    calc::T
+    calculation::T
 end
 function (x::CalculationSetter)(template::PWInput)
-    @set! template.control.calculation = if x.calc isa Scf  # Functions can be extended, not safe
+    @set! template.control.calculation = if x.calculation isa SelfConsistentField  # Functions can be extended, not safe
         "scf"
-    elseif x.calc isa FixedCellOptimization
+    elseif x.calculation isa FixedCellOptimization
         "relax"
-    elseif x.calc isa VariableCellOptimization
+    elseif x.calculation isa VariableCellOptimization
         "vc-relax"
     else
         throw(ArgumentError("this should never happen!"))
@@ -38,7 +35,8 @@ function (x::PseudoDirSetter)(template::PWInput)
     return template
 end
 
-normalizer(calc) = VerbositySetter("high") ∘ CalculationSetter(calc) ∘ PseudoDirSetter()
+normalizer(calculation) =
+    VerbositySetter("high") ∘ CalculationSetter(calculation) ∘ PseudoDirSetter()
 
 struct OutdirSetter <: Setter
     timefmt::String
@@ -57,32 +55,4 @@ function (x::OutdirSetter)(template::PWInput)
     return template
 end
 
-function customizer(volume::Volume, timefmt="Y-m-d_H:M:S")
-    return OutdirSetter(timefmt) ∘ VolumeSetter(volume)
-end
-function customizer(pressure::Pressure, eos::PressureEquation, timefmt="Y-m-d_H:M:S")
-    possible_volumes = vsolve(eos, pressure)
-    volume = if length(possible_volumes) > 1
-        _choose(possible_volumes, pressure, eos)
-    else
-        only(possible_volumes)
-    end
-    return OutdirSetter(timefmt) ∘ PressureSetter(pressure) ∘ VolumeSetter(volume)
-end
-function customizer(pressure::Pressure, params::Parameters, timefmt="Y-m-d_H:M:S")
-    return customizer(pressure, PressureEquation(params), timefmt)
-end
-
-function (x::RunCmd)(input, output=mktemp(parentdir(input))[1]; kwargs...)
-    return pw(input, output; kwargs...)
-end
-
-function _choose(possible_volumes, pressure, eos)
-    v0 = getparam(eos).v0
-    filtered = if pressure >= zero(pressure)  # If pressure is greater than zero,
-        filter(<=(v0), possible_volumes)  # the volume could only be smaller than `v0`.
-    else
-        filter(v -> 1 < v / v0 <= 3, possible_volumes)
-    end
-    return only(filtered)
-end
+customizer(volume::Volume) = OutdirSetter("Y-m-d_H:M:S") ∘ VolumeSetter(volume)
