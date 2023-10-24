@@ -15,7 +15,7 @@ ecutwfc = 55
 conv_thr=1.0d-10
 /
 ATOMIC_SPECIES
-Ge    72.64    Ge.pz-dn-kjpaw_psl.0.2.2.UPF
+Ge    72.64    Ge.pbe-dn-kjpaw_psl.1.0.0.UPF
 
 ATOMIC_POSITIONS (crystal)
 Ge    0.00000    0.00000    0.00000
