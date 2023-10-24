@@ -2,7 +2,14 @@ using AbInitioSoftwareBase: Setter
 using Dates: format, now
 using EquationsOfStateOfSolids: PressureEquation, Parameters, getparam, vsolve
 using ExpressBase: SelfConsistentField, FixedCellOptimization, VariableCellOptimization
-using QuantumESPRESSO.PWscf: PWInput, VerbositySetter, VolumeSetter, PressureSetter
+using QuantumESPRESSO.PWscf:
+    CellParametersCard,
+    AtomicPositionsCard,
+    PWInput,
+    VerbositySetter,
+    VolumeSetter,
+    PressureSetter,
+    CardSetter
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: Pressure, Volume, @u_str
@@ -10,8 +17,8 @@ using UnitfulAtomic
 
 import Express.EquationOfStateWorkflow: CreateInput, FitEquationOfState
 
-(::CreateInput{T})(template::PWInput, volume) where {T} =
-    (customizer(volume) ∘ normalizer(T()))(template)
+(::CreateInput{T})(template::PWInput, volume_or_cell) where {T} =
+    (customizer(volume_or_cell) ∘ normalizer(T()))(template)
 
 struct CalculationSetter{T} <: Setter
     calculation::T
@@ -56,3 +63,6 @@ function (x::OutdirSetter)(template::PWInput)
 end
 
 customizer(volume::Volume) = OutdirSetter("Y-m-d_H:M:S") ∘ VolumeSetter(volume)
+customizer(cell::Cell) =
+    OutdirSetter("Y-m-d_H:M:S") ∘ CardSetter(CellParametersCard(cell)) ∘
+    CardSetter(AtomicPositionsCard(cell))
