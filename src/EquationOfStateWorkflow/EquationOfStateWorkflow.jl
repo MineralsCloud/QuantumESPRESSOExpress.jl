@@ -2,7 +2,7 @@ module EquationOfStateWorkflow
 
 using AtomsIO: FlexibleSystem, save_system
 using CrystallographyBase: Cell, cellvolume
-using Express: Calculation
+using ExpressBase: Calculation
 using QuantumESPRESSO.PWscf:
     CellParametersCard,
     Preamble,
