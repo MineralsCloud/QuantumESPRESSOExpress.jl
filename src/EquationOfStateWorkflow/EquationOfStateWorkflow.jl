@@ -1,10 +1,11 @@
 module EquationOfStateWorkflow
 
-using AtomsIO: FlexibleSystem, save_system
-using CrystallographyBase: Cell, cellvolume
+using AtomsIO: Atom, periodic_system, save_system
+using CrystallographyBase: Lattice, Cell, basisvectors, cellvolume, eachatom
 using ExpressBase: Calculation
 using QuantumESPRESSO.PWscf:
     CellParametersCard,
+    AtomicPositionsCard,
     Preamble,
     parse_electrons_energies,
     parsefinal,
@@ -52,12 +53,19 @@ end
 
 function (::ExtractCell)(file)
     str = read(file, String)
-    card = parsefinal(CellParametersCard, str)
-    return Cell(card)
+    cell_parameters = parsefinal(CellParametersCard, str)
+    atomic_positions = parsefinal(AtomicPositionsCard, str)
+    return Cell(cell_parameters, atomic_positions)
 end
 
 function (action::SaveCell)(cell)
-    system = FlexibleSystem(cell)
+    lattice = Lattice(cell)
+    lattice *= 1u"bohr"
+    box = collect(basisvectors(lattice))
+    atomicpositions = map(eachatom(cell)) do (atom, position)
+        Atom(atom, lattice(position))
+    end
+    system = periodic_system(atomicpositions, box; fractional=true)
     return save_system(string(Calculation(action)) * ".cif", system)
 end
 
