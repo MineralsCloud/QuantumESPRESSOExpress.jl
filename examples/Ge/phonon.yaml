@@ -2,17 +2,15 @@ recipe: vdos
 cli:
   mpi:
     np: 16
-template:
-  scf: ../examples/Ge/template.in
-  dfpt: ../examples/Ge/ph.in
-  q2r: ../examples/Ge/q2r.in
-  disp: ../examples/Ge/disp.in
-save:
-  status: status.jls
-fixed:
+templates:
+  - template.in
+  - ph.in
+  - q2r.in
+  - disp.in
+at:
   pressures:
     unit: GPa
-    values:
+    numbers:
       - -5
       - -2
       - 0
