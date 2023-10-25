@@ -64,5 +64,5 @@ end
 
 customizer(volume::Volume) = OutdirSetter("Y-m-d_H:M:S") ∘ VolumeSetter(volume)
 customizer(cell::Cell) =
-    OutdirSetter("Y-m-d_H:M:S") ∘ CardSetter(CellParametersCard(cell)) ∘
+    OutdirSetter("Y-m-d_H:M:S") ∘ CardSetter(CellParametersCard(cell, :bohr)) ∘
     CardSetter(AtomicPositionsCard(cell))
