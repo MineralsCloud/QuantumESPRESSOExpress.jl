@@ -38,6 +38,11 @@ function (::CreateInput{RealSpaceForceConstants})(template::Q2rInput, previnp::P
     return normalizer(RealSpaceForceConstants(), previnp)(template)
 end
 function (::CreateInput{T})(
+    template::MatdynInput, set::Set
+) where {T<:Union{PhononDispersion,PhononDensityOfStates}}
+    return normalizer(T(), Tuple(set))(template)
+end
+function (::CreateInput{T})(
     template::MatdynInput, a::Q2rInput, b::PhInput
 ) where {T<:Union{PhononDispersion,PhononDensityOfStates}}
     return normalizer(T(), (a, b))(template)
