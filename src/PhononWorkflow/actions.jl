@@ -24,6 +24,8 @@ function parsecell(str)
     return tryparsefinal(AtomicPositionsCard, str), tryparsefinal(CellParametersCard, str)
 end
 
+(::CreateInput{SelfConsistentField})(file::AbstractString) =
+    parse(PWInput, read(file, String))
 function (::CreateInput{SelfConsistentField})(template::PWInput, args...)
     return (customizer(args...) ∘ normalizer(SelfConsistentField(), template))(template)
 end
