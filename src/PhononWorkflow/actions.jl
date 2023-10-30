@@ -13,7 +13,8 @@ using QuantumESPRESSO.PWscf:
     AtomicPositionsCard,
     CellParametersCardSetter,
     AtomicPositionsCardSetter,
-    tryparsefinal
+    eachatomicpositionscard,
+    eachcellparameterscard
 using QuantumESPRESSO.PHonon: PhInput, Q2rInput, MatdynInput, VerbositySetter, relayinfo
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
