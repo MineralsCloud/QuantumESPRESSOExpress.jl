@@ -21,7 +21,10 @@ using UnifiedPseudopotentialFormat  # To work with `download_potential`
 import Express.PhononWorkflow: CreateInput, RunCmd, parsecell
 
 function parsecell(str)
-    return tryparsefinal(AtomicPositionsCard, str), tryparsefinal(CellParametersCard, str)
+    str = read(file, String)
+    cell_parameters = last(eachcellparameterscard(str))
+    atomic_positions = last(eachatomicpositionscard(str))
+    return atomic_positions, cell_parameters
 end
 
 (::CreateInput{SelfConsistentField})(file::AbstractString) =
