@@ -17,7 +17,7 @@ end
 function (::ExtractData)(file)
     str = read(file, String)
     preamble = tryparse(Preamble, str)
-    energies = eachconvergedenergy(str)
+    energies = collect(eachconvergedenergy(str))
     if !isnothing(preamble) && !isempty(energies)
         return preamble.ecutwfc * u"Ry" => last(energies) * u"Ry"  # volume, energy
     else

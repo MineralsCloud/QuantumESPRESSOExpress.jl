@@ -21,7 +21,7 @@ end
 function (::ExtractData{SelfConsistentField})(file)
     str = read(file, String)
     preamble = tryparse(Preamble, str)
-    energies = eachconvergedenergy(str)
+    energies = collect(eachconvergedenergy(str))
     if !isnothing(preamble) && !isempty(energies)
         return preamble.omega * u"bohr^3" => last(energies) * u"Ry"  # volume, energy
     else
@@ -36,7 +36,8 @@ function (::ExtractData{VariableCellOptimization})(file)
     if !isoptimized(str)
         @warn "Cell is not completely optimized!"
     end
-    cards, energies = eachcellparameterscard(str), eachconvergedenergy(str)
+    cards, energies = collect(eachcellparameterscard(str)),
+    collect(eachconvergedenergy(str))
     if !isempty(cards) && !isempty(energies)
         lastcell, lastenergy = last(cards), last(energies)
         return cellvolume(lastcell) * u"bohr^3" => lastenergy * u"Ry"  # volume, energy
@@ -47,8 +48,8 @@ end
 
 function (::ExtractCell)(file)
     str = read(file, String)
-    cell_parameters = last(eachcellparameterscard(str))
-    atomic_positions = last(eachatomicpositionscard(str))
+    cell_parameters = last(collect(eachcellparameterscard(str)))
+    atomic_positions = last(collect(eachatomicpositionscard(str)))
     return Cell(cell_parameters, atomic_positions)
 end
 

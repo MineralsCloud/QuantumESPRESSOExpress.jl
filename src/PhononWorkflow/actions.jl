@@ -22,8 +22,8 @@ using UnifiedPseudopotentialFormat  # To work with `download_potential`
 import Express.PhononWorkflow: CreateInput, RunCmd, parsecell
 
 function parsecell(str)
-    cell_parameters = last(eachcellparameterscard(str))
-    atomic_positions = last(eachatomicpositionscard(str))
+    cell_parameters = last(collect(eachcellparameterscard(str)))
+    atomic_positions = last(collect(eachatomicpositionscard(str)))
     return atomic_positions, cell_parameters
 end
 
