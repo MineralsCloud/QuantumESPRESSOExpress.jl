@@ -13,7 +13,8 @@ using QuantumESPRESSO.PWscf:
     AtomicPositionsCard,
     CellParametersCardSetter,
     AtomicPositionsCardSetter,
-    tryparsefinal
+    eachatomicpositionscard,
+    eachcellparameterscard
 using QuantumESPRESSO.PHonon: PhInput, Q2rInput, MatdynInput, VerbositySetter, relayinfo
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
@@ -21,7 +22,9 @@ using UnifiedPseudopotentialFormat  # To work with `download_potential`
 import Express.PhononWorkflow: CreateInput, RunCmd, parsecell
 
 function parsecell(str)
-    return tryparsefinal(AtomicPositionsCard, str), tryparsefinal(CellParametersCard, str)
+    cell_parameters = last(collect(eachcellparameterscard(str)))
+    atomic_positions = last(collect(eachatomicpositionscard(str)))
+    return atomic_positions, cell_parameters
 end
 
 (::CreateInput{SelfConsistentField})(file::AbstractString) =

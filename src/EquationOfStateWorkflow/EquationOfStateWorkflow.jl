@@ -4,13 +4,7 @@ using AtomsIO: Atom, periodic_system, save_system
 using CrystallographyBase: Lattice, Cell, basisvectors, cellvolume, eachatom
 using ExpressBase: Calculation
 using QuantumESPRESSO.PWscf:
-    CellParametersCard,
-    AtomicPositionsCard,
-    Preamble,
-    parse_electrons_energies,
-    parsefinal,
-    isjobdone,
-    tryparsefinal
+    Preamble, isjobdone, isoptimized, eachcellparameterscard, eachconvergedenergy
 using Unitful: @u_str
 using UnitfulAtomic
 
@@ -27,12 +21,9 @@ end
 function (::ExtractData{SelfConsistentField})(file)
     str = read(file, String)
     preamble = tryparse(Preamble, str)
-    e = try
-        parse_electrons_energies(str, :converged)
-    catch
-    end
-    if preamble !== nothing && !isempty(e)
-        return preamble.omega * u"bohr^3" => e.ε[end] * u"Ry"  # volume, energy
+    energies = collect(eachconvergedenergy(str))
+    if !isnothing(preamble) && !isempty(energies)
+        return preamble.omega * u"bohr^3" => last(energies) * u"Ry"  # volume, energy
     else
         throw(DataExtractionFailed("no data found in file $file."))
     end
@@ -42,10 +33,14 @@ function (::ExtractData{VariableCellOptimization})(file)
     if !isjobdone(str)
         @warn "Job is not finished!"
     end
-    x = tryparsefinal(CellParametersCard, str)
-    if x !== nothing
-        return cellvolume(parsefinal(CellParametersCard, str)) * u"bohr^3" =>
-            parse_electrons_energies(str, :converged).ε[end] * u"Ry"  # volume, energy
+    if !isoptimized(str)
+        @warn "Cell is not completely optimized!"
+    end
+    cards, energies = collect(eachcellparameterscard(str)),
+    collect(eachconvergedenergy(str))
+    if !isempty(cards) && !isempty(energies)
+        lastcell, lastenergy = last(cards), last(energies)
+        return cellvolume(lastcell) * u"bohr^3" => lastenergy * u"Ry"  # volume, energy
     else
         throw(DataExtractionFailed("no data found in file $file."))
     end
@@ -53,8 +48,8 @@ end
 
 function (::ExtractCell)(file)
     str = read(file, String)
-    cell_parameters = parsefinal(CellParametersCard, str)
-    atomic_positions = parsefinal(AtomicPositionsCard, str)
+    cell_parameters = last(collect(eachcellparameterscard(str)))
+    atomic_positions = last(collect(eachatomicpositionscard(str)))
     return Cell(cell_parameters, atomic_positions)
 end
 

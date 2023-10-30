@@ -2,7 +2,7 @@ using AbInitioSoftwareBase: Setter
 using CrystallographyBase: MonkhorstPackGrid
 using Dates: format, now
 using QuantumESPRESSO.PWscf:
-    PWInput, KMeshCard, PWInput, VerbositySetter, Preamble, parse_electrons_energies
+    PWInput, KMeshCard, PWInput, VerbositySetter, Preamble, eachconvergedenergy
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: ustrip, @u_str
@@ -17,12 +17,9 @@ end
 function (::ExtractData)(file)
     str = read(file, String)
     preamble = tryparse(Preamble, str)
-    e = try
-        parse_electrons_energies(str, :converged)
-    catch
-    end
-    if preamble !== nothing && !isempty(e)
-        return preamble.ecutwfc * u"Ry" => e.ε[end] * u"Ry"  # volume, energy
+    energies = collect(eachconvergedenergy(str))
+    if !isnothing(preamble) && !isempty(energies)
+        return preamble.ecutwfc * u"Ry" => last(energies) * u"Ry"  # volume, energy
     else
         throw(DataExtractionFailed("no data found in file $file."))
     end
