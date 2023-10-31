@@ -4,7 +4,12 @@ using AtomsIO: Atom, periodic_system, save_system
 using CrystallographyBase: Lattice, Cell, basisvectors, cellvolume, eachatom
 using ExpressBase: Calculation
 using QuantumESPRESSO.PWscf:
-    Preamble, isjobdone, isoptimized, eachcellparameterscard, eachconvergedenergy
+    Preamble,
+    isjobdone,
+    isoptimized,
+    eachcellparameterscard,
+    eachatomicpositionscard,
+    eachconvergedenergy
 using Unitful: @u_str
 using UnitfulAtomic
 
@@ -23,7 +28,7 @@ function (::ExtractData{SelfConsistentField})(file)
     preamble = tryparse(Preamble, str)
     energies = collect(eachconvergedenergy(str))
     if !isnothing(preamble) && !isempty(energies)
-        return preamble.omega * u"bohr^3" => last(energies) * u"Ry"  # volume, energy
+        return preamble.omega * u"bohr^3" => last(energies).total * u"Ry"  # volume, energy
     else
         throw(DataExtractionFailed("no data found in file $file."))
     end
@@ -39,7 +44,7 @@ function (::ExtractData{VariableCellOptimization})(file)
     cards, energies = collect(eachcellparameterscard(str)),
     collect(eachconvergedenergy(str))
     if !isempty(cards) && !isempty(energies)
-        lastcell, lastenergy = last(cards), last(energies)
+        lastcell, lastenergy = last(cards), last(energies).total
         return cellvolume(lastcell) * u"bohr^3" => lastenergy * u"Ry"  # volume, energy
     else
         throw(DataExtractionFailed("no data found in file $file."))
