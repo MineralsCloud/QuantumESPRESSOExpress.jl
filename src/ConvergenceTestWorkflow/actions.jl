@@ -19,7 +19,7 @@ function (::ExtractData)(file)
     preamble = tryparse(Preamble, str)
     energies = collect(eachconvergedenergy(str))
     if !isnothing(preamble) && !isempty(energies)
-        return preamble.ecutwfc * u"Ry" => last(energies) * u"Ry"  # volume, energy
+        return preamble.ecutwfc * u"Ry" => last(energies).total * u"Ry"  # volume, energy
     else
         throw(DataExtractionFailed("no data found in file $file."))
     end
