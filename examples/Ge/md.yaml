@@ -1,0 +1,17 @@
+recipe: vc-md
+cli:
+  mpi:
+    np: 16
+template: md.in
+at:
+  pressures:
+    unit: GPa
+    numbers:
+      - -5
+      - -2
+      - 0
+      - 5
+      - 10
+      - 15
+      - 17
+      - 20
