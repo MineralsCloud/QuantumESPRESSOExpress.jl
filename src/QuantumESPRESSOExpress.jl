@@ -3,7 +3,8 @@ module QuantumESPRESSOExpress
 using AbInitioSoftwareBase: AbInitioSoftware
 using ExpressBase:
     SelfConsistentField,
-    VariableCellOptimization,
+    MolecularDynamics,
+    StructuralOptimization,
     LinearResponse,
     FourierTransform,
     PhononDispersion,
@@ -31,19 +32,20 @@ function (x::RunCmd{SelfConsistentField})(
 )
     return pw(input, output; kwargs...)
 end
-function (x::RunCmd{VariableCellOptimization})(
+function (x::RunCmd{<:MolecularDynamics})(
     input, output=mktemp(parentdir(input))[1]; kwargs...
 )
     return pw(input, output; kwargs...)
 end
-function (x::RunCmd{LinearResponse})(
+function (x::RunCmd{<:StructuralOptimization})(
     input, output=mktemp(parentdir(input))[1]; kwargs...
 )
+    return pw(input, output; kwargs...)
+end
+function (x::RunCmd{LinearResponse})(input, output=mktemp(parentdir(input))[1]; kwargs...)
     return ph(input, output; kwargs...)
 end
-function (x::RunCmd{FourierTransform})(
-    input, output=mktemp(parentdir(input))[1]; kwargs...
-)
+function (x::RunCmd{FourierTransform})(input, output=mktemp(parentdir(input))[1]; kwargs...)
     return q2r(input, output; kwargs...)
 end
 function (x::RunCmd{<:Union{PhononDensityOfStates,PhononDispersion}})(
