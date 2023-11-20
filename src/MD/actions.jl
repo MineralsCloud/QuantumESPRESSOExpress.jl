@@ -3,7 +3,8 @@ using CrystallographyBase: Cell
 using Dates: format, now
 using EquationsOfStateOfSolids: PressureEquation, Parameters, getparam, vsolve
 using ExpressBase: IonDynamics, VariableCellMolecularDynamics
-using QuantumESPRESSO.PWscf: PWInput, VerbositySetter
+using QuantumESPRESSO.PWscf:
+    PWInput, VerbositySetter, eachatomicpositionscard, eachcellparameterscard
 using Accessors: @reset
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: Pressure, Volume, @u_str
