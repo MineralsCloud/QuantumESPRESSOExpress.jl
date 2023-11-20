@@ -26,8 +26,8 @@ using UnitfulAtomic
 import Express.EquationOfState:
     CreateInput, FitEquationOfState, ExtractData, ExtractCell, SaveCell
 
-(::CreateInput{T})(template::PWInput, volume_or_cell) where {T} =
-    (customizer(volume_or_cell) ∘ normalizer(T()))(template)
+(::CreateInput{T})(template::PWInput, arg) where {T} =
+    (customizer(arg) ∘ normalizer(T()))(template)
 
 struct CalculationSetter{T} <: Setter
     calculation::T
@@ -71,7 +71,9 @@ function (x::OutdirSetter)(template::PWInput)
     return template
 end
 
-customizer(volume::Volume) = OutdirSetter("Y-m-d_H:M:S") ∘ VolumeSetter(volume)
+customizer(volume_pressure::Tuple) =
+    OutdirSetter("Y-m-d_H:M:S") ∘ PressureSetter(volume_pressure[2]) ∘
+    VolumeSetter(volume_pressure[1])
 customizer(cell::Cell) =
     OutdirSetter("Y-m-d_H:M:S") ∘ CardSetter(CellParametersCard(cell, :bohr)) ∘
     CardSetter(AtomicPositionsCard(cell))
