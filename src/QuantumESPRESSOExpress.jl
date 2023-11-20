@@ -22,6 +22,7 @@ currentsoftware() = QE()
 
 include("SoftwareConfig.jl")
 include("ConvergenceTest/ConvergenceTest.jl")
+include("MD/MD.jl")
 include("EquationOfState/EquationOfState.jl")
 include("Phonon/Phonon.jl")
 
