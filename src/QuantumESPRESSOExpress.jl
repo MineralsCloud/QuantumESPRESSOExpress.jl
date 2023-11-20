@@ -23,7 +23,7 @@ currentsoftware() = QE()
 include("SoftwareConfig.jl")
 include("ConvergenceTest/ConvergenceTest.jl")
 include("EquationOfState/EquationOfState.jl")
-include("PhononWorkflow/PhononWorkflow.jl")
+include("Phonon/Phonon.jl")
 
 function (x::RunCmd{SelfConsistentField})(
     input, output=mktemp(parentdir(input))[1]; kwargs...

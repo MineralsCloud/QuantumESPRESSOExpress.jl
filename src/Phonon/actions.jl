@@ -19,7 +19,7 @@ using QuantumESPRESSO.PHonon: PhInput, Q2rInput, MatdynInput, VerbositySetter, r
 using Setfield: @set!
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 
-import Express.PhononWorkflow: CreateInput, RunCmd, parsecell
+import Express.Phonon: CreateInput, RunCmd, parsecell
 
 function parsecell(str)
     cell_parameters = last(collect(eachcellparameterscard(str)))

@@ -3,5 +3,5 @@ using Test
 
 @testset "QuantumESPRESSOExpress.jl" begin
     include("EquationOfState.jl")
-    include("PhononWorkflow.jl")
+    include("Phonon.jl")
 end

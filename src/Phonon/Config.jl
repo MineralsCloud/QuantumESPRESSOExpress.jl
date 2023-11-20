@@ -1,7 +1,7 @@
 module Config
 
 using Configurations: OptionField
-using Express.PhononWorkflow.Config: StaticConfig
+using Express.Phonon.Config: StaticConfig
 using ExpressBase:
     SelfConsistentField,
     DensityFunctionalPerturbationTheory,
@@ -16,7 +16,7 @@ using ...QuantumESPRESSOExpress:
     MpiexecConfig, QuantumESPRESSOConfig, PwxConfig, PhxConfig, Q2rxConfig, MatdynxConfig
 
 import Configurations: from_dict
-import Express.PhononWorkflow.Config: StaticConfig, _update!
+import Express.Phonon.Config: StaticConfig, _update!
 
 function _update!(conf, templates::Vector{String})
     stage, T = if conf.calculation isa SelfConsistentField

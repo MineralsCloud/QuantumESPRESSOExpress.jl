@@ -1,9 +1,9 @@
-module PhononWorkflow
+module Phonon
 
 using AbInitioSoftwareBase: load
-using Express.PhononWorkflow: SCF, DFPT
-using Express.PhononWorkflow.Config: ExpandConfig
-using QuantumESPRESSOExpress.PhononWorkflow
+using Express.Phonon: SCF, DFPT
+using Express.Phonon.Config: ExpandConfig
+using QuantumESPRESSOExpress.Phonon
 using QuantumESPRESSO.PHonon:
     PhNamelist, Q2rNamelist, MatdynNamelist, PhInput, Q2rInput, MatdynInput
 using Test
