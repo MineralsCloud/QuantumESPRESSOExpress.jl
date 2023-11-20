@@ -8,7 +8,7 @@ using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: ustrip, @u_str
 using UnitfulAtomic
 
-import Express.ConvergenceTestWorkflow: CreateInput, ExtractData
+import Express.ConvergenceTest: CreateInput, ExtractData
 
 struct DataExtractionFailed <: Exception
     msg::String

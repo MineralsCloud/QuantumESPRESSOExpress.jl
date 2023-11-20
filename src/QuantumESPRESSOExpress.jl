@@ -21,7 +21,7 @@ const QE = QuantumESPRESSO
 currentsoftware() = QE()
 
 include("SoftwareConfig.jl")
-include("ConvergenceTestWorkflow/ConvergenceTestWorkflow.jl")
+include("ConvergenceTest/ConvergenceTest.jl")
 include("EquationOfStateWorkflow/EquationOfStateWorkflow.jl")
 include("PhononWorkflow/PhononWorkflow.jl")
 
