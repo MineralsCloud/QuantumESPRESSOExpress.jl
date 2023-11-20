@@ -3,8 +3,8 @@ using Dates: format, now
 using ExpressBase:
     Calculation,
     SelfConsistentField,
-    DensityFunctionalPerturbationTheory,
-    RealSpaceForceConstants,
+    LinearResponse,
+    FourierTransform,
     PhononDispersion,
     PhononDensityOfStates
 using QuantumESPRESSO.PWscf:
@@ -32,13 +32,11 @@ end
 function (::CreateInput{SelfConsistentField})(template::PWInput, args...)
     return (customizer(args...) ∘ normalizer(SelfConsistentField(), template))(template)
 end
-function (::CreateInput{DensityFunctionalPerturbationTheory})(
-    template::PhInput, previnp::PWInput
-)
-    return normalizer(DensityFunctionalPerturbationTheory(), previnp)(template)
+function (::CreateInput{LinearResponse})(template::PhInput, previnp::PWInput)
+    return normalizer(LinearResponse(), previnp)(template)
 end
-function (::CreateInput{RealSpaceForceConstants})(template::Q2rInput, previnp::PhInput)
-    return normalizer(RealSpaceForceConstants(), previnp)(template)
+function (::CreateInput{FourierTransform})(template::Q2rInput, previnp::PhInput)
+    return normalizer(FourierTransform(), previnp)(template)
 end
 function (::CreateInput{T})(
     template::MatdynInput, set::Set
@@ -54,7 +52,7 @@ end
     action(template, b, a)
 
 struct CalculationSetter <: Setter
-    calc::Union{SelfConsistentField,DensityFunctionalPerturbationTheory}
+    calc::Union{SelfConsistentField,LinearResponse}
 end
 function (::CalculationSetter)(template::PWInput)
     @reset template.control.calculation = "scf"
@@ -95,10 +93,10 @@ function normalizer(::SelfConsistentField, args...)
     return VerbositySetter("high") ∘ CalculationSetter(SelfConsistentField()) ∘
            PseudoDirSetter()
 end
-function normalizer(::DensityFunctionalPerturbationTheory, input::PWInput)
+function normalizer(::LinearResponse, input::PWInput)
     return RelayArgumentsSetter(input) ∘ VerbositySetter("high") ∘ RecoverySetter()
 end
-normalizer(::RealSpaceForceConstants, input::PhInput) = RelayArgumentsSetter(input)
+normalizer(::FourierTransform, input::PhInput) = RelayArgumentsSetter(input)
 function normalizer(
     ::PhononDispersion, inputs::Union{Tuple{Q2rInput,PhInput},Tuple{PhInput,Q2rInput}}
 )

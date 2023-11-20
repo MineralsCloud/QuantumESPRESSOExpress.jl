@@ -4,8 +4,8 @@ using Configurations: OptionField
 using Express.Phonon.Config: StaticConfig
 using ExpressBase:
     SelfConsistentField,
-    DensityFunctionalPerturbationTheory,
-    RealSpaceForceConstants,
+    LinearResponse,
+    FourierTransform,
     PhononDispersion,
     PhononDensityOfStates
 using ExpressBase.Config: SoftwareConfig
@@ -21,9 +21,9 @@ import Express.Phonon.Config: StaticConfig, _update!
 function _update!(conf, templates::Vector{String})
     stage, T = if conf.calculation isa SelfConsistentField
         1, PWInput
-    elseif conf.calculation isa DensityFunctionalPerturbationTheory
+    elseif conf.calculation isa LinearResponse
         2, PhInput
-    elseif conf.calculation isa RealSpaceForceConstants
+    elseif conf.calculation isa FourierTransform
         3, Q2rInput
     elseif conf.calculation isa PhononDispersion
         4, MatdynInput

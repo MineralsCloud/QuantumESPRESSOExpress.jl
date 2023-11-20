@@ -4,8 +4,8 @@ using AbInitioSoftwareBase: AbInitioSoftware
 using ExpressBase:
     SelfConsistentField,
     VariableCellOptimization,
-    DensityFunctionalPerturbationTheory,
-    RealSpaceForceConstants,
+    LinearResponse,
+    FourierTransform,
     PhononDispersion,
     PhononDensityOfStates
 using ExpressBase.Files: parentdir
@@ -35,12 +35,12 @@ function (x::RunCmd{VariableCellOptimization})(
 )
     return pw(input, output; kwargs...)
 end
-function (x::RunCmd{DensityFunctionalPerturbationTheory})(
+function (x::RunCmd{LinearResponse})(
     input, output=mktemp(parentdir(input))[1]; kwargs...
 )
     return ph(input, output; kwargs...)
 end
-function (x::RunCmd{RealSpaceForceConstants})(
+function (x::RunCmd{FourierTransform})(
     input, output=mktemp(parentdir(input))[1]; kwargs...
 )
     return q2r(input, output; kwargs...)
