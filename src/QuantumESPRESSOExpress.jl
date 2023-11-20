@@ -22,7 +22,7 @@ currentsoftware() = QE()
 
 include("SoftwareConfig.jl")
 include("ConvergenceTest/ConvergenceTest.jl")
-include("EquationOfStateWorkflow/EquationOfStateWorkflow.jl")
+include("EquationOfState/EquationOfState.jl")
 include("PhononWorkflow/PhononWorkflow.jl")
 
 function (x::RunCmd{SelfConsistentField})(

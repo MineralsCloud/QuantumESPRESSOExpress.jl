@@ -7,7 +7,7 @@ using QuantumESPRESSO.PWscf: PWInput
 using ...QuantumESPRESSOExpress: QuantumESPRESSOConfig, MpiexecConfig, PwxConfig
 
 import Configurations: from_dict
-import Express.EquationOfStateWorkflow.Config: StaticConfig, _update!
+import Express.EquationOfState.Config: StaticConfig, _update!
 
 function _update!(conf, template::AbstractString)
     str = read(expanduser(template), String)

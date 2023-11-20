@@ -1,11 +1,11 @@
-module EquationOfStateWorkflow
+module EquationOfState
 
 using AbInitioSoftwareBase: load
 using CrystallographyBase: MonkhorstPackGrid
 using EquationsOfStateOfSolids: BirchMurnaghan3rd
-using Express.EquationOfStateWorkflow: SCF
-using Express.EquationOfStateWorkflow.Config: ExpandConfig
-using QuantumESPRESSOExpress.EquationOfStateWorkflow
+using Express.EquationOfState: SCF
+using Express.EquationOfState.Config: ExpandConfig
+using QuantumESPRESSOExpress.EquationOfState
 using QuantumESPRESSO.PWscf
 using Test
 using Unitful: @u_str

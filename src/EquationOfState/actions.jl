@@ -15,7 +15,7 @@ using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: Pressure, Volume, @u_str
 using UnitfulAtomic
 
-import Express.EquationOfStateWorkflow: CreateInput, FitEquationOfState
+import Express.EquationOfState: CreateInput, FitEquationOfState
 
 (::CreateInput{T})(template::PWInput, volume_or_cell) where {T} =
     (customizer(volume_or_cell) ∘ normalizer(T()))(template)

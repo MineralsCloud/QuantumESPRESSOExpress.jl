@@ -1,4 +1,4 @@
-module EquationOfStateWorkflow
+module EquationOfState
 
 using AtomsIO: Atom, periodic_system, save_system
 using CrystallographyBase: Lattice, Cell, basisvectors, cellvolume, eachatom
@@ -13,7 +13,7 @@ using QuantumESPRESSO.PWscf:
 using Unitful: @u_str
 using UnitfulAtomic
 
-import Express.EquationOfStateWorkflow: ExtractData, ExtractCell, SaveCell
+import Express.EquationOfState: ExtractData, ExtractCell, SaveCell
 
 include("Config.jl")
 include("actions.jl")

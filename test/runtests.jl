@@ -2,6 +2,6 @@ using QuantumESPRESSOExpress
 using Test
 
 @testset "QuantumESPRESSOExpress.jl" begin
-    include("EquationOfStateWorkflow.jl")
+    include("EquationOfState.jl")
     include("PhononWorkflow.jl")
 end
