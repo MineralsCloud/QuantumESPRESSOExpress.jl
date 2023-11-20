@@ -1,4 +1,5 @@
 using AbInitioSoftwareBase: Setter
+using CrystallographyBase: Cell
 using Dates: format, now
 using EquationsOfStateOfSolids: PressureEquation, Parameters, getparam, vsolve
 using ExpressBase: IonDynamics, VariableCellMolecularDynamics
@@ -8,7 +9,7 @@ using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: Pressure, Volume, @u_str
 using UnitfulAtomic
 
-import Express.EquationOfState: CreateInput, FitEquationOfState
+import Express.MD: CreateInput, ExtractCell
 
 (::CreateInput{T})(template::PWInput, cell) where {T} =
     (customizer(cell) ∘ normalizer(T()))(template)
