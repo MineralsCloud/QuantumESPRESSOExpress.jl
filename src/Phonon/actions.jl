@@ -16,7 +16,7 @@ using QuantumESPRESSO.PWscf:
     eachatomicpositionscard,
     eachcellparameterscard
 using QuantumESPRESSO.PHonon: PhInput, Q2rInput, MatdynInput, VerbositySetter, relayinfo
-using Setfield: @set!
+using Accessors: @reset
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 
 import Express.Phonon: CreateInput, RunCmd, parsecell
@@ -57,7 +57,7 @@ struct CalculationSetter <: Setter
     calc::Union{SelfConsistentField,DensityFunctionalPerturbationTheory}
 end
 function (::CalculationSetter)(template::PWInput)
-    @set! template.control.calculation = "scf"
+    @reset template.control.calculation = "scf"
     return template
 end
 
@@ -75,19 +75,19 @@ struct DosSetter <: Setter
     dos::Bool
 end
 function (x::DosSetter)(template::MatdynInput)
-    @set! template.input.dos = x.dos
+    @reset template.input.dos = x.dos
     return template
 end
 
 struct RecoverySetter <: Setter end
 function (::RecoverySetter)(template::PhInput)
-    @set! template.inputph.recover = true
+    @reset template.inputph.recover = true
     return template
 end
 
 struct PseudoDirSetter <: Setter end
 function (x::PseudoDirSetter)(template::PWInput)
-    @set! template.control.pseudo_dir = abspath(template.control.pseudo_dir)
+    @reset template.control.pseudo_dir = abspath(template.control.pseudo_dir)
     return template
 end
 
@@ -115,7 +115,7 @@ struct OutdirSetter <: Setter
 end
 function (x::OutdirSetter)(template::PWInput)
     # Set `outdir` to `outdir` + a subdirectory.
-    @set! template.control.outdir = abspath(
+    @reset template.control.outdir = abspath(
         joinpath(
             template.control.outdir,
             join((template.control.prefix, format(now(), x.timefmt), rand(UInt)), '_'),

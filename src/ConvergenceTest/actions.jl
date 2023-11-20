@@ -3,7 +3,7 @@ using CrystallographyBase: MonkhorstPackGrid
 using Dates: format, now
 using QuantumESPRESSO.PWscf:
     PWInput, KMeshCard, PWInput, VerbositySetter, Preamble, eachconvergedenergy
-using Setfield: @set!
+using Accessors: @reset
 using UnifiedPseudopotentialFormat  # To work with `download_potential`
 using Unitful: ustrip, @u_str
 using UnitfulAtomic
@@ -31,13 +31,13 @@ struct CutoffEnergySetter <: Setter
     wfc::Number
 end
 function (x::CutoffEnergySetter)(template::PWInput)
-    @set! template.system.ecutwfc = ustrip(u"Ry", x.wfc)
+    @reset template.system.ecutwfc = ustrip(u"Ry", x.wfc)
     return template
 end
 
 struct PseudoDirSetter <: Setter end
 function (x::PseudoDirSetter)(template::PWInput)
-    @set! template.control.pseudo_dir = abspath(template.control.pseudo_dir)
+    @reset template.control.pseudo_dir = abspath(template.control.pseudo_dir)
     return template
 end
 
@@ -48,7 +48,7 @@ struct OutdirSetter <: Setter
 end
 function (x::OutdirSetter)(template::PWInput)
     # Set `outdir` to `outdir` + a subdirectory.
-    @set! template.control.outdir = abspath(
+    @reset template.control.outdir = abspath(
         joinpath(
             template.control.outdir,
             join((template.control.prefix, format(now(), x.timefmt), rand(UInt)), '_'),
@@ -65,7 +65,7 @@ struct MonkhorstPackGridSetter <: Setter
     shift::Vector{Int}
 end
 function (x::MonkhorstPackGridSetter)(template::PWInput)
-    @set! template.k_points = KMeshCard(MonkhorstPackGrid(x.mesh, x.shift))
+    @reset template.k_points = KMeshCard(MonkhorstPackGrid(x.mesh, x.shift))
     return template
 end
 
