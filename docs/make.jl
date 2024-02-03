@@ -1,7 +1,9 @@
 using QuantumESPRESSOExpress
 using Documenter
 
-DocMeta.setdocmeta!(QuantumESPRESSOExpress, :DocTestSetup, :(using QuantumESPRESSOExpress); recursive=true)
+DocMeta.setdocmeta!(
+    QuantumESPRESSOExpress, :DocTestSetup, :(using QuantumESPRESSOExpress); recursive=true
+)
 
 makedocs(;
     modules=[QuantumESPRESSOExpress],
@@ -16,9 +18,7 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
-        "Manual" => [
-            "Installation guide" => "installation.md",
-        ],
+        "Manual" => ["Installation guide" => "installation.md"],
         # "API Reference" => "public.md",
         "Developer Docs" => [
             "Contributing" => "developers/contributing.md",
@@ -29,7 +29,4 @@ makedocs(;
     ],
 )
 
-deploydocs(;
-    repo="github.com/MineralsCloud/QuantumESPRESSOExpress.jl",
-    devbranch="main",
-)
+deploydocs(; repo="github.com/MineralsCloud/QuantumESPRESSOExpress.jl", devbranch="main")
