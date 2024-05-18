@@ -16,33 +16,33 @@ using UnitfulAtomic
     @test config.template.dfpt == PhInput(
         "Phonon",
         PhNamelist(;
-            verbosity = "high",
-            fildyn = "dyn",
-            outdir = "./tmp",
-            prefix = "Ge",
-            ldisp = true,
-            tr2_ph = 1e-14,
-            nq1 = 2,
-            nq2 = 2,
-            nq3 = 2,
-            amass = [72.64],
+            verbosity="high",
+            fildyn="dyn",
+            outdir="./tmp",
+            prefix="Ge",
+            ldisp=true,
+            tr2_ph=1e-14,
+            nq1=2,
+            nq2=2,
+            nq3=2,
+            amass=[72.64],
         ),
         nothing,
     )
     @test config.template.q2r ==
-          Q2rInput(Q2rNamelist(; fildyn = "dyn", zasr = "crystal", flfrc = "fc.out"))
+        Q2rInput(Q2rNamelist(; fildyn="dyn", zasr="crystal", flfrc="fc.out"))
     @test config.template.disp == MatdynInput(
         MatdynNamelist(;
-            asr = "crystal",
-            amass = [72.64],
-            flfrc = "fc.out",
-            flfrq = "freq.out",
-            flvec = "modes.out",
-            dos = true,
-            q_in_band_form = false,
-            nk1 = 8,
-            nk2 = 8,
-            nk3 = 8,
+            asr="crystal",
+            amass=[72.64],
+            flfrc="fc.out",
+            flfrq="freq.out",
+            flvec="modes.out",
+            dos=true,
+            q_in_band_form=false,
+            nk1=8,
+            nk2=8,
+            nk3=8,
         ),
     )
     @test config.fixed == [-5, -2, 0, 5, 10, 15, 17, 20] * u"GPa"
